@@ -1,5 +1,34 @@
 = repocache
 
-This project is not ready yet! Please don't use for real!
+[red] *This project is not ready yet! Please don't use for real!*
 
 http, p2 and Maven repository cache implementation.
+
+== Goal
+
+To create a local repository cache of various repositories that are used when installing development environment or doing auto-builds. The local cache created is used for these purposes:
+
+ * Speed up download time and reduce bandwith - using the cache which is on the same computer or in the same office.
+ * Make it possible to work offline with tools that are designed online only.
+ * Make past builds reproducible even if the Internet has forgot some of the old packaged. For projects where binary reproducibility is a requirement.
+
+== Implementation details
+
+=== Not transparent cache
+
+All programs have to be directed to use this cache instead of its original repository URLs. Examples: eclipse installer, Maven, etc.
+
+=== GIT backend
+
+All files accessed through the cache are first stored in a git repository then served to the client. This has the following features:
+
+ * It is never possible to return anything by the server not in the cache.
+ * Going back to a past state is possible.
+
+=== Files are just plain files within the git repo
+
+The resulted git repo can be used as a repository backend even using a simple HTTP server or using "file:" protocol. After downloading all the dependencies the repocache server is not required to be used (but it is possible).
+
+=== Merge feature
+
+Automatic merge feature for p2 repos is planned.
