@@ -1,0 +1,5 @@
+= repocache
+
+This project is not ready yet! Please don't use for real!
+
+http, p2 and Maven repository cache implementation.
