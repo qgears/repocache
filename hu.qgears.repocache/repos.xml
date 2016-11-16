@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<repos>
+	<mavenrepo name="maven-central">
+		<remote>http://repo1.maven.org/maven2/</remote>
+	</mavenrepo>
+	<mavenrepo name="maven-inquery">
+		<remote>http://repo.eclipse.org/content/groups/emf-incquery/</remote>
+	</mavenrepo>
+	<mavenrepo name="maven-rcptt-rel">
+		<remote>http://repo.eclipse.org/content/repositories/rcptt-releases/</remote>
+	</mavenrepo>
+	<mavenrepo name="maven-rcptt-snap">
+		<remote>http://repo.eclipse.org/content/repositories/rcptt-snapshots/</remote>
+	</mavenrepo>
+	<mavenrepo name="maven-jenkins">
+		<remote>http://repo.jenkins-ci.org/public/</remote>
+	</mavenrepo>
+	<httprepo name="oomphneon">
+		<remote>http://mirror.switch.ch/eclipse/oomph/epp/neon/</remote>
+	</httprepo>
+	<p2repo name="qgears-opensource">
+		<file>opensource/updates</file>
+		<primaryHost>http://qgears.com/</primaryHost>
+		<selectedMirror>http://qgears.com/</selectedMirror>
+	</p2repo>
+	<p2repo name="eclipse-neon">
+		<file>technology/epp/packages/neon</file>
+		<primaryHost>http://download.eclipse.org/</primaryHost>
+		<selectedMirror>http://mirror.tspu.ru/eclipse/</selectedMirror>
+	</p2repo>
+	<p2repo name="eclipse-release-neon-201610111000">
+		<file>releases/neon/201610111000</file>
+		<primaryHost>http://download.eclipse.org/</primaryHost>
+		<selectedMirror>http://mirror.tspu.ru/eclipse/</selectedMirror>
+	</p2repo>
+	<p2repo name="oomph-updates-milestone-latest">
+		<file>oomph/updates/milestone/latest</file>
+		<primaryHost>http://download.eclipse.org/</primaryHost>
+		<selectedMirror>http://mirror.tspu.ru/eclipse/</selectedMirror>
+	</p2repo>
+</repos>

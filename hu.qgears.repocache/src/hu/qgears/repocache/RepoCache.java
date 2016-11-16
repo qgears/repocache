@@ -71,6 +71,7 @@ public class RepoCache {
 				}
 			}
 		}
+		ReadConfig.getInstance();
 		plugins.add(new RepoPluginP2());
 		plugins.add(new RepoPluginHttp());
 		plugins.add(new RepoPluginMaven());

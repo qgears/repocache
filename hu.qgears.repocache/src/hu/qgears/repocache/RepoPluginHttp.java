@@ -1,7 +1,6 @@
 package hu.qgears.repocache;
 
 import java.io.IOException;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.TreeMap;
 
@@ -11,17 +10,15 @@ import org.slf4j.LoggerFactory;
 public class RepoPluginHttp extends AbstractRepoPlugin
 {
 	private Logger log=LoggerFactory.getLogger(getClass());
-	private Map<String, String> httprepos = new HashMap<>();
+
 	public RepoPluginHttp() {
-		// TODO parameter aliases
-		httprepos.put("oomphneon", "http://mirror.switch.ch/eclipse/oomph/epp/neon/");
 	}
 
 	public String getPath() {
 		return "http";
 	}
 	public Map<String, String> getHttpRepos() {
-		return new TreeMap<>(httprepos);
+		return new TreeMap<>(ReadConfig.getInstance().getHttprepos());
 	}
 	@Override
 	public QueryResponse getOnlineResponse(Path localPath, ClientQuery q, QueryResponse cachedContent, boolean netAllowed) throws IOException {
@@ -29,7 +26,7 @@ public class RepoPluginHttp extends AbstractRepoPlugin
 		{
 			return new HttpListing(q, this).generate();
 		}
-		for (Map.Entry<String, String> entry : httprepos.entrySet()) {
+		for (Map.Entry<String, String> entry : ReadConfig.getInstance().getHttprepos().entrySet()) {
 			if (localPath.pieces.get(0).equals(entry.getKey())) {
 				Path ref = new Path(localPath).remove(0);
 				String httpPath = entry.getValue() + ref.toStringPath();

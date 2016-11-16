@@ -1,7 +1,6 @@
 package hu.qgears.repocache;
 
 import java.io.IOException;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.TreeMap;
 
@@ -11,17 +10,15 @@ import org.slf4j.LoggerFactory;
 public class RepoPluginMaven extends AbstractRepoPlugin
 {
 	private Logger log=LoggerFactory.getLogger(getClass());
-	private Map<String, String> mvnrepos = new HashMap<>();
+
 	public RepoPluginMaven() {
-		// TODO parameter aliases
-		mvnrepos.put("maven-central", "http://repo1.maven.org/maven2/");
 	}
 
 	public String getPath() {
 		return "maven";
 	}
 	public Map<String, String> getMavenRepos() {
-		return new TreeMap<>(mvnrepos);
+		return new TreeMap<>(ReadConfig.getInstance().getMvnrepos());
 	}
 	@Override
 	public QueryResponse getOnlineResponse(Path localPath, ClientQuery q, QueryResponse cachedContent, boolean netAllowed) throws IOException {
@@ -29,7 +26,7 @@ public class RepoPluginMaven extends AbstractRepoPlugin
 		{
 			return new MavenListing(q, this).generate();
 		}
-		for (Map.Entry<String, String> entry : mvnrepos.entrySet()) {
+		for (Map.Entry<String, String> entry : ReadConfig.getInstance().getMvnrepos().entrySet()) {
 			if (localPath.pieces.get(0).equals(entry.getKey())) {
 				Path ref = new Path(localPath).remove(0);
 				String httpPath = entry.getValue() + ref.toStringPath();

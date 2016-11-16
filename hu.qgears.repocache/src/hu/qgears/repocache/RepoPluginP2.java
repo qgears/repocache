@@ -3,7 +3,6 @@ package hu.qgears.repocache;
 import java.io.ByteArrayInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.TreeMap;
 
@@ -16,20 +15,15 @@ import org.slf4j.LoggerFactory;
 public class RepoPluginP2 extends AbstractRepoPlugin
 {
 	private Logger log=LoggerFactory.getLogger(RepoPluginP2.class);
-	private Map<String, RepoConfig> p2repos = new HashMap<>();
+
 	public RepoPluginP2() {
-		// TODO parameter aliases
-		p2repos.put("qgears-opensource", new RepoConfig("opensource/updates", "http://qgears.com/", "http://qgears.com/"));
-		p2repos.put("eclipse-neon", new RepoConfig("technology/epp/packages/neon", "http://download.eclipse.org/", "http://mirror.tspu.ru/eclipse/"));
-		p2repos.put("eclipse-release-neon-201610111000", new RepoConfig("releases/neon/201610111000", "http://download.eclipse.org/", "http://mirror.tspu.ru/eclipse/"));
-		p2repos.put("oomph-updates-milestone-latest", new RepoConfig("oomph/updates/milestone/latest", "http://download.eclipse.org/", "http://mirror.tspu.ru/eclipse/"));
 	}
 
 	public String getPath() {
 		return "p2";
 	}
 	public Map<String, RepoConfig> getP2Repos() {
-		return new TreeMap<>(p2repos);
+		return new TreeMap<>(ReadConfig.getInstance().getP2repos());
 	}
 	@Override
 	public QueryResponse getOnlineResponse(Path localPath, ClientQuery q, QueryResponse cachedContent, boolean netAllowed) throws IOException {
@@ -58,7 +52,7 @@ public class RepoPluginP2 extends AbstractRepoPlugin
 			}
 			return ret;
 		}
-		for (Map.Entry<String, RepoConfig> entry : p2repos.entrySet()) {
+		for (Map.Entry<String, RepoConfig> entry : ReadConfig.getInstance().getP2repos().entrySet()) {
 			if (localPath.pieces.get(0).equals(entry.getKey())) {
 				Path ref = new Path(localPath).remove(0);
 				String httpPath = entry.getValue().getBaseUrl() + ref.toStringPath();
