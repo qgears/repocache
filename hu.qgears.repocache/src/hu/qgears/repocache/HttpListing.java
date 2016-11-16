@@ -2,10 +2,10 @@ package hu.qgears.repocache;
 
 import java.util.Map;
 
-public class HttpsListing extends AbstractPage
+public class HttpListing extends AbstractPage
 {
 	RepoPluginHttp http;
-	public HttpsListing(ClientQuery query, RepoPluginHttp http) {
+	public HttpListing(ClientQuery query, RepoPluginHttp http) {
 		super(query);
 		this.http=http;
 	}
@@ -14,7 +14,7 @@ public class HttpsListing extends AbstractPage
 	protected void doGenerate() {
 		folder=true;
 		write("Index of HTTP repositiory\n\n<a href=\"../\">Parent Directory</a><br/>\n");
-		for(Map.Entry<String, String> e: http.getP2Repos().entrySet())
+		for(Map.Entry<String, String> e: http.getHttpRepos().entrySet())
 		{
 			write("\t<a href=\"");
 			writeValue(e.getKey());

@@ -73,6 +73,7 @@ public class RepoCache {
 		}
 		plugins.add(new RepoPluginP2());
 		plugins.add(new RepoPluginHttp());
+		plugins.add(new RepoPluginMaven());
 	}
 
 //	public QueryResponse getContent(Path localPath) throws Exception {
