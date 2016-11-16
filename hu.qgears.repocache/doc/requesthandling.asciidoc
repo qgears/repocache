@@ -1,0 +1,40 @@
+= How a request is handled
+
+First the cache (git) is queried. It can reply:
+
+ * folder listing
+ * file direct content
+ * file merged content
+
+If all below is true then the remote file is queried:
+ * the server is in online state
+ * the cache plugin may decide to not refresh the file
+
+ * The remote file content is downloaded
+ * Compared to the cached version (the not merged instance in the cache)
+ * In case the remote is different from the cached version then the cached version is updated:
+    * direct content is updated
+    * merged view is also updated
+    * changes are written to git in a single commit
+ * File to return is re-read from cache
+
+File is returned to user.
+
+== Plugins
+
+Plugin types:
+
+ * http
+ * p2
+ * maven
+ 
+A single plugin handles the followings:
+
+ * In general generates the contents to be replied for a specific query
+
+ * Listing of the first level contents of the plugin
+ * Listing of the folders provided
+ * Merging of the target repositories
+
+
+
