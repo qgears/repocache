@@ -23,6 +23,8 @@ public class ReadConfig {
 	private Map<String, String> httprepos = new HashMap<>();
 	private Map<String, RepoConfig> p2repos = new HashMap<>();
 	
+	private String localGitRepo = "/tmp/repo2";
+	
 	private ReadConfig () {
 		this.parseConfig();
 	}
@@ -44,6 +46,7 @@ public class ReadConfig {
 			parseMavenRepos(doc);
 			parseHttpRepos(doc);
 			parseP2Repos(doc);
+			parseLocalGitRepo(doc);
 		} catch (ParserConfigurationException e) {
 			e.printStackTrace();
 		} catch (SAXException e) {
@@ -53,6 +56,16 @@ public class ReadConfig {
 		}
 	}
 
+	private void parseLocalGitRepo (Document doc) {
+		NodeList localRepos = doc.getElementsByTagName("localgitrepo");
+		for (int temp = 0; temp < localRepos.getLength(); temp++) {
+			Node localRepo = localRepos.item(temp);
+			String path = getNodeValue("path", localRepo.getChildNodes());
+			System.out.println("Local path: " + path);
+			localGitRepo = path;
+		}
+	}
+	
 	private void parseMavenRepos (Document doc) {
 		NodeList mavenRepos = doc.getElementsByTagName("mavenrepo");
 		for (int temp = 0; temp < mavenRepos.getLength(); temp++) {
@@ -100,6 +113,10 @@ public class ReadConfig {
 		return p2repos;
 	}
 	
+	public String getLocalGitRepo() {
+		return localGitRepo;
+	}
+
 	private String getNodeAttr(String attrName, Node node ) {
 	    NamedNodeMap attrs = node.getAttributes();
 	    for (int y = 0; y < attrs.getLength(); y++ ) {

@@ -40,7 +40,7 @@ public class RepoCache {
 
 	private void init() throws Exception {
 		// TODO parameter repo URL
-		File wc=new File("/tmp/repo2/");
+		File wc=new File(ReadConfig.getInstance().getLocalGitRepo());
 		if(!wc.exists())
 		{
 			wc.mkdirs();
