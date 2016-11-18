@@ -78,8 +78,11 @@ public class RepoHandler extends AbstractHandler {
 	}
 
 	private void appendRealFolderListing(ClientQuery q, HttpServletResponse response, QueryResponse cachedContent) throws IOException {
-		QueryResponse r2=new RealFolderListing(q, cachedContent).generate();
-		response.getOutputStream().write(r2.responseBody);
+		ClientSetup client=rc.getConfiguration().getClientSetup(q.getClientIdentifier());
+		if (client.isShawRealFolderListing()) {
+			QueryResponse r2=new RealFolderListing(q, cachedContent).generate();
+			response.getOutputStream().write(r2.responseBody);
+		}
 	}
 
 	private QueryResponse getResponseFromPlugin(ClientQuery q, QueryResponse cachedContent, boolean netAllowed) throws IOException {

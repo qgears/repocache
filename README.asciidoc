@@ -60,5 +60,6 @@ Possible to set on /config page and simple HTTP GET commands:
  * No cache transparent proxy mode: turn on this mode and you can download all packages available, even ones that are not available in the repo. (Use it to dry-run installing new features. After validating the install it is possible to turn on "update" or "add" mode which installs all files into cache.)
  * missingFilesTransparentDownload mode: use cache when available but download when not available. Downloaded file is not saved to cache.
 
- * timed mode (TODO implement): use the selected mode until the timeout then go back to default mode.
+ * timed mode: use the selected mode until the timeout then go back to default mode.
 
+ * Shawing real folder listing can be enabled/disabled.

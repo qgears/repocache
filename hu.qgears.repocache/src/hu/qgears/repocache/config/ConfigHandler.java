@@ -27,13 +27,20 @@ public class ConfigHandler {
 		{
 			String client=q.getParameter("client");
 			String mode=q.getParameter("mode");
-			EClientMode emode=EClientMode.valueOf(mode);
+			EClientMode emode=(mode==null?null:EClientMode.valueOf(mode));
+			String validInMinute=q.getParameter("validInMinute");
+			String shawRealFolderListing=q.getParameter("shawRealFolderListing");
 			if(client.equals("this"))
 			{
 				client=q.getClientIdentifier();
 			}
-			ClientSetup cs=new ClientSetup(client, emode);
-			q.rc.getConfiguration().setClientConfiguration(cs);
+			ClientSetup cs=q.rc.getConfiguration().getClientSetup(client);
+			if (emode!=null) {
+				cs.setMode(emode, validInMinute);
+			}
+			if (shawRealFolderListing!=null) {
+				cs.setShawRealFolderListing(Boolean.valueOf(shawRealFolderListing));
+			}
 			q.sendRedirect("./");
 			return;
 		}
