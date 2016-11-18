@@ -149,6 +149,9 @@ public class ReadConfig {
 	}
 
 	public Map<String, ClientSetup> getClients() {
+		for(ClientSetup c: clients.values()) {
+			removeNotValidClient(c) ;
+		}
 		return clients;
 	}
 
@@ -157,10 +160,20 @@ public class ReadConfig {
 		if(ret==null)
 		{
 			ret=new ClientSetup();
+		} else if (removeNotValidClient(ret)) {
+			ret=new ClientSetup();
 		}
 		return ret;
 	}
 
+	private boolean removeNotValidClient(ClientSetup cs) {
+		if (!cs.isValidSetup()) {
+			clients.remove(cs.getId());
+			return true;
+		}
+		return false;
+	}
+	
 	public void setClientConfiguration(ClientSetup cs) {
 		if(cs.getMode()==EClientMode.normal)
 		{

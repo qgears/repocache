@@ -1,8 +1,11 @@
 package hu.qgears.repocache;
 
+import java.util.Calendar;
+
 public class ClientSetup {
 	private String id;
 	EClientMode mode;
+	private Calendar validTill = null;
 	public ClientSetup()
 	{
 		this.mode=EClientMode.normal;
@@ -10,6 +13,10 @@ public class ClientSetup {
 	public ClientSetup(String client, EClientMode mode) {
 		id=client;
 		this.mode=mode;
+		if (EClientMode.updater.equals(mode)) {
+			validTill = Calendar.getInstance();
+			validTill.add(Calendar.HOUR, 8);
+		}
 	}
 
 	public boolean isUpdater() {
@@ -31,6 +38,9 @@ public class ClientSetup {
 	}
 	public boolean isNoCacheTransparent() {
 		return mode==EClientMode.noCacheTransparent;
+	}
+	public boolean isValidSetup() {
+		return validTill==null || validTill.after(Calendar.getInstance());
 	}
 
 }
