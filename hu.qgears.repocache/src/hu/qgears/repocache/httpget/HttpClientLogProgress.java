@@ -1,4 +1,4 @@
-package hu.qgears.repocache;
+package hu.qgears.repocache.httpget;
 
 import java.util.concurrent.Callable;
 

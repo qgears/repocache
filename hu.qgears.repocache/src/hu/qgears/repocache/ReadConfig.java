@@ -1,58 +1,56 @@
 package hu.qgears.repocache;
 
+import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.TreeMap;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
-import org.xml.sax.SAXException;
 
+/**
+ * Configuration parser for repocache implementation.
+ */
 public class ReadConfig {
 
-	private static ReadConfig instance = null;
-	
 	private Map<String, String> mvnrepos = new HashMap<>();
 	private Map<String, String> httprepos = new HashMap<>();
-	private Map<String, RepoConfig> p2repos = new HashMap<>();
+	private Map<String, P2RepoConfig> p2repos = new HashMap<>();
+	private Map<String, ClientSetup> clients=Collections.synchronizedMap(new TreeMap<>());
+	private CommandLineArgs args;
+	private byte[] configXml;
 	
-	private String localGitRepo = "/tmp/repo2";
-	
-	private ReadConfig () {
-		this.parseConfig();
+	public ReadConfig (CommandLineArgs args) throws IOException {
+		this.args=args;
+		args.validate();
+		parseConfig();
 	}
-	
-	public static ReadConfig getInstance() {
-		if (instance == null) {
-			instance = new ReadConfig();
-		}
-		return instance;
-	}
-	
-	private void parseConfig() {
-		File fXmlFile = new File("repos.xml");
+		
+	private void parseConfig() throws IOException {
 		try {
+			configXml=args.openConfigXml();
 			DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
 			DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
-			Document doc = dBuilder.parse(fXmlFile);
-		
-			parseMavenRepos(doc);
-			parseHttpRepos(doc);
-			parseP2Repos(doc);
-			parseLocalGitRepo(doc);
-		} catch (ParserConfigurationException e) {
-			e.printStackTrace();
-		} catch (SAXException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
+			try(InputStream configXMLInputStream=new ByteArrayInputStream(configXml))
+			{
+				Document doc = dBuilder.parse(configXMLInputStream);
+				
+				parseMavenRepos(doc);
+				parseHttpRepos(doc);
+				parseP2Repos(doc);
+				parseLocalGitRepo(doc);
+			}
+		} catch (Exception e) {
+			throw new IOException("Error reading configuration: "+args.config, e);
 		}
 	}
 
@@ -61,8 +59,6 @@ public class ReadConfig {
 		for (int temp = 0; temp < localRepos.getLength(); temp++) {
 			Node localRepo = localRepos.item(temp);
 			String path = getNodeValue("path", localRepo.getChildNodes());
-			System.out.println("Local path: " + path);
-			localGitRepo = path;
 		}
 	}
 	
@@ -96,7 +92,8 @@ public class ReadConfig {
 			String file = getNodeValue("file", p2Repo.getChildNodes());
 			String primaryHost = getNodeValue("primaryHost", p2Repo.getChildNodes());
 			String selectedMirror = getNodeValue("selectedMirror", p2Repo.getChildNodes());
-			p2repos.put(repoName, new RepoConfig(file, primaryHost, selectedMirror));
+			P2RepoMode repoMode = P2RepoMode.parse(getNodeValue("mode", p2Repo.getChildNodes()));
+			p2repos.put(repoName, new P2RepoConfig(file, primaryHost, selectedMirror, repoMode));
 			System.out.println("P2 repo name: " + repoName + ", file: " + file + ", primaryHost: " + primaryHost + ", selectedMirror: " + selectedMirror);
 		}
 	}
@@ -109,12 +106,12 @@ public class ReadConfig {
 		return httprepos;
 	}
 
-	public Map<String, RepoConfig> getP2repos() {
+	public Map<String, P2RepoConfig> getP2repos() {
 		return p2repos;
 	}
 	
-	public String getLocalGitRepo() {
-		return localGitRepo;
+	public File getLocalGitRepo() {
+		return args.repo;
 	}
 
 	private String getNodeAttr(String attrName, Node node ) {
@@ -142,5 +139,35 @@ public class ReadConfig {
 	    }
 	    return "";
 	}
-	
+
+	public CommandLineArgs getCommandLine() {
+		return args;
+	}
+
+	public byte[] getConfigXml() {
+		return configXml;
+	}
+
+	public Map<String, ClientSetup> getClients() {
+		return clients;
+	}
+
+	public ClientSetup getClientSetup(String clientIdentifier) {
+		ClientSetup ret=clients.get(clientIdentifier);
+		if(ret==null)
+		{
+			ret=new ClientSetup();
+		}
+		return ret;
+	}
+
+	public void setClientConfiguration(ClientSetup cs) {
+		if(cs.getMode()==EClientMode.normal)
+		{
+			clients.remove(cs.getId());
+		}else
+		{
+			clients.put(cs.getId(), cs);
+		}
+	}
 }

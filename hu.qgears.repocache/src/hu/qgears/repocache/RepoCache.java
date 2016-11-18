@@ -19,28 +19,38 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import hu.qgears.commons.UtilFile;
+import hu.qgears.repocache.httpget.HttpClientToInternet;
+import joptsimple.annot.AnnotatedClass;
 
 public class RepoCache {
 	private Repository repository;
 	private Git git;
 	HttpClientToInternet client = new HttpClientToInternet();
-	private String maintenancefilesprefix = "XXXRepoCache.";
-	private boolean usenet=true;
-	private Logger log=LoggerFactory.getLogger(getClass());
+	public static final String maintenancefilesprefix = "XXXRepoCache.";
+	private static Logger log=LoggerFactory.getLogger(RepoCache.class);
 	private List<AbstractRepoPlugin> plugins=new ArrayList<>();
+	private ReadConfig configuration;
 
 	public static void main(String[] args) throws Exception {
-		RepoCache rc = new RepoCache();
-		rc.init();
-		Server server = new Server(8080);
-		server.setHandler(new RepoHandler(rc));
-		server.start();
-		server.join();
+		CommandLineArgs clargs=new CommandLineArgs();
+		AnnotatedClass cl = new AnnotatedClass();
+		cl.parseAnnotations(clargs);
+		System.out.println("Repository cache program. Usage:\n");
+		cl.printHelpOn(System.out);
+		cl.parseArgs(args);
+		String parsedOptions=cl.optionsToString();
+		log.info(parsedOptions);
+		clargs.validate();
+		ReadConfig config=new ReadConfig(clargs);
+		RepoCache rc = new RepoCache(config);
+		rc.start();
+	}
+	public RepoCache(ReadConfig configuration) {
+		this.configuration=configuration;
 	}
 
-	private void init() throws Exception {
-		// TODO parameter repo URL
-		File wc=new File(ReadConfig.getInstance().getLocalGitRepo());
+	public void start() throws Exception {
+		File wc=configuration.getLocalGitRepo();
 		if(!wc.exists())
 		{
 			wc.mkdirs();
@@ -71,10 +81,14 @@ public class RepoCache {
 				}
 			}
 		}
-		ReadConfig.getInstance();
-		plugins.add(new RepoPluginP2());
-		plugins.add(new RepoPluginHttp());
-		plugins.add(new RepoPluginMaven());
+		plugins.add(new RepoPluginP2(this));
+		plugins.add(new RepoPluginHttp(this));
+		plugins.add(new RepoPluginMaven(this));
+
+		Server server = new Server(configuration.getCommandLine().port);
+		server.setHandler(new RepoHandler(this));
+		server.start();
+		server.join();
 	}
 
 //	public QueryResponse getContent(Path localPath) throws Exception {
@@ -125,6 +139,7 @@ public class RepoCache {
 			QueryResponse fileResponse=loadFromCache(path, false);
 			if(listingResponse!=null)
 			{
+				listingResponse.fileSystemFolder=getWorkingCopyFile(path);
 				// Folder
 				return listingResponse;
 			}else if(fileResponse!=null)
@@ -257,10 +272,6 @@ public class RepoCache {
 	{
 		return plugins;
 	}
-	public boolean isUsenet()
-	{
-		return usenet;
-	}
 	/**
 	 * Update the stored cached content.
 	 * @param path path to overwrite.
@@ -287,16 +298,23 @@ public class RepoCache {
 
 	/**
 	 * Handles update strategy.
-	 * TODO fine tune!
 	 * @param q
 	 * @param cachedContent
-	 * @return
+	 * @return true means that the remote server should be queried for an update.
 	 */
 	public boolean updateRequired(ClientQuery q, QueryResponse cachedContent) {
-		if(cachedContent!=null)
+		if(configuration.getCommandLine().localOnly)
 		{
 			return false;
 		}
-		return usenet;
+		ClientSetup client=getConfiguration().getClientSetup(q.getClientIdentifier());
+		if(cachedContent!=null)
+		{
+			return client.isUpdater();
+		}
+		return client.isAdder();
+	}
+	public ReadConfig getConfiguration() {
+		return configuration;
 	}
 }

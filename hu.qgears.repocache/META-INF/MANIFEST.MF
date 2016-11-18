@@ -17,4 +17,6 @@ Require-Bundle: org.eclipse.jgit;bundle-version="4.3.1",
  org.apache.commons.codec,
  hu.qgears.commons;bundle-version="6.6.0",
  hu.qgears.rtemplate.runtime;bundle-version="3.0.0",
- org.eclipse.m2e.maven.runtime.slf4j.simple;bundle-version="1.6.2"
+ org.eclipse.m2e.maven.runtime.slf4j.simple;bundle-version="1.6.2",
+ joptsimple;bundle-version="1.2.0",
+ org.jsoup;bundle-version="1.7.2"

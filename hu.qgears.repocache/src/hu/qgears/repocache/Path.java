@@ -1,5 +1,6 @@
 package hu.qgears.repocache;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -16,6 +17,11 @@ public class Path {
 	public Path(Path p) {
 		pieces=new ArrayList<>(p.pieces);
 		folder=p.folder;
+	}
+	public Path(Path p, String relpath) {
+		pieces=new ArrayList<>(p.pieces);
+		pieces.addAll(UtilString.split(relpath, "/"));
+		folder=relpath.endsWith("/");
 	}
 	public String toStringPath() {
 		return UtilString.concat(pieces, "/")+(folder?"/":"");
@@ -46,5 +52,14 @@ public class Path {
 			return null;
 		}
 		return pieces.get(pieces.size()-1);
+	}
+	public void validate() throws IOException {
+		for(String p: pieces)
+		{
+			if(p.equals(".."))
+			{
+				throw new IOException("Invlaid path: "+this);
+			}
+		}
 	}
 }

@@ -12,18 +12,22 @@ import javax.xml.parsers.SAXParserFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import hu.qgears.repocache.httpget.HttpGet;
+
 public class RepoPluginP2 extends AbstractRepoPlugin
 {
 	private Logger log=LoggerFactory.getLogger(RepoPluginP2.class);
+	private RepoCache rc;
 
-	public RepoPluginP2() {
+	public RepoPluginP2(RepoCache rc) {
+		this.rc=rc;
 	}
 
 	public String getPath() {
 		return "p2";
 	}
-	public Map<String, RepoConfig> getP2Repos() {
-		return new TreeMap<>(ReadConfig.getInstance().getP2repos());
+	public Map<String, P2RepoConfig> getP2Repos() {
+		return new TreeMap<>(rc.getConfiguration().getP2repos());
 	}
 	@Override
 	public QueryResponse getOnlineResponse(Path localPath, ClientQuery q, QueryResponse cachedContent, boolean netAllowed) throws IOException {
@@ -52,7 +56,7 @@ public class RepoPluginP2 extends AbstractRepoPlugin
 			}
 			return ret;
 		}
-		for (Map.Entry<String, RepoConfig> entry : ReadConfig.getInstance().getP2repos().entrySet()) {
+		for (Map.Entry<String, P2RepoConfig> entry : rc.getConfiguration().getP2repos().entrySet()) {
 			if (localPath.pieces.get(0).equals(entry.getKey())) {
 				Path ref = new Path(localPath).remove(0);
 				String httpPath = entry.getValue().getBaseUrl() + ref.toStringPath();
@@ -60,7 +64,7 @@ public class RepoPluginP2 extends AbstractRepoPlugin
 				{
 					try
 					{
-						QueryResponse response = q.rc.client.get(httpPath);
+						QueryResponse response = q.rc.client.get(new HttpGet(httpPath));
 						return response;
 					}catch(FileNotFoundException e)
 					{

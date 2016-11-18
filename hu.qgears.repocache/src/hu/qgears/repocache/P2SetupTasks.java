@@ -2,6 +2,11 @@ package hu.qgears.repocache;
 
 import java.util.Map;
 
+/**
+ * Generator that generates setup code for Ooomph to use this repository
+ * instead of all mirrored repos.
+ * TODO finish
+ */
 public class P2SetupTasks extends AbstractPage
 {
 	private RepoPluginP2 p2;
@@ -12,7 +17,7 @@ public class P2SetupTasks extends AbstractPage
 
 	@Override
 	protected void doGenerate() {
-		for(Map.Entry<String, RepoConfig> entry: p2.getP2Repos().entrySet())
+		for(Map.Entry<String, P2RepoConfig> entry: p2.getP2Repos().entrySet())
 		{
 			write("  <setupTask\n      xsi:type=\"setup:RedirectionTask\"\n      id=\"Redirect_Neon_To_Mirror\"\n\t\t\tsourceURL=\"http://download.eclipse.org/releases/neon/201610111000\"\n      targetURL=\"http://localhost:8080/p2/eclipse-release-neon-201610111000/\">\n    <description>Redirect all requests to: #X# to this mirror.</description>\n  </setupTask>\n");
 		}

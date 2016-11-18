@@ -32,3 +32,33 @@ The resulted git repo can be used as a repository backend even using a simple HT
 === Merge feature
 
 Automatic merge feature for p2 repos is planned.
+
+=== Folder listing rewrite
+
+
+When a listing is downloaded then all the internal links are rewritten to relative. Rewriting is done _before_ storing the page.
+
+Downloading http://targettocache/a/b/:
+http://targettocache/a/b/c -> "c"
+http://targettocache/a/ -> ".."
+/a/b/c -> "c"
+/a/ -> "../"
+
+=== Crawl subtree
+
+Automatic crawling of subtree (and thus caching all in the subtree) is implemented. Crawling uses HTML listing of files in the folders. (If the cached server implements such listing then it will work.)
+
+Crawling can be started using the crawl link on the bottom part of the listing.
+
+=== Modes of operation by client IP
+
+Possible to set on /config page and simple HTTP GET commands:
+
+ * default mode: read from cache only, do not use any remote servers
+ * update mode: all queries initiate a remote server query and cache is updated if remote source has changed
+ * add mode: non-exisiting files are queried from remote and added to cache on demand.
+ * No cache transparent proxy mode: turn on this mode and you can download all packages available, even ones that are not available in the repo. (Use it to dry-run installing new features. After validating the install it is possible to turn on "update" or "add" mode which installs all files into cache.)
+ * missingFilesTransparentDownload mode: use cache when available but download when not available. Downloaded file is not saved to cache.
+
+ * timed mode (TODO implement): use the selected mode until the timeout then go back to default mode.
+

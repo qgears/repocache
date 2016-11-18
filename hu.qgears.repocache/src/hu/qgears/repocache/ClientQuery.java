@@ -1,29 +1,19 @@
 package hu.qgears.repocache;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
-import org.eclipse.jetty.server.Request;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.util.Set;
 
 import hu.qgears.rtemplate.runtime.ICodeGeneratorContext;
 import hu.qgears.rtemplate.runtime.TemplateTracker;
 
-public class ClientQuery implements ICodeGeneratorContext
+abstract public class ClientQuery implements ICodeGeneratorContext
 {
-	private String target;
-	private Request baseRequest;
-	private HttpServletRequest request;
-	public final HttpServletResponse response;
 	public final RepoCache rc;
 	public final Path path;
 	
-	public ClientQuery(String target, Request baseRequest, HttpServletRequest request, HttpServletResponse response,
-			RepoCache rc, Path path) {
+	public ClientQuery(RepoCache rc, Path path) {
 		super();
-		this.target = target;
-		this.baseRequest = baseRequest;
-		this.request = request;
-		this.response = response;
 		this.rc = rc;
 		this.path=path;
 	}
@@ -41,4 +31,15 @@ public class ClientQuery implements ICodeGeneratorContext
 	public void createReport(String path, String o, TemplateTracker tt) {
 	}
 
+	abstract public String getClientIdentifier();
+
+	abstract public String getParameter(String string);
+
+	abstract public void sendRedirect(String string) throws IOException;
+	abstract public void reply(String mimeType, byte[] responseBody) throws IOException;
+	abstract public OutputStream createReplyStream(String mimeType) throws IOException;
+
+	abstract public String[] getParameterValues(String string);
+
+	abstract public Set<String> getParameterNames();
 }

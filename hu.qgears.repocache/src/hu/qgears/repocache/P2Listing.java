@@ -14,7 +14,7 @@ public class P2Listing extends AbstractPage
 	protected void doGenerate() {
 		folder=true;
 		write("Index of P2 repositiory\n\n<a href=\"../\">Parent Directory</a><br/>\n<a href=\"compositeArtifacts.xml\">compositeArtifacts.xml</a><br/>\n<a href=\"compositeContent.xml\">compositeContent.xml</a><br/>\n");
-		for(Map.Entry<String, RepoConfig> e: p2.getP2Repos().entrySet())
+		for(Map.Entry<String, P2RepoConfig> e: p2.getP2Repos().entrySet())
 		{
 			write("\t<a href=\"");
 			writeValue(e.getKey());

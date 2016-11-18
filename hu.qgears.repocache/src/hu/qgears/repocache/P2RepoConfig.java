@@ -1,6 +1,9 @@
 package hu.qgears.repocache;
 
-public class RepoConfig {
+/**
+ * Configuration of a {@link P2CompositeArtifacts} repository to be cahced.
+ */
+public class P2RepoConfig {
 	/**
 	 * See: http://www.eclipse.org/downloads/download.php?file=/technology/epp/packages/neon/&protocol=http&format=xml
 	 */
@@ -20,11 +23,13 @@ public class RepoConfig {
 	 * Eg. "http://mirror.tspu.ru/eclipse/"
 	 */
 	private String selectedMirror;
-	public RepoConfig(String file, String primaryHost, String selectedMirror) {
+	private P2RepoMode repoMode;
+	public P2RepoConfig(String file, String primaryHost, String selectedMirror, P2RepoMode repoMode) {
 		super();
 		this.file = file;
 		this.primaryHost = primaryHost;
 		this.selectedMirror = selectedMirror;
+		this.repoMode=repoMode;
 	}
 	public String getBaseUrl() {
 		return selectedMirror+file+"/";

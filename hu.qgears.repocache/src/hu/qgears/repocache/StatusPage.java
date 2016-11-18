@@ -9,7 +9,7 @@ public class StatusPage extends AbstractPage {
 	@Override
 	protected void doGenerate() {
 		folder=true;
-		write("<h1>Maven and P2 repo cache</h1>\nPlugins:\n<br/>\n<ul>\n");
+		write("<h1>Maven and P2 repo cache</h1>\n\n<a href=\"config\">Configuration</a><br/>\nPlugins:\n<br/>\n<ul>\n");
 		for(AbstractRepoPlugin plugin: getQuery().rc.getPlugins())
 		{
 			write("\t<li><a href=\"");

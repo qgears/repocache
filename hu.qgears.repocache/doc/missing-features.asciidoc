@@ -1,0 +1,13 @@
+P2RepoMode.rewrite - handle rewrite mode repos correctly (create a new sub-listing for them)
+
+Stop crawling: Ongoing crawlings must be registered. config page should list them with a link, which when called cancels the crawling (after the current file is finished.)
+(Currently setting the client to read only mode fixes this problem.)
+
+* Add to updaters for a limited time: Let's say you update your devenv to a new version. You activate this for 8 hours. After work it is automatically disabled.
+
+* missingFilesTransparentDownload mode: use cache when available but download when not available. Downloaded file is not saved to c
+Add crawling result in a single commit (but do not lock the repository while crawling - makes it hard).
+
+Auto "Compress" commits into single commit which are done is a short time.
+
+Generate configuration file for Oomph, maven, etc. (on a web handler below /config) This file can be directly used to set up these tools.

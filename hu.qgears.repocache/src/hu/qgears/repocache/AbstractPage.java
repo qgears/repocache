@@ -2,6 +2,7 @@ package hu.qgears.repocache;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
+import java.util.Enumeration;
 
 import hu.qgears.rtemplate.runtime.RAbstractTemplatePart;
 
@@ -32,6 +33,19 @@ abstract public class AbstractPage extends RAbstractTemplatePart
 		// TODO Auto-generated method stub
 		writeObject(key);
 		
+	}
+	protected void printParameters() {
+		for(String s: getQuery().getParameterNames())
+		{
+			writeObject(s);
+			write(":");
+			String[]vs=getQuery().getParameterValues(s);
+			for(String v: vs)
+			{
+				writeObject(v);
+			}
+			write("<br/>\n");
+		}
 	}
 
 }
