@@ -49,7 +49,7 @@ public class ConfigListing extends AbstractPage
 				write("</li>\n");
 			}
 		}
-		write("<h2>Current staging area</h2>\n(Added but not committed changes.)\n<a href=\"commit\">Execute commit now</a>\n<pre>\n");
+		write("<h2>Current staging area</h2>\n(Added but not committed changes.)\n<a href=\"commit\">Execute commit now</a>\n<a href=\"revert\">Execute revert</a>\n<pre>\n");
 		writeHtml(getQuery().rc.getCommitTimer().getCurrentStagingMessage());
 		write("\n</pre>\n");
 	}

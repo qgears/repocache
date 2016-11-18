@@ -48,6 +48,17 @@ public class ConfigHandler {
 			q.sendRedirect("./");
 			return;
 		}
+		if(q.path.pieces.size()==2&&q.path.eq(1, "revert"))
+		{
+			try {
+				q.rc.getCommitTimer().executeRevert();
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			q.sendRedirect("./");
+			return;
+		}
 		if(ret!=null)
 		{
 			q.reply(ret.mimeType, ret.responseBody);

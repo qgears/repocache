@@ -45,6 +45,19 @@ public class CommitTimer implements Callable<Object>{
 			}
 		}
 	}
+	public void executeRevert() throws IOException, NoFilepatternException, GitAPIException
+	{
+		synchronized (rc) {
+			if(commitMessage.length()>0)
+			{
+				rc.git.add().addFilepattern(".").call();
+				rc.git.stashCreate().call();
+				rc.git.stashDrop().call();
+				rc.assertStatusClean();
+				commitMessage=new StringBuilder();
+			}
+		}
+	}
 	@Override
 	public Object call() throws Exception {
 		long now=System.nanoTime();

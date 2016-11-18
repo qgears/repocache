@@ -32,7 +32,7 @@ public class RepoCache {
 	private ReadConfig configuration;
 	private CommitTimer commitTimer;
 	private File worktree;
-	private String repoVersion="Repo Cace 1.0.0 by Q-Gears Kft.";
+	private String repoVersion="Repo Cache 1.0.0 by Q-Gears Kft.\n";
 	private String versionFilePath="version.txt";
 
 	public static void main(String[] args) throws Exception {
