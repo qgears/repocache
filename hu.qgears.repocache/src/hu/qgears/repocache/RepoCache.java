@@ -24,12 +24,16 @@ import joptsimple.annot.AnnotatedClass;
 
 public class RepoCache {
 	private Repository repository;
-	private Git git;
+	public Git git;
 	HttpClientToInternet client = new HttpClientToInternet();
 	public static final String maintenancefilesprefix = "XXXRepoCache.";
 	private static Logger log=LoggerFactory.getLogger(RepoCache.class);
 	private List<AbstractRepoPlugin> plugins=new ArrayList<>();
 	private ReadConfig configuration;
+	private CommitTimer commitTimer;
+	private File worktree;
+	private String repoVersion="Repo Cace 1.0.0 by Q-Gears Kft.";
+	private String versionFilePath="version.txt";
 
 	public static void main(String[] args) throws Exception {
 		CommandLineArgs clargs=new CommandLineArgs();
@@ -50,14 +54,15 @@ public class RepoCache {
 	}
 
 	public void start() throws Exception {
+		commitTimer=new CommitTimer(this);
 		File wc=configuration.getLocalGitRepo();
 		if(!wc.exists())
 		{
 			wc.mkdirs();
 			try(Git git = Git.init().setDirectory( wc ).call())
 			{
-				File initial=new File(wc, "readme.txt");
-				UtilFile.saveAsFile(initial, "Eclipse P2 and Maven repository clone");
+				File initial=new File(wc, versionFilePath);
+				UtilFile.saveAsFile(initial, repoVersion);
 				git.add().addFilepattern(".").call();
 				git.commit().setMessage("Initial commit").call();
 			}
@@ -67,6 +72,7 @@ public class RepoCache {
 		System.out.println("Folder: " + repository.getDirectory());
 		System.out.println("Branch: " + repository.getBranch());
 		System.out.println("IsBare: " + repository.isBare());
+		worktree=git.getRepository().getWorkTree();
 		assertStatusClean();
 		try (ObjectReader reader = repository.newObjectReader()) {
 			for (RevCommit rc : git.log().addPath("alma.txt").call()) {
@@ -91,44 +97,19 @@ public class RepoCache {
 		server.join();
 	}
 
-//	public QueryResponse getContent(Path localPath) throws Exception {
-//		synchronized (this) {
-//			for (Map.Entry<String, String> entry : p2repos.entrySet()) {
-//				if (localPath.pieces.get(0).equals(entry.getKey())) {
-//					Path ref = new Path(localPath).remove(0);
-//					String httpPath = entry.getValue() + ref.toStringPath();
-//					QueryResponse cached=getCache(localPath);
-//					if(usenet)
-//					{
-//						QueryResponse response = client.get(httpPath);
-//						if(!response.equals(cached))
-//						{
-//							updateFile(localPath, response);
-//						}else
-//						{
-//							log.info("Path did not change: "+localPath.toStringPath());
-//						}
-//						assertStatusClean();
-//						// Always return from cache so it is not possible to accidentally not stor something!
-//						cached=getCache(localPath);
-//					}
-//					// if(response.url.endsWith("/"))
-//					// {
-//					// // Folder listing query
-//					// }
-//					return cached;
-//				}
-//			}
-//			QueryResponse ret = new QueryResponse("text/html", "", "Filecontent".getBytes(), localPath.folder);
-//			return ret;
-//		}
-//	}
-	private void assertStatusClean() throws IOException, NoWorkTreeException, GitAPIException {
-		Status status=git.status().call();
-		log.info("Git status clean: "+status.isClean());
-		if(!status.isClean())
-		{
-			throw new IOException("git repo is not clean");
+	public void assertStatusClean() throws IOException, NoWorkTreeException, GitAPIException {
+		synchronized (this) {
+			Status status=git.status().call();
+			log.info("Git status clean: "+status.isClean());
+			if(!status.isClean())
+			{
+				throw new IOException("git repo is not clean");
+			}
+			String storedVersion=UtilFile.loadAsString(new File(worktree, versionFilePath));
+			if(!storedVersion.equals(repoVersion))
+			{
+				throw new IOException("Invalid repocache version: "+storedVersion);
+			}
 		}
 	}
 
@@ -183,12 +164,12 @@ public class RepoCache {
 			getWorkingCopyFile(path).getParentFile().mkdirs();
 			UtilFile.saveAsFile(getWorkingCopyFile(path), response.responseBody);
 			UtilFile.saveAsFile(getWorkingCopyFile(meta), response.createMeta());
-			git.add().addFilepattern(".").call();
-			git.commit().setMessage(response.folder?"Auto update folder listing: "+new Path(path).remove(path.pieces.size()-1).setFolder(true).toStringPath():("Auto update path: "+path.toStringPath())).call();
-			log.info("Path committed: "+response+" to git: "+path.toStringPath());
+			String message=response.folder?"Auto update folder listing: "+new Path(path).remove(path.pieces.size()-1).setFolder(true).toStringPath():("Auto update path: "+path.toStringPath());
+			commitTimer.addCommit(message);
+			log.info("Path refreshed in cache: "+response+" to git: "+path.toStringPath());
 		}else
 		{
-			log.info("Path deleted: "+response+" to git: "+path.toStringPath());
+			log.info("Path deleted on remote: "+response+" retained in git: "+path.toStringPath());
 		}
 	}
 
@@ -205,7 +186,7 @@ public class RepoCache {
 	}
 
 	private File getWorkingCopyFile(Path path) {
-		return new File(git.getRepository().getWorkTree(), path.toStringPath());
+		return new File(worktree, path.toStringPath());
 	}
 
 	private byte[] getFile(Path path) throws IOException {
@@ -292,7 +273,6 @@ public class RepoCache {
 			{
 				log.info("Path did not change: "+path.toStringPath());
 			}
-			assertStatusClean();
 		}
 	}
 
@@ -316,5 +296,8 @@ public class RepoCache {
 	}
 	public ReadConfig getConfiguration() {
 		return configuration;
+	}
+	public CommitTimer getCommitTimer() {
+		return commitTimer;
 	}
 }

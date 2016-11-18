@@ -15,7 +15,6 @@ public class ConfigListing extends AbstractPage
 	@Override
 	protected void doGenerate() {
 		printParameters();
-//		handleConfigUpdates();
 		write("<h1>Repo Cache configuration</h1>\n<a href=\"../\">../</a><br/>\n<a href=\"./\">reload</a><br/>\nLocal Only: ");
 		writeObject(getQuery().rc.getConfiguration().getCommandLine().localOnly);
 		write("<br/>\n<a href=\"config.xml\">config.xml</a><br/>\nClient IP address: ");
@@ -50,5 +49,8 @@ public class ConfigListing extends AbstractPage
 				write("</li>\n");
 			}
 		}
+		write("<h2>Current staging area</h2>\n(Added but not committed changes.)\n<a href=\"commit\">Execute commit now</a>\n<pre>\n");
+		writeHtml(getQuery().rc.getCommitTimer().getCurrentStagingMessage());
+		write("\n</pre>\n");
 	}
 }
