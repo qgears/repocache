@@ -140,30 +140,25 @@ public class RepoCache {
 			return null;
 		}
 		byte[] file=getFile(path);
-		byte[] fileMeta=getFile(getMeta(path));
-		if(file!=null && fileMeta!=null)
+		if(file!=null)
 		{
 			// Folder
-			return QueryResponse.createFromContentAndMeta(file, fileMeta, folder);
+			return QueryResponse.createFromContentAndMeta(file, folder);
 		}
 		return null;
 	}
 
 	private void updateFile(Path path, QueryResponse response) throws IOException, NoFilepatternException, GitAPIException {
 		deleteIfExists(path);
-		deleteIfExists(getMeta(path));
 		deleteIfExists(getFolderListingPath(path));
-		deleteIfExists(getMeta(getFolderListingPath(path)));
 		if(response!=null)
 		{
 			if(response.folder)
 			{
 				path=getFolderListingPath(path);
 			}
-			Path meta=getMeta(path);
 			getWorkingCopyFile(path).getParentFile().mkdirs();
 			UtilFile.saveAsFile(getWorkingCopyFile(path), response.responseBody);
-			UtilFile.saveAsFile(getWorkingCopyFile(meta), response.createMeta());
 			String message=response.folder?"Auto update folder listing: "+new Path(path).remove(path.pieces.size()-1).setFolder(true).toStringPath():("Auto update path: "+path.toStringPath());
 			commitTimer.addCommit(message);
 			log.info("Path refreshed in cache: "+response+" to git: "+path.toStringPath());
@@ -202,23 +197,6 @@ public class RepoCache {
 		return new Path(localPath).add(maintenancefilesprefix + "listing");
 	}
 
-	/**
-	 * Get Metadata file URL
-	 * @param path
-	 * @return
-	 */
-	private Path getMeta(Path p) {
-		if(p.pieces.size()==0)
-		{
-			return null;
-		}
-		p=new Path(p);
-		String name=p.pieces.get(p.pieces.size()-1);
-		p.pieces.set(p.pieces.size()-1, maintenancefilesprefix+"meta."+name);
-		return p;
-	}
-
-	
 //	private byte[] getFile(ObjectReader reader, Path path)
 //			throws MissingObjectException, IncorrectObjectTypeException, CorruptObjectException, IOException {
 //		ObjectId lastCommitId = repository.resolve(Constants.HEAD);

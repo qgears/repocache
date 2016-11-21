@@ -17,7 +17,7 @@ public class ConfigHandler {
 		}
 		if(q.path.eq(1, "config.xml"))
 		{
-			ret=new QueryResponse("application/xml", "", q.rc.getConfiguration().getConfigXml(), false);
+			ret=new QueryResponse("", q.rc.getConfiguration().getConfigXml(), false);
 		}
 		if(q.path.pieces.size()==1)
 		{
@@ -68,7 +68,7 @@ public class ConfigHandler {
 		}
 		if(ret!=null)
 		{
-			q.reply(ret.mimeType, ret.responseBody);
+			q.reply(ret.responseBody);
 		}
 	}
 }

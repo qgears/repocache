@@ -39,9 +39,9 @@ public class ClientQueryHttp extends ClientQuery
 		response.sendRedirect(string);
 	}
 	@Override
-	public void reply(String mimeType, byte[] responseBody) throws IOException
+	public void reply(byte[] responseBody) throws IOException
 	{
-		response.setContentType(mimeType);
+		response.setContentType(getMimeType());
 		response.setStatus(HttpServletResponse.SC_OK);
 		baseRequest.setHandled(true);
 		response.getOutputStream().write(responseBody);

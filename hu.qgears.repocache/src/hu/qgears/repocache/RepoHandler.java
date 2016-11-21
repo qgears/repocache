@@ -45,7 +45,7 @@ public class RepoHandler extends AbstractHandler {
 //				response.sendRedirect(q.path.pieces.get(q.path.pieces.size()-1)+"/");
 			}else
 			{
-				response.setContentType(cachedContent.mimeType);
+				response.setContentType(q.getMimeType());
 				response.setStatus(HttpServletResponse.SC_OK);
 				baseRequest.setHandled(true);
 				response.getOutputStream().write(cachedContent.responseBody);
