@@ -9,6 +9,9 @@ import org.jsoup.select.Elements;
 
 import hu.qgears.repocache.QueryResponse;
 
+/**
+ * Parse result HTML and convert absolute lints to relative so that they work on the mirror site.
+ */
 public class UrlFixer {
 
 	public static void fixUrls(QueryResponse queryResponse) {
