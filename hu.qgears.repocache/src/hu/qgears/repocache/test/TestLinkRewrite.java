@@ -1,5 +1,6 @@
 package hu.qgears.repocache.test;
 
+import java.io.File;
 import java.io.IOException;
 
 import org.apache.commons.httpclient.HttpException;
@@ -11,7 +12,7 @@ import hu.qgears.repocache.httpget.HttpGet;
 public class TestLinkRewrite {
 	public static void main(String[] args) throws HttpException, IOException {
 		HttpClientToInternet http= new HttpClientToInternet();
-		QueryResponse resp=http.get(new HttpGet("https://repo.eclipse.org/content/groups/emf-incquery/"));
-		System.out.println(new String(resp.responseBody));
+		QueryResponse resp=http.get(new HttpGet(new File("/tmp/linkrewrite.txt"), "https://repo.eclipse.org/content/groups/emf-incquery/"));
+		System.out.println(resp.getResponseAsString());
 	}
 }

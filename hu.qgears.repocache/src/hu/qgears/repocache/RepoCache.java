@@ -162,7 +162,7 @@ public class RepoCache {
 			}
 			Path meta=getMeta(path);
 			getWorkingCopyFile(path).getParentFile().mkdirs();
-			UtilFile.saveAsFile(getWorkingCopyFile(path), response.responseBody);
+			UtilFile.saveAsFile(getWorkingCopyFile(path), response.openInputStream());
 			UtilFile.saveAsFile(getWorkingCopyFile(meta), response.createMeta());
 			String message=response.folder?"Auto update folder listing: "+new Path(path).remove(path.pieces.size()-1).setFolder(true).toStringPath():("Auto update path: "+path.toStringPath());
 			commitTimer.addCommit(message);
@@ -299,5 +299,9 @@ public class RepoCache {
 	}
 	public CommitTimer getCommitTimer() {
 		return commitTimer;
+	}
+	public File createTmpFile(Path path) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 }

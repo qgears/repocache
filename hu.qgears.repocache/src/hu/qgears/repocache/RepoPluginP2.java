@@ -64,7 +64,7 @@ public class RepoPluginP2 extends AbstractRepoPlugin
 				{
 					try
 					{
-						QueryResponse response = q.rc.client.get(new HttpGet(httpPath));
+						QueryResponse response = q.rc.client.get(new HttpGet(q.rc.createTmpFile(q.path), httpPath));
 						return response;
 					}catch(FileNotFoundException e)
 					{
@@ -90,7 +90,7 @@ public class RepoPluginP2 extends AbstractRepoPlugin
 		{
 			try {
 				SAXParser p=SAXParserFactory.newInstance().newSAXParser();
-				p.parse(new ByteArrayInputStream(cachedContent.responseBody), tp);
+				p.parse(new ByteArrayInputStream(cachedContent.getResponseAsBytes()), tp);
 			} catch (Exception e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();

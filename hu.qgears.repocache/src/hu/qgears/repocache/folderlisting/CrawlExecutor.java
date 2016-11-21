@@ -39,7 +39,7 @@ public class CrawlExecutor {
 		if(resp!=null&&resp.folder)
 		{
 			try {
-				Document doc=Jsoup.parse(new String(resp.responseBody, StandardCharsets.UTF_8));
+				Document doc=Jsoup.parse(resp.getResponseAsString());
 				Elements elems=doc.select("a");
 				for(Element e: elems)
 				{

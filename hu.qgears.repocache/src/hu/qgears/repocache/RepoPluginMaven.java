@@ -38,7 +38,7 @@ public class RepoPluginMaven extends AbstractRepoPlugin
 					log.info("Path not updated from remote server: "+httpPath+" local path: "+localPath);
 					return null;
 				}
-				QueryResponse response = q.rc.client.get(new HttpGet(httpPath));
+				QueryResponse response = q.rc.client.get(new HttpGet(q.rc.createTmpFile(q.path), httpPath));
 				return response;
 			}
 		}

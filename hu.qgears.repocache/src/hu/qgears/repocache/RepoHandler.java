@@ -48,7 +48,7 @@ public class RepoHandler extends AbstractHandler {
 				response.setContentType(cachedContent.mimeType);
 				response.setStatus(HttpServletResponse.SC_OK);
 				baseRequest.setHandled(true);
-				response.getOutputStream().write(cachedContent.responseBody);
+				response.getOutputStream().write(cachedContent.getResponseAsBytes());
 				if(cachedContent.fileSystemFolder!=null)
 				{
 					appendRealFolderListing(q, response, cachedContent);

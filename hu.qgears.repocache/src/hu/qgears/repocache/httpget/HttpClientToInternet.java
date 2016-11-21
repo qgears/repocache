@@ -1,5 +1,6 @@
 package hu.qgears.repocache.httpget;
 
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 
@@ -17,12 +18,12 @@ import hu.qgears.repocache.QueryResponse;
 public class HttpClientToInternet {
 	final static Logger log=LoggerFactory.getLogger(HttpClientToInternet.class);
 	public static void main(String[] args) throws HttpException, IOException {
-		QueryResponse r=new HttpClientToInternet().get(new HttpGet("http://qgears.com/opensource/updates"));
+		QueryResponse r=new HttpClientToInternet().get(new HttpGet(new File("/tmp/linkrewrite.txt"), "http://qgears.com/opensource/updates"));
 		System.out.println(r);
 		// Deal with the response.
 		// Use caution: ensure correct character encoding and is not binary
 		// data
-		System.out.println(new String(r.responseBody));
+		System.out.println(r.getResponseAsString());
 
 	}
 
