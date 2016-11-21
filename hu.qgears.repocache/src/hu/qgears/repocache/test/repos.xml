@@ -22,6 +22,15 @@
 	<httprepo name="oomphneon">
 		<remote>http://mirror.switch.ch/eclipse/oomph/epp/neon/</remote>
 	</httprepo>
+	<httprepo name="test">
+		<remote>http://localhost:8081/</remote>
+	</httprepo>
+	<httprepo name="ubuntu-releases-16.04.1">
+		<remote>http://releases.ubuntu.com/16.04.1/</remote>
+	</httprepo>
+	<httprepo name="ubuntu-releases-16.10">
+		<remote>http://releases.ubuntu.com/16.10/</remote>
+	</httprepo>
 	<p2repo name="qgears-opensource">
 		<file>opensource/updates</file>
 		<primaryHost>http://qgears.com/</primaryHost>

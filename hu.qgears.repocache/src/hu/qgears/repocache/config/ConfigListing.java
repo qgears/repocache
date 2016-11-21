@@ -32,6 +32,16 @@ public class ConfigListing extends AbstractPage
 			writeObject(m);
 			write("</a><br/>\n");
 		}
+		write("<a href=\"setClientMode?client=");
+		writeObject(getQuery().getClientIdentifier());
+		write("&amp;shawRealFolderListing=true\">Set ");
+		writeObject(getQuery().getClientIdentifier());
+		write(" client to shaw real folder listing.</a><br/>\n");
+		write("<a href=\"setClientMode?client=");
+		writeObject(getQuery().getClientIdentifier());
+		write("&amp;shawRealFolderListing=false\">Set ");
+		writeObject(getQuery().getClientIdentifier());
+		write(" client NOT to shaw real folder listing.</a><br/>\n");
 		for(EClientMode m: EClientMode.values())
 		{
 			write("<a href=\"setClientMode?client=this&amp;mode=");
@@ -40,6 +50,8 @@ public class ConfigListing extends AbstractPage
 			writeObject(m);
 			write("</a><br/>\n");
 		}
+		write("<a href=\"setClientMode?client=this&amp;shawRealFolderListing=true\">Set this client to shaw real folder listing.</a><br/>\n");
+		write("<a href=\"setClientMode?client=this&amp;shawRealFolderListing=false\">Set this client NOT to shaw real folder listing.</a><br/>\n");
 		write("<ul>\n");
 		synchronized (getQuery().rc.getConfiguration().getClients()) {
 			for(ClientSetup c: getQuery().rc.getConfiguration().getClients().values())
@@ -49,7 +61,7 @@ public class ConfigListing extends AbstractPage
 				write("</li>\n");
 			}
 		}
-		write("<h2>Current staging area</h2>\n(Added but not committed changes.)\n<a href=\"commit\">Execute commit now</a>\n<pre>\n");
+		write("<h2>Current staging area</h2>\n(Added but not committed changes.)\n<a href=\"commit\">Execute commit now</a>\n<a href=\"revert\">Execute revert</a>\n<pre>\n");
 		writeHtml(getQuery().rc.getCommitTimer().getCurrentStagingMessage());
 		write("\n</pre>\n");
 	}

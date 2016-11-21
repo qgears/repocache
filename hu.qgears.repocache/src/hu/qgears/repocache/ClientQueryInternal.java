@@ -29,7 +29,7 @@ public class ClientQueryInternal extends ClientQuery
 	}
 
 	@Override
-	public void reply(String mimeType, byte[] responseBody) throws IOException {
+	public void reply(QueryResponse response) throws IOException {
 		// TODO Auto-generated method stub
 		
 	}

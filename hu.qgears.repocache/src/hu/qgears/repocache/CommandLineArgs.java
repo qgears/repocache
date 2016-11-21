@@ -18,6 +18,8 @@ public class CommandLineArgs {
 	@JOHelp("If local only then the cache does not access the remote servers at all.")
 	@JOSimpleBoolean
 	public boolean localOnly;
+	@JOHelp("Downloads folder. Should be on the same physical device as the repo so files can be moved into repo by cheap move command.")
+	public File downloadsFolder;
 	/**
 	 * Validate parameters if they are valid to start the repo cache server.
 	 */
@@ -41,6 +43,18 @@ public class CommandLineArgs {
 		if(repo.exists()&& !repo.isDirectory())
 		{
 			throw new IllegalArgumentException("'repo' Repository folder must be a folder.");
+		}
+		if(downloadsFolder==null)
+		{
+			throw new IllegalArgumentException("'downloadsFolder' must be set as command line parameter.");
+		}
+		if(!downloadsFolder.exists())
+		{
+			downloadsFolder.mkdirs();
+		}
+		if(!downloadsFolder.isDirectory())
+		{
+			throw new IllegalArgumentException("'downloadsFolder' must be a directory.");
 		}
 	}
 	public CommandLineArgs setConfigOverride(byte[] bs)

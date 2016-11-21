@@ -156,18 +156,10 @@ public class ReadConfig {
 		ClientSetup ret=clients.get(clientIdentifier);
 		if(ret==null)
 		{
-			ret=new ClientSetup();
+			ret=new ClientSetup(clientIdentifier);
+			clients.put(ret.getId(), ret);
 		}
 		return ret;
 	}
 
-	public void setClientConfiguration(ClientSetup cs) {
-		if(cs.getMode()==EClientMode.normal)
-		{
-			clients.remove(cs.getId());
-		}else
-		{
-			clients.put(cs.getId(), cs);
-		}
-	}
 }

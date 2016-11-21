@@ -36,10 +36,30 @@ abstract public class ClientQuery implements ICodeGeneratorContext
 	abstract public String getParameter(String string);
 
 	abstract public void sendRedirect(String string) throws IOException;
-	abstract public void reply(String mimeType, byte[] responseBody) throws IOException;
+	abstract public void reply(QueryResponse responseBody) throws IOException;
 	abstract public OutputStream createReplyStream(String mimeType) throws IOException;
 
 	abstract public String[] getParameterValues(String string);
 
 	abstract public Set<String> getParameterNames();
+
+	public String getMimeType() {
+		if(path.folder)
+		{
+			return "text/html;charset=utf-8";
+		}else if(path.getFileName()!=null)
+		{
+			if(path.getFileName().endsWith(".xml"))
+			{
+				return "application/xml";
+			}else if(path.getFileName().endsWith(".jar"))
+			{
+				return "application/java-archive";
+			}else if(path.getFileName().endsWith(".html"))
+			{
+				return "text/html";
+			}
+		}
+		return "application/data";
+	}
 }

@@ -13,17 +13,13 @@ import org.eclipse.jetty.server.Request;
 
 public class ClientQueryHttp extends ClientQuery
 {
-	private String target;
 	public Request baseRequest;
-	private HttpServletRequest request;
 	public final HttpServletResponse response;
 
 	public ClientQueryHttp(String target, Request baseRequest, HttpServletRequest request, HttpServletResponse response,
 			RepoCache rc, Path path) {
 		super(rc, path);
-		this.target = target;
 		this.baseRequest = baseRequest;
-		this.request = request;
 		this.response = response;
 	}
 	@Override
@@ -39,12 +35,12 @@ public class ClientQueryHttp extends ClientQuery
 		response.sendRedirect(string);
 	}
 	@Override
-	public void reply(String mimeType, byte[] responseBody) throws IOException
+	public void reply(QueryResponse r) throws IOException
 	{
-		response.setContentType(mimeType);
+		response.setContentType(getMimeType());
 		response.setStatus(HttpServletResponse.SC_OK);
 		baseRequest.setHandled(true);
-		response.getOutputStream().write(responseBody);
+		r.streamTo(response.getOutputStream());
 	}
 	@Override
 	public String[] getParameterValues(String name) {

@@ -8,8 +8,6 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.eclipse.jetty.server.Request;
 import org.eclipse.jetty.server.handler.AbstractHandler;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import hu.qgears.repocache.config.ConfigHandler;
 import hu.qgears.repocache.folderlisting.CrawlExecutor;
@@ -17,7 +15,6 @@ import hu.qgears.repocache.folderlisting.RealFolderListing;
 
 public class RepoHandler extends AbstractHandler {
 	private RepoCache rc;
-	private Logger log=LoggerFactory.getLogger(RepoHandler.class);
 	public RepoHandler(RepoCache rc) {
 		this.rc = rc;
 	}
@@ -35,23 +32,25 @@ public class RepoHandler extends AbstractHandler {
 			new CrawlExecutor().handle(this, q);
 			return;
 		}
-		QueryResponse cachedContent=getQueryResponse(q);
-		if(cachedContent!=null)
+		try(QueryResponse cachedContent=getQueryResponse(q))
 		{
-			if(!q.path.folder && cachedContent.folder)
+			if(cachedContent!=null)
 			{
-				redirectToFolder(q);
-				return;
-//				response.sendRedirect(q.path.pieces.get(q.path.pieces.size()-1)+"/");
-			}else
-			{
-				response.setContentType(cachedContent.mimeType);
-				response.setStatus(HttpServletResponse.SC_OK);
-				baseRequest.setHandled(true);
-				response.getOutputStream().write(cachedContent.getResponseAsBytes());
-				if(cachedContent.fileSystemFolder!=null)
+				if(!q.path.folder && cachedContent.folder)
 				{
-					appendRealFolderListing(q, response, cachedContent);
+					redirectToFolder(q);
+					return;
+	//				response.sendRedirect(q.path.pieces.get(q.path.pieces.size()-1)+"/");
+				}else
+				{
+					response.setContentType(q.getMimeType());
+					response.setStatus(HttpServletResponse.SC_OK);
+					baseRequest.setHandled(true);
+					cachedContent.streamTo(response.getOutputStream());
+					if(cachedContent.fileSystemFolder!=null)
+					{
+						appendRealFolderListing(q, response, cachedContent);
+					}
 				}
 			}
 		}
@@ -67,19 +66,28 @@ public class RepoHandler extends AbstractHandler {
 		QueryResponse qr=getResponseFromPlugin(q, cachedContent, q.rc.updateRequired(q, cachedContent));
 		if(qr!=null)
 		{
-			try {
-				rc.updateResponse(q.path, cachedContent, qr);
-			} catch (Exception e) {
-				throw new IOException(e);
+			try
+			{
+				try {
+					rc.updateResponse(q.path, cachedContent, qr);
+				} catch (Exception e) {
+					throw new IOException(e);
+				}
+				cachedContent=rc.getCache(q.path);
+			}finally
+			{
+				qr.close();
 			}
-			cachedContent=rc.getCache(q.path);
 		}
 		return cachedContent;
 	}
 
 	private void appendRealFolderListing(ClientQuery q, HttpServletResponse response, QueryResponse cachedContent) throws IOException {
-		QueryResponse r2=new RealFolderListing(q, cachedContent).generate();
-		response.getOutputStream().write(r2.responseBody);
+		ClientSetup client=rc.getConfiguration().getClientSetup(q.getClientIdentifier());
+		if (client.isShawRealFolderListing()) {
+			QueryResponse r2=new RealFolderListing(q, cachedContent).generate();
+			response.getOutputStream().write(r2.getResponseAsBytes());
+		}
 	}
 
 	private QueryResponse getResponseFromPlugin(ClientQuery q, QueryResponse cachedContent, boolean netAllowed) throws IOException {

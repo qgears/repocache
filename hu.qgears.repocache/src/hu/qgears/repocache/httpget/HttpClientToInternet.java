@@ -14,6 +14,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import hu.qgears.repocache.QueryResponse;
+import hu.qgears.repocache.QueryResponseByteArray;
 
 public class HttpClientToInternet {
 	final static Logger log=LoggerFactory.getLogger(HttpClientToInternet.class);
@@ -52,7 +53,7 @@ public class HttpClientToInternet {
 			if (statusCode != HttpStatus.SC_OK) {
 				throw new FileNotFoundException("Method failed: " + method.getStatusLine()+" '"+get.url+"'");
 			}
-			return new QueryResponse(method, get);
+			return new QueryResponseByteArray(method.getURI().toString(), method.getResponseBody());
 		} finally {
 			progress.cancel();
 			// Release the connection.

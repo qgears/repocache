@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jgit.api.Git;
@@ -19,20 +20,20 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import hu.qgears.commons.UtilFile;
-import hu.qgears.repocache.httpget.HttpClientToInternet;
+import hu.qgears.repocache.httpget.StreamingHttpClient;
 import joptsimple.annot.AnnotatedClass;
 
 public class RepoCache {
 	private Repository repository;
 	public Git git;
-	HttpClientToInternet client = new HttpClientToInternet();
+	public StreamingHttpClient client = new StreamingHttpClient();
 	public static final String maintenancefilesprefix = "XXXRepoCache.";
 	private static Logger log=LoggerFactory.getLogger(RepoCache.class);
 	private List<AbstractRepoPlugin> plugins=new ArrayList<>();
 	private ReadConfig configuration;
 	private CommitTimer commitTimer;
 	private File worktree;
-	private String repoVersion="Repo Cace 1.0.0 by Q-Gears Kft.";
+	private String repoVersion="Repo Cache 1.0.0 by Q-Gears Kft.\n";
 	private String versionFilePath="version.txt";
 
 	public static void main(String[] args) throws Exception {
@@ -139,31 +140,25 @@ public class RepoCache {
 		{
 			return null;
 		}
-		byte[] file=getFile(path);
-		byte[] fileMeta=getFile(getMeta(path));
-		if(file!=null && fileMeta!=null)
+		File file=getFile(path);
+		if(file!=null)
 		{
-			// Folder
-			return QueryResponse.createFromContentAndMeta(file, fileMeta, folder);
+			return new QueryResponseFile(path.toStringPath(), file, folder);
 		}
 		return null;
 	}
 
 	private void updateFile(Path path, QueryResponse response) throws IOException, NoFilepatternException, GitAPIException {
 		deleteIfExists(path);
-		deleteIfExists(getMeta(path));
 		deleteIfExists(getFolderListingPath(path));
-		deleteIfExists(getMeta(getFolderListingPath(path)));
 		if(response!=null)
 		{
 			if(response.folder)
 			{
 				path=getFolderListingPath(path);
 			}
-			Path meta=getMeta(path);
 			getWorkingCopyFile(path).getParentFile().mkdirs();
-			UtilFile.saveAsFile(getWorkingCopyFile(path), response.openInputStream());
-			UtilFile.saveAsFile(getWorkingCopyFile(meta), response.createMeta());
+			response.saveToFile(getWorkingCopyFile(path));
 			String message=response.folder?"Auto update folder listing: "+new Path(path).remove(path.pieces.size()-1).setFolder(true).toStringPath():("Auto update path: "+path.toStringPath());
 			commitTimer.addCommit(message);
 			log.info("Path refreshed in cache: "+response+" to git: "+path.toStringPath());
@@ -189,36 +184,19 @@ public class RepoCache {
 		return new File(worktree, path.toStringPath());
 	}
 
-	private byte[] getFile(Path path) throws IOException {
+	private File getFile(Path path) throws IOException {
 		File f=getWorkingCopyFile(path);
 		if(!f.exists()||f.isDirectory())
 		{
 			return null;
 		}
-		return UtilFile.loadFile(f);
+		return f;
 	}
 
 	private Path getFolderListingPath(Path localPath) {
 		return new Path(localPath).add(maintenancefilesprefix + "listing");
 	}
 
-	/**
-	 * Get Metadata file URL
-	 * @param path
-	 * @return
-	 */
-	private Path getMeta(Path p) {
-		if(p.pieces.size()==0)
-		{
-			return null;
-		}
-		p=new Path(p);
-		String name=p.pieces.get(p.pieces.size()-1);
-		p.pieces.set(p.pieces.size()-1, maintenancefilesprefix+"meta."+name);
-		return p;
-	}
-
-	
 //	private byte[] getFile(ObjectReader reader, Path path)
 //			throws MissingObjectException, IncorrectObjectTypeException, CorruptObjectException, IOException {
 //		ObjectId lastCommitId = repository.resolve(Constants.HEAD);
@@ -264,8 +242,6 @@ public class RepoCache {
 	 */
 	public void updateResponse(Path path, QueryResponse cachedContent, QueryResponse qr) throws NoFilepatternException, IOException, GitAPIException {
 		synchronized (this) {
-			// TODO Re-read cached content to check if it was already updated?
-			// cachedContent=getCache(path);
 			if(qr!=null&&!(qr.equals(cachedContent)))
 			{
 				updateFile(path, qr);
@@ -300,8 +276,8 @@ public class RepoCache {
 	public CommitTimer getCommitTimer() {
 		return commitTimer;
 	}
+	private AtomicInteger ctr=new AtomicInteger(0);
 	public File createTmpFile(Path path) {
-		// TODO Auto-generated method stub
-		return null;
+		return new File(configuration.getCommandLine().downloadsFolder, ""+ctr.incrementAndGet());
 	}
 }

@@ -16,7 +16,6 @@ public class P2CompositeArtifacts extends AbstractPage
 	
 	@Override
 	protected void doGenerate() {
-		contentType="application/xml";
 		Map<String, P2RepoConfig> m=p2.getP2Repos();
 		write("<?xml version='1.0' encoding='UTF-8'?>\n<?compositeArtifactRepository version='1.0.0'?>\n<repository name='QGears p2 repo cache repository' type='org.eclipse.equinox.internal.p2.artifact.repository.CompositeArtifactRepository' version='1'>\n  <properties size='1'>\n    <property name='p2.timestamp' value='");
 		writeObject(timestamp);

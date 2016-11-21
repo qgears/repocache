@@ -6,6 +6,7 @@ import hu.qgears.repocache.ClientQuery;
 import hu.qgears.repocache.ClientSetup;
 import hu.qgears.repocache.EClientMode;
 import hu.qgears.repocache.QueryResponse;
+import hu.qgears.repocache.QueryResponseByteArray;
 import hu.qgears.repocache.RepoHandler;
 
 public class ConfigHandler {
@@ -17,7 +18,7 @@ public class ConfigHandler {
 		}
 		if(q.path.eq(1, "config.xml"))
 		{
-			ret=new QueryResponse("application/xml", "", q.rc.getConfiguration().getConfigXml(), false);
+			ret=new QueryResponseByteArray("config.xml", q.rc.getConfiguration().getConfigXml());
 		}
 		if(q.path.pieces.size()==1)
 		{
@@ -27,13 +28,20 @@ public class ConfigHandler {
 		{
 			String client=q.getParameter("client");
 			String mode=q.getParameter("mode");
-			EClientMode emode=EClientMode.valueOf(mode);
+			EClientMode emode=(mode==null?null:EClientMode.valueOf(mode));
+			String validInMinute=q.getParameter("validInMinute");
+			String shawRealFolderListing=q.getParameter("shawRealFolderListing");
 			if(client.equals("this"))
 			{
 				client=q.getClientIdentifier();
 			}
-			ClientSetup cs=new ClientSetup(client, emode);
-			q.rc.getConfiguration().setClientConfiguration(cs);
+			ClientSetup cs=q.rc.getConfiguration().getClientSetup(client);
+			if (emode!=null) {
+				cs.setMode(emode, validInMinute);
+			}
+			if (shawRealFolderListing!=null) {
+				cs.setShawRealFolderListing(Boolean.valueOf(shawRealFolderListing));
+			}
 			q.sendRedirect("./");
 			return;
 		}
@@ -48,9 +56,20 @@ public class ConfigHandler {
 			q.sendRedirect("./");
 			return;
 		}
+		if(q.path.pieces.size()==2&&q.path.eq(1, "revert"))
+		{
+			try {
+				q.rc.getCommitTimer().executeRevert();
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			q.sendRedirect("./");
+			return;
+		}
 		if(ret!=null)
 		{
-			q.reply(ret.mimeType, ret.responseBody);
+			q.reply(ret);
 		}
 	}
 }

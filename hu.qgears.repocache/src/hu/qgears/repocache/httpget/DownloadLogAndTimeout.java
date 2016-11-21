@@ -57,6 +57,7 @@ public class DownloadLogAndTimeout implements AutoCloseable, Callable<Object>
 		boolean reinit;
 		boolean close;
 		long bps;
+		long remaining;
 		synchronized (this) {
 			if(closed)
 			{
@@ -70,13 +71,15 @@ public class DownloadLogAndTimeout implements AutoCloseable, Callable<Object>
 				dt=1;
 			}
 			bps=(sum*1000/dt);
-			log.info("Download progress: "+url+" "+sum+"/"+l+" "+bps+"BPS");
+			remaining=l-sum;
+			float eta=((float)remaining/bps);
+			log.info("Download progress: "+url+" "+sum+"/"+l+" "+bps+"BPS ETA: "+eta+" seconds");
 			reinit=!closed;
 			close=(dt>timeoutReply&&sum==0l)||(bps<minBps&&dt>timeoutReply);
 		}
 		if(close)
 		{
-			log.error("Download stalled - abort: "+url+" "+sum+"/"+l+" "+bps+"BPS");
+			log.error("Download stalled - abort: "+url+" "+sum+"/"+l+" "+bps+"BPS"+" ETA: "+((float)remaining/bps)+" seconds");
 			method.abort();
 		}
 		if(reinit)

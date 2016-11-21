@@ -21,10 +21,10 @@ public class TestServer extends AbstractHandler {
 	class HandleInstance
 	{
 
-		int bytesPerSec=10000000;
+		int bytesPerSec=200000;
 		long n=0;
 		long t0=System.currentTimeMillis();
-		int N=500000000;
+		int N=5000000;
 
 		public void handle(Request baseRequest, HttpServletResponse response) throws IOException {
 			System.out.println("Estimated download secs: "+N/bytesPerSec);
@@ -72,7 +72,7 @@ public class TestServer extends AbstractHandler {
 	}
 	private void starts() throws Exception
 	{
-		Server server = new Server(8080);
+		Server server = new Server(8081);
 		server.setHandler(this);
 		server.start();
 		server.join();
@@ -80,6 +80,15 @@ public class TestServer extends AbstractHandler {
 	@Override
 	public void handle(String target, Request baseRequest, HttpServletRequest request, HttpServletResponse response)
 			throws IOException, ServletException {
+		String pi=baseRequest.getPathInfo();
+		if(pi.length()<1||pi.endsWith("/"))
+		{
+			response.setContentType("text/html");
+			response.setStatus(HttpServletResponse.SC_OK);
+			baseRequest.setHandled(true);
+			response.getWriter().write("<a href='a.txt'>a.txt</a>");
+			return;
+		}
 		new HandleInstance().handle(baseRequest, response);
 	}
 }

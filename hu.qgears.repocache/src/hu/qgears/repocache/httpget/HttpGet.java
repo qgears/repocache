@@ -3,7 +3,14 @@ package hu.qgears.repocache.httpget;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.OutputStream;
+
+import org.apache.commons.httpclient.URIException;
+import org.apache.commons.httpclient.methods.GetMethod;
+
+import hu.qgears.repocache.QueryResponse;
+import hu.qgears.repocache.QueryResponseFile;
 
 public class HttpGet {
 	public final String url;
@@ -32,8 +39,9 @@ public class HttpGet {
 		}
 	}
 
-	public void ready() {
+	public QueryResponse ready(GetMethod method) throws URIException, IOException {
 		this.ready=true;
+		return new QueryResponseFile(method.getURI().toString(), tmpFile).setDeleteFileOnClose(true);
 	}
 	public File getFile()
 	{

@@ -11,6 +11,7 @@ public class TestSetup {
 	public static void main(String[] args) throws Exception {
 		CommandLineArgs clargs=new CommandLineArgs();
 		clargs.repo=new File("/tmp/repo2");
+		clargs.downloadsFolder=new File("/tmp/repoDownloads");
 		clargs.setConfigOverride(UtilFile.loadFile(TestSetup.class.getResource("repos.xml")));
 		ReadConfig conf=new ReadConfig(clargs);
 		new RepoCache(conf).start();

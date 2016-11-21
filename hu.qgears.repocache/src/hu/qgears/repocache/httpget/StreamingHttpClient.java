@@ -18,6 +18,7 @@ import org.slf4j.LoggerFactory;
 import hu.qgears.repocache.QueryResponse;
 
 public class StreamingHttpClient {
+	public static final int bufferSize=1024*1024;
 	final static Logger log=LoggerFactory.getLogger(StreamingHttpClient.class);
 	/**
 	 * 
@@ -30,7 +31,7 @@ public class StreamingHttpClient {
 		// Create an instance of HttpClient.
 		HttpClient client = new HttpClient();
 		// Create a method instance.
-		GetMethod method = new GetMethod("http://localhost:8080/a.txt");
+		GetMethod method = new GetMethod(get.url);
 //		GetMethod method = new GetMethod("http://releases.ubuntu.com/16.04.1/ubuntu-16.04.1-desktop-amd64.iso");
 		
 
@@ -42,7 +43,7 @@ public class StreamingHttpClient {
 			int statusCode = client.executeMethod(method);
 
 			if (statusCode != HttpStatus.SC_OK) {
-				throw new FileNotFoundException("Method failed: " + method.getStatusLine());
+				throw new FileNotFoundException("Method failed: " + method.getStatusLine()+" "+get.url);
 			}
 			long l=-1;
 			Header h=method.getResponseHeader("Content-Length");
@@ -59,7 +60,7 @@ public class StreamingHttpClient {
 			{
 				try(InputStream is=method.getResponseBodyAsStream())
 				{
-					byte[] buffer=new byte[1000000];
+					byte[] buffer=new byte[bufferSize];
 					int n;
 					while((n=is.read(buffer))>0)
 					{
@@ -74,8 +75,12 @@ public class StreamingHttpClient {
 				// Premature close of download
 				throw new IOException("Premature end of file: "+sum+"/"+l);
 			}
-			get.ready();
-			return new QueryResponse(method, get);
+			QueryResponse ret=get.ready(method);
+			if(ret.folder)
+			{
+				UrlFixer.fixUrls(ret);
+			}
+			return ret;
 		} finally {
 			get.close();
 			method.abort();
