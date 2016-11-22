@@ -1,6 +1,7 @@
 package hu.qgears.repocache;
 
 import java.io.ByteArrayInputStream;
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.Map;
@@ -58,7 +59,39 @@ public class RepoPluginP2 extends AbstractRepoPlugin
 		}
 		for (Map.Entry<String, P2RepoConfig> entry : rc.getConfiguration().getP2repos().entrySet()) {
 			if (localPath.pieces.get(0).equals(entry.getKey())) {
+				if (localPath.pieces.size()==1) {
+					File f = getP2VersionFolder(q, localPath.pieces.get(0));
+					if (!f.exists()) {
+						f.mkdir();
+						File f2 = new File(f.getAbsolutePath() + "/1");
+						f2.mkdir();
+					}
+					return new P2RepoVersionListing(q, this, f).generate();
+				}
+				if(!localPath.folder&&localPath.pieces.size()==2 &&localPath.pieces.get(1).equals(P2RepoVersionArtifacts.file))
+				{
+					File f = getP2VersionFolder(q, localPath.pieces.get(0));
+					long timestamp=parseTimeStamp(cachedContent);
+					QueryResponse ret=new P2RepoVersionArtifacts(q, this, timestamp, f).generate();
+					if(!ret.equals(cachedContent))
+					{
+						// In case the listing has changed also update the timestamp
+						ret=new P2RepoVersionArtifacts(q, this, System.currentTimeMillis(), f).generate();
+					}
+					return ret;
+				} else if(!localPath.folder&&localPath.pieces.size()==2 &&localPath.pieces.get(1).equals(P2RepoVersionContent.file)) {
+					File f = getP2VersionFolder(q, localPath.pieces.get(0));
+					long timestamp=parseTimeStamp(cachedContent);
+					QueryResponse ret=new P2RepoVersionContent(q, this, timestamp, f).generate();
+					if(!ret.equals(cachedContent))
+					{
+						// In case the listing has changed also update the timestamp
+						ret=new P2RepoVersionContent(q, this, System.currentTimeMillis(), f).generate();
+					}
+					return ret;
+				}
 				Path ref = new Path(localPath).remove(0);
+				ref.remove(0);
 				String httpPath = entry.getValue().getBaseUrl() + ref.toStringPath();
 				if(netAllowed)
 				{
@@ -84,6 +117,11 @@ public class RepoPluginP2 extends AbstractRepoPlugin
 		return null;
 	}
 
+	private File getP2VersionFolder (ClientQuery q, String p2Repo) {
+		File f = new File(q.rc.getConfiguration().getLocalGitRepo().getAbsolutePath() + "/p2/" + p2Repo);
+		return f;
+	}
+	
 	private long parseTimeStamp(QueryResponse cachedContent) {
 		TimestampParser tp=new TimestampParser();
 		if(cachedContent!=null&&!cachedContent.folder)

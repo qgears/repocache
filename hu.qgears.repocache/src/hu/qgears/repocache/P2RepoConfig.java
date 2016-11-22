@@ -40,4 +40,8 @@ public class P2RepoConfig {
 	public String getFile() {
 		return file;
 	}
+	public P2RepoMode getRepoMode() {
+		return repoMode;
+	}
+	
 }

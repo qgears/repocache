@@ -32,9 +32,9 @@
 		<remote>http://releases.ubuntu.com/16.10/</remote>
 	</httprepo>
 	<p2repo name="qgears-opensource">
-		<file>opensource/updates</file>
-		<primaryHost>http://qgears.com/</primaryHost>
-		<selectedMirror>http://qgears.com/</selectedMirror>
+		<file>p2/qgears-opensource</file>
+		<primaryHost>http://localhost:8082/</primaryHost>
+		<selectedMirror>http://localhost:8082/</selectedMirror>
 	</p2repo>
 	<p2repo name="eclipse-neon">
 		<file>technology/epp/packages/neon</file>
