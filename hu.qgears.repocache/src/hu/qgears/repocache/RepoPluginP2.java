@@ -18,9 +18,11 @@ public class RepoPluginP2 extends AbstractRepoPlugin
 {
 	private Logger log=LoggerFactory.getLogger(RepoPluginP2.class);
 	private RepoCache rc;
+	private RepoHandler rh;
 
-	public RepoPluginP2(RepoCache rc) {
+	public RepoPluginP2(RepoCache rc, RepoHandler rh) {
 		this.rc=rc;
+		this.rh = rh;
 	}
 
 	public String getPath() {
@@ -44,6 +46,19 @@ public class RepoPluginP2 extends AbstractRepoPlugin
 	public boolean isUpdateModeNormal(String repoName) {
 		P2RepoConfig conf = getRepoConfig(repoName);
 		return (conf==null || P2RepoMode.normal.equals(conf.getRepoMode()));
+	}
+	
+	@Override
+	public boolean createNewVersionOnRewriteMode(Path path) {
+		// Exception files (P2 versioning), that can be updated
+		if (!path.folder && path.pieces.size()==3 
+				&& (path.pieces.get(2).equals(P2RepoVersionArtifacts.file)) || path.pieces.get(2).equals(P2RepoVersionContent.file)) {
+		} else {
+			int version = P2VersionFolderUtil.getInstance().createNextVersionFolder(path.pieces.get(1));
+			System.out.println("Update is forbidden, new version created for repo " + path.pieces.get(1) + ", version: " + version);
+			return true;
+		}
+		return false;
 	}
 	
 	@Override
@@ -81,6 +96,8 @@ public class RepoPluginP2 extends AbstractRepoPlugin
 			}
 			if(!localPath.folder&&localPath.pieces.size()==2 &&localPath.pieces.get(1).equals(P2RepoVersionArtifacts.file))
 			{
+				Path relpath = P2VersionFolderUtil.getInstance().getLastVersionPath(localPath.pieces.get(0));
+				updateLatestListings(q, relpath);
 				long timestamp=parseTimeStamp(cachedContent);
 				QueryResponse ret=new P2RepoVersionArtifacts(q, this, timestamp, localPath.pieces.get(0)).generate();
 				if(!ret.equals(cachedContent))
@@ -90,6 +107,8 @@ public class RepoPluginP2 extends AbstractRepoPlugin
 				}
 				return ret;
 			} else if(!localPath.folder&&localPath.pieces.size()==2 &&localPath.pieces.get(1).equals(P2RepoVersionContent.file)) {
+				Path relpath = P2VersionFolderUtil.getInstance().getLastVersionPath(localPath.pieces.get(0));
+				updateLatestListings(q, relpath);
 				long timestamp=parseTimeStamp(cachedContent);
 				QueryResponse ret=new P2RepoVersionContent(q, this, timestamp, localPath.pieces.get(0)).generate();
 				if(!ret.equals(cachedContent))
@@ -125,6 +144,22 @@ public class RepoPluginP2 extends AbstractRepoPlugin
 		return null;
 	}
 
+	private void updateLatestListings(ClientQuery q, Path relpath) {
+		// Update compositeArtifact
+		updatePath(q, new Path(relpath, "compositeArtifacts.xml"));
+		// Update compositeContent
+		updatePath(q, new Path(relpath, "compositeContent.xml"));
+	}
+
+	private void updatePath (ClientQuery q, Path relpath) {
+		ClientQueryInternal subq=new ClientQueryInternal(rc, relpath, q);
+		try {
+			rh.getQueryResponse(subq);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+	
 	private long parseTimeStamp(QueryResponse cachedContent) {
 		TimestampParser tp=new TimestampParser();
 		if(cachedContent!=null&&!cachedContent.folder)

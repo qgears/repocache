@@ -10,4 +10,6 @@ abstract public class AbstractRepoPlugin {
 
 	abstract public boolean isUpdateModeNormal(String repoName);
 	
+	abstract public boolean createNewVersionOnRewriteMode(Path path);
+	
 }

@@ -59,4 +59,8 @@ public class RepoPluginHttp extends AbstractRepoPlugin
 		return true;
 	}
 	
+	@Override
+	public boolean createNewVersionOnRewriteMode(Path path) {
+		return false;
+	}
 }

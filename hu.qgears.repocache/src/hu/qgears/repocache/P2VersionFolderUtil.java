@@ -44,6 +44,13 @@ public class P2VersionFolderUtil {
 		return version;
 	}
 	
+	public Path getLastVersionPath (String p2Repo) {
+		Path p = new Path("p2/" + p2Repo);
+		File repoFolder = this.getP2VersionFolder(p2Repo);
+		p.add(""+getLastVersionUsed(repoFolder));
+		return p;
+	}
+	
 	public int createNextVersionFolder(String p2Repo) {
 		File repoFolder = this.getP2VersionFolder(p2Repo);
 		int lastVersion = getLastVersionUsed(repoFolder);

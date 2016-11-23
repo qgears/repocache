@@ -89,12 +89,13 @@ public class RepoCache {
 				}
 			}
 		}
-		plugins.add(new RepoPluginP2(this));
+		RepoHandler rh = new RepoHandler(this);
+		plugins.add(new RepoPluginP2(this, rh));
 		plugins.add(new RepoPluginHttp(this));
 		plugins.add(new RepoPluginMaven(this));
 
 		Server server = new Server(configuration.getCommandLine().port);
-		server.setHandler(new RepoHandler(this));
+		server.setHandler(rh);
 		server.start();
 		server.join();
 	}
@@ -246,13 +247,7 @@ public class RepoCache {
 			if(qr!=null&&!(qr.equals(cachedContent)))
 			{
 				if (cachedContent != null && plugin != null && path.pieces.size()>2 && !plugin.isUpdateModeNormal(path.pieces.get(1))) {
-					if (!path.folder && path.pieces.size()==3 
-							&& (path.pieces.get(2).equals(P2RepoVersionArtifacts.file)) || path.pieces.get(2).equals(P2RepoVersionContent.file)) {
-					} else {
-						int version = P2VersionFolderUtil.getInstance().createNextVersionFolder(path.pieces.get(1));
-						System.out.println("Update is forbidden, new version created for repo " + path.pieces.get(1) + ", version: " + version);
-						return;
-					}
+					if (plugin.createNewVersionOnRewriteMode(path)) return;
 				}
 				updateFile(path, qr);
 			}else
