@@ -69,7 +69,7 @@ public class RepoHandler extends AbstractHandler {
 			try
 			{
 				try {
-					rc.updateResponse(q.path, cachedContent, qr);
+					updateResponseByPlugin(q, cachedContent, qr);
 				} catch (Exception e) {
 					throw new IOException(e);
 				}
@@ -82,6 +82,19 @@ public class RepoHandler extends AbstractHandler {
 		return cachedContent;
 	}
 
+	private void updateResponseByPlugin(ClientQuery q, QueryResponse cachedContent, QueryResponse qr) throws Exception {
+		AbstractRepoPlugin plugin = null;
+		for(AbstractRepoPlugin pl: rc.getPlugins())
+		{
+			if(q.path.eq(0, pl.getPath()))
+			{
+				plugin = pl;
+				break;
+			}
+		}
+		rc.updateResponse(q.path, cachedContent, qr, plugin);
+	}
+	
 	private void appendRealFolderListing(ClientQuery q, HttpServletResponse response, QueryResponse cachedContent) throws IOException {
 		ClientSetup client=rc.getConfiguration().getClientSetup(q.getClientIdentifier());
 		if (client.isShawRealFolderListing()) {

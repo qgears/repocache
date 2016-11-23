@@ -57,6 +57,7 @@ public class RepoCache {
 	public void start() throws Exception {
 		commitTimer=new CommitTimer(this);
 		File wc=configuration.getLocalGitRepo();
+		new P2VersionFolderUtil(wc.getAbsolutePath());
 		if(!wc.exists())
 		{
 			wc.mkdirs();
@@ -240,10 +241,19 @@ public class RepoCache {
 	 * @throws IOException
 	 * @throws GitAPIException
 	 */
-	public void updateResponse(Path path, QueryResponse cachedContent, QueryResponse qr) throws NoFilepatternException, IOException, GitAPIException {
+	public void updateResponse(Path path, QueryResponse cachedContent, QueryResponse qr, AbstractRepoPlugin plugin) throws NoFilepatternException, IOException, GitAPIException {
 		synchronized (this) {
 			if(qr!=null&&!(qr.equals(cachedContent)))
 			{
+				if (cachedContent != null && plugin != null && path.pieces.size()>2 && !plugin.isUpdateModeNormal(path.pieces.get(1))) {
+					if (!path.folder && path.pieces.size()==3 
+							&& (path.pieces.get(2).equals(P2RepoVersionArtifacts.file)) || path.pieces.get(2).equals(P2RepoVersionContent.file)) {
+					} else {
+						int version = P2VersionFolderUtil.getInstance().createNextVersionFolder(path.pieces.get(1));
+						System.out.println("Update is forbidden, new version created for repo " + path.pieces.get(1) + ", version: " + version);
+						return;
+					}
+				}
 				updateFile(path, qr);
 			}else
 			{

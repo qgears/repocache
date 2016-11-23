@@ -1,7 +1,6 @@
 package hu.qgears.repocache;
 
 import java.io.ByteArrayInputStream;
-import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.Map;
@@ -30,6 +29,23 @@ public class RepoPluginP2 extends AbstractRepoPlugin
 	public Map<String, P2RepoConfig> getP2Repos() {
 		return new TreeMap<>(rc.getConfiguration().getP2repos());
 	}
+	
+	private P2RepoConfig getRepoConfig(String repoName) {
+		if (repoName == null) return null;
+		for (Map.Entry<String, P2RepoConfig> entry : rc.getConfiguration().getP2repos().entrySet()) {
+			if (repoName.equals(entry.getKey())) {
+				return entry.getValue();
+			}
+		}
+		return null;
+	}
+	
+	@Override
+	public boolean isUpdateModeNormal(String repoName) {
+		P2RepoConfig conf = getRepoConfig(repoName);
+		return (conf==null || P2RepoMode.normal.equals(conf.getRepoMode()));
+	}
+	
 	@Override
 	public QueryResponse getOnlineResponse(Path localPath, ClientQuery q, QueryResponse cachedContent, boolean netAllowed) throws IOException {
 		if(localPath.pieces.size()==0)
@@ -57,71 +73,58 @@ public class RepoPluginP2 extends AbstractRepoPlugin
 			}
 			return ret;
 		}
-		for (Map.Entry<String, P2RepoConfig> entry : rc.getConfiguration().getP2repos().entrySet()) {
-			if (localPath.pieces.get(0).equals(entry.getKey())) {
-				if (localPath.pieces.size()==1) {
-					File f = getP2VersionFolder(q, localPath.pieces.get(0));
-					if (!f.exists()) {
-						f.mkdir();
-						File f2 = new File(f.getAbsolutePath() + "/1");
-						f2.mkdir();
-					}
-					return new P2RepoVersionListing(q, this, f).generate();
-				}
-				if(!localPath.folder&&localPath.pieces.size()==2 &&localPath.pieces.get(1).equals(P2RepoVersionArtifacts.file))
+		P2RepoConfig config = getRepoConfig(localPath.pieces.get(0));
+		if (config != null) {
+			if (localPath.pieces.size()==1) {
+				P2VersionFolderUtil.getInstance().createP2VersionFolderIfNotExist(localPath.pieces.get(0));
+				return new P2RepoVersionListing(q, this, localPath.pieces.get(0)).generate();
+			}
+			if(!localPath.folder&&localPath.pieces.size()==2 &&localPath.pieces.get(1).equals(P2RepoVersionArtifacts.file))
+			{
+				long timestamp=parseTimeStamp(cachedContent);
+				QueryResponse ret=new P2RepoVersionArtifacts(q, this, timestamp, localPath.pieces.get(0)).generate();
+				if(!ret.equals(cachedContent))
 				{
-					File f = getP2VersionFolder(q, localPath.pieces.get(0));
-					long timestamp=parseTimeStamp(cachedContent);
-					QueryResponse ret=new P2RepoVersionArtifacts(q, this, timestamp, f).generate();
-					if(!ret.equals(cachedContent))
-					{
-						// In case the listing has changed also update the timestamp
-						ret=new P2RepoVersionArtifacts(q, this, System.currentTimeMillis(), f).generate();
-					}
-					return ret;
-				} else if(!localPath.folder&&localPath.pieces.size()==2 &&localPath.pieces.get(1).equals(P2RepoVersionContent.file)) {
-					File f = getP2VersionFolder(q, localPath.pieces.get(0));
-					long timestamp=parseTimeStamp(cachedContent);
-					QueryResponse ret=new P2RepoVersionContent(q, this, timestamp, f).generate();
-					if(!ret.equals(cachedContent))
-					{
-						// In case the listing has changed also update the timestamp
-						ret=new P2RepoVersionContent(q, this, System.currentTimeMillis(), f).generate();
-					}
-					return ret;
+					// In case the listing has changed also update the timestamp
+					ret=new P2RepoVersionArtifacts(q, this, System.currentTimeMillis(), localPath.pieces.get(0)).generate();
 				}
-				Path ref = new Path(localPath).remove(0);
-				ref.remove(0);
-				String httpPath = entry.getValue().getBaseUrl() + ref.toStringPath();
-				if(netAllowed)
+				return ret;
+			} else if(!localPath.folder&&localPath.pieces.size()==2 &&localPath.pieces.get(1).equals(P2RepoVersionContent.file)) {
+				long timestamp=parseTimeStamp(cachedContent);
+				QueryResponse ret=new P2RepoVersionContent(q, this, timestamp, localPath.pieces.get(0)).generate();
+				if(!ret.equals(cachedContent))
 				{
-					try
-					{
-						QueryResponse response = q.rc.client.get(new HttpGet(q.rc.createTmpFile(q.path), httpPath));
-						return response;
-					}catch(FileNotFoundException e)
-					{
-						if(ref.pieces.size()==1 && ref.pieces.get(0).equals("p2.index"))
-						{
-							// Workaround missing p2.index file in composited repo
-							return new P2Index(q).generate();
-						}
-						throw e;
-					}
-				}else
-				{
-					log.info("File in cache is not updated: "+q.path);
+					// In case the listing has changed also update the timestamp
+					ret=new P2RepoVersionContent(q, this, System.currentTimeMillis(), localPath.pieces.get(0)).generate();
 				}
+				return ret;
+			}
+			Path ref = new Path(localPath).remove(0);
+			ref.remove(0);
+			String httpPath = config.getBaseUrl() + ref.toStringPath();
+			if(netAllowed)
+			{
+				try
+				{
+					QueryResponse response = q.rc.client.get(new HttpGet(q.rc.createTmpFile(q.path), httpPath));
+					return response;
+				}catch(FileNotFoundException e)
+				{
+					if(ref.pieces.size()==1 && ref.pieces.get(0).equals("p2.index"))
+					{
+						// Workaround missing p2.index file in composited repo
+						return new P2Index(q).generate();
+					}
+					throw e;
+				}
+			}else
+			{
+				log.info("File in cache is not updated: "+q.path);
 			}
 		}
 		return null;
 	}
 
-	private File getP2VersionFolder (ClientQuery q, String p2Repo) {
-		File f = new File(q.rc.getConfiguration().getLocalGitRepo().getAbsolutePath() + "/p2/" + p2Repo);
-		return f;
-	}
-	
 	private long parseTimeStamp(QueryResponse cachedContent) {
 		TimestampParser tp=new TimestampParser();
 		if(cachedContent!=null&&!cachedContent.folder)
@@ -136,5 +139,5 @@ public class RepoPluginP2 extends AbstractRepoPlugin
 		}
 		return tp.getTimestamp();
 	}
-
+	
 }

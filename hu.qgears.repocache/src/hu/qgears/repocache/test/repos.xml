@@ -35,11 +35,13 @@
 		<file>p2/qgears-opensource</file>
 		<primaryHost>http://localhost:8082/</primaryHost>
 		<selectedMirror>http://localhost:8082/</selectedMirror>
+		<mode>replace</mode>
 	</p2repo>
 	<p2repo name="eclipse-neon">
 		<file>technology/epp/packages/neon</file>
 		<primaryHost>http://download.eclipse.org/</primaryHost>
 		<selectedMirror>http://mirror.tspu.ru/eclipse/</selectedMirror>
+		<mode>normal</mode>
 	</p2repo>
 	<p2repo name="eclipse-release-neon-201610111000">
 		<file>releases/neon/201610111000</file>
