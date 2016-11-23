@@ -1,4 +1,4 @@
-package hu.qgears.repocache;
+package hu.qgears.repocache.mavenplugin;
 
 import java.io.IOException;
 import java.util.Map;
@@ -7,34 +7,38 @@ import java.util.TreeMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import hu.qgears.repocache.AbstractRepoPlugin;
+import hu.qgears.repocache.ClientQuery;
+import hu.qgears.repocache.Path;
+import hu.qgears.repocache.QueryResponse;
+import hu.qgears.repocache.RepoCache;
 import hu.qgears.repocache.httpget.HttpGet;
 
-public class RepoPluginHttp extends AbstractRepoPlugin
+public class RepoPluginMaven extends AbstractRepoPlugin
 {
 	private Logger log=LoggerFactory.getLogger(getClass());
 	private RepoCache rc;
-
-	public RepoPluginHttp(RepoCache rc) {
+	public RepoPluginMaven(RepoCache rc) {
 		this.rc=rc;
 	}
 
 	public String getPath() {
-		return "http";
+		return "maven";
 	}
-	public Map<String, String> getHttpRepos() {
-		return new TreeMap<>(rc.getConfiguration().getHttprepos());
+	public Map<String, String> getMavenRepos() {
+		return new TreeMap<>(rc.getConfiguration().getMvnrepos());
 	}
 	@Override
 	public QueryResponse getOnlineResponse(Path localPath, ClientQuery q, QueryResponse cachedContent, boolean netAllowed) throws IOException {
 		if(localPath.pieces.size()==0)
 		{
-			return new HttpListing(q, this).generate();
+			return new MavenListing(q, this).generate();
 		}
-		for (Map.Entry<String, String> entry : rc.getConfiguration().getHttprepos().entrySet()) {
+		for (Map.Entry<String, String> entry : rc.getConfiguration().getMvnrepos().entrySet()) {
 			if (localPath.pieces.get(0).equals(entry.getKey())) {
 				Path ref = new Path(localPath).remove(0);
 				String httpPath = entry.getValue() + ref.toStringPath();
-				if(!netAllowed||noRefresh(ref, cachedContent))
+				if(!netAllowed)
 				{
 					log.info("Path not updated from remote server: "+httpPath+" local path: "+localPath);
 					return null;
@@ -44,14 +48,6 @@ public class RepoPluginHttp extends AbstractRepoPlugin
 			}
 		}
 		return null;
-	}
-
-	private boolean noRefresh(Path ref, QueryResponse cachedContent) {
-		if(cachedContent!=null&&ref.getFileName().endsWith(".tar.gz"))
-		{
-			return true;
-		}
-		return false;
 	}
 	
 	@Override

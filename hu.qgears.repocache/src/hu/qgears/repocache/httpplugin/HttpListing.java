@@ -1,6 +1,9 @@
-package hu.qgears.repocache;
+package hu.qgears.repocache.httpplugin;
 
 import java.util.Map;
+
+import hu.qgears.repocache.AbstractPage;
+import hu.qgears.repocache.ClientQuery;
 
 public class HttpListing extends AbstractPage
 {

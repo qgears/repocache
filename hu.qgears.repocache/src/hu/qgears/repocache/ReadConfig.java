@@ -17,6 +17,9 @@ import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
+import hu.qgears.repocache.p2plugin.P2RepoConfig;
+import hu.qgears.repocache.p2plugin.P2RepoMode;
+
 /**
  * Configuration parser for repocache implementation.
  */

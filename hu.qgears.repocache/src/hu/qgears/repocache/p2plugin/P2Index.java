@@ -1,4 +1,7 @@
-package hu.qgears.repocache;
+package hu.qgears.repocache.p2plugin;
+
+import hu.qgears.repocache.AbstractPage;
+import hu.qgears.repocache.ClientQuery;
 
 public class P2Index extends AbstractPage {
 

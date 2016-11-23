@@ -1,4 +1,4 @@
-package hu.qgears.repocache;
+package hu.qgears.repocache.p2plugin;
 
 public enum P2RepoMode {
 	/**

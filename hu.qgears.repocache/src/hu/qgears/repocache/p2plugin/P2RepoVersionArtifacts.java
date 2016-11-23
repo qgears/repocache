@@ -1,6 +1,9 @@
-package hu.qgears.repocache;
+package hu.qgears.repocache.p2plugin;
 
 import java.util.List;
+
+import hu.qgears.repocache.AbstractPage;
+import hu.qgears.repocache.ClientQuery;
 
 public class P2RepoVersionArtifacts extends AbstractPage {
 	public static String file="compositeArtifacts.xml";

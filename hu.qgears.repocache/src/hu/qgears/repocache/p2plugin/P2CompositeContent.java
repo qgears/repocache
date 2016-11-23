@@ -1,34 +1,36 @@
-package hu.qgears.repocache;
+package hu.qgears.repocache.p2plugin;
 
-import java.util.List;
+import java.util.Map;
 
-public class P2RepoVersionContent extends AbstractPage {
+import hu.qgears.repocache.AbstractPage;
+import hu.qgears.repocache.ClientQuery;
+
+public class P2CompositeContent extends AbstractPage
+{
 	private RepoPluginP2 p2;
 	private long timestamp;
 	public static String file="compositeContent.xml";
-	private String p2Repo;
 
-	public P2RepoVersionContent(ClientQuery query, RepoPluginP2 p2, long timestamp, String p2Repo) {
+	public P2CompositeContent(ClientQuery query, RepoPluginP2 p2, long timestamp) {
 		super(query);
 		this.p2=p2;
 		this.timestamp=timestamp;
-		this.p2Repo = p2Repo;
 	}
 	
 	@Override
 	protected void doGenerate() {
-		List<String> folderList = P2VersionFolderUtil.getInstance().listFolders(p2Repo);
+		Map<String, P2RepoConfig> m=p2.getP2Repos();
 		write("<?xml version='1.0' encoding='UTF-8'?>\n<?compositeMetadataRepository version='1.0.0'?>\n<repository name='QGears p2 repo cache repository' type='org.eclipse.equinox.internal.p2.metadata.repository.CompositeMetadataRepository' version='1'>\n  <properties size='1'>\n    <property name='p2.timestamp' value='");
 		writeObject(timestamp);
 		write("'/>\n  </properties>\n  <children size='");
-		writeObject(folderList.size());
+		writeObject(m.size());
 		write("'>\n");
-		for (String dir : folderList) {
+		for(Map.Entry<String, P2RepoConfig> entry: m.entrySet())
+		{
 			write("    <child location='");
-			writeObject(dir);
+			writeObject(entry.getKey());
 			write("'/>\n");
 		}
 		write("  </children>\n</repository>\n\n");
 	}
-
 }

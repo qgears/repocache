@@ -1,6 +1,9 @@
-package hu.qgears.repocache;
+package hu.qgears.repocache.p2plugin;
 
 import java.util.Map;
+
+import hu.qgears.repocache.AbstractPage;
+import hu.qgears.repocache.ClientQuery;
 
 /**
  * Generator that generates setup code for Ooomph to use this repository

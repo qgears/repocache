@@ -1,4 +1,4 @@
-package hu.qgears.repocache;
+package hu.qgears.repocache.p2plugin;
 
 import java.io.ByteArrayInputStream;
 import java.io.FileNotFoundException;
@@ -12,6 +12,14 @@ import javax.xml.parsers.SAXParserFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import hu.qgears.repocache.AbstractRepoPlugin;
+import hu.qgears.repocache.ClientQuery;
+import hu.qgears.repocache.ClientQueryInternal;
+import hu.qgears.repocache.Path;
+import hu.qgears.repocache.QueryResponse;
+import hu.qgears.repocache.RepoCache;
+import hu.qgears.repocache.RepoHandler;
+import hu.qgears.repocache.TimestampParser;
 import hu.qgears.repocache.httpget.HttpGet;
 
 public class RepoPluginP2 extends AbstractRepoPlugin

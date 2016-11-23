@@ -1,9 +1,11 @@
-package hu.qgears.repocache;
+package hu.qgears.repocache.p2plugin;
 
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+
+import hu.qgears.repocache.Path;
 
 public class P2VersionFolderUtil {
 	

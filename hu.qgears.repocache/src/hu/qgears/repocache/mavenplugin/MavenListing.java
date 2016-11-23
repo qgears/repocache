@@ -1,6 +1,9 @@
-package hu.qgears.repocache;
+package hu.qgears.repocache.mavenplugin;
 
 import java.util.Map;
+
+import hu.qgears.repocache.AbstractPage;
+import hu.qgears.repocache.ClientQuery;
 
 public class MavenListing extends AbstractPage
 {

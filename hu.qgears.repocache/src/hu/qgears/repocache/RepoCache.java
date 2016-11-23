@@ -21,6 +21,10 @@ import org.slf4j.LoggerFactory;
 
 import hu.qgears.commons.UtilFile;
 import hu.qgears.repocache.httpget.StreamingHttpClient;
+import hu.qgears.repocache.httpplugin.RepoPluginHttp;
+import hu.qgears.repocache.mavenplugin.RepoPluginMaven;
+import hu.qgears.repocache.p2plugin.P2VersionFolderUtil;
+import hu.qgears.repocache.p2plugin.RepoPluginP2;
 import joptsimple.annot.AnnotatedClass;
 
 public class RepoCache {
