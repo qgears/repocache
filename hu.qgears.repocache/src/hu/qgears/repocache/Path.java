@@ -35,6 +35,12 @@ public class Path {
 		pieces.remove(i);
 		return this;
 	}
+	public Path removeLast() {
+		if (pieces.size()>0) {
+			pieces.remove(pieces.size()-1);
+		}
+		return this;
+	}
 	public boolean eq(int i, String path) {
 		return (pieces.size()>i)&&pieces.get(i).equals(path) ;
 	}

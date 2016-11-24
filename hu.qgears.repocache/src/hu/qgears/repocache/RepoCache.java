@@ -174,6 +174,18 @@ public class RepoCache {
 		}
 	}
 
+	public void createFolder (Path path) {
+		File f = getWorkingCopyFile(path);
+		f.mkdir();
+		File f2 = new File(f.getAbsolutePath()+"/.folder");
+		try {
+			f2.createNewFile();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		commitTimer.addCommit("Auto update folder: " + path.toStringPath());
+	}
+	
 	private void deleteIfExists(Path path) {
 		if(path==null)
 		{
@@ -250,9 +262,9 @@ public class RepoCache {
 		synchronized (this) {
 			if(qr!=null&&!(qr.equals(cachedContent)))
 			{
-				if (cachedContent != null && plugin != null && path.pieces.size()>2 && !plugin.isUpdateModeNormal(path.pieces.get(1))) {
+				/*if (cachedContent != null && plugin != null && path.pieces.size()>2 && !plugin.isUpdateModeNormal(path.pieces.get(1))) {
 					if (plugin.createNewVersionOnRewriteMode(path)) return;
-				}
+				}*/
 				updateFile(path, qr);
 			}else
 			{

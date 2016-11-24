@@ -58,14 +58,4 @@ public class RepoPluginHttp extends AbstractRepoPlugin
 		}
 		return false;
 	}
-	
-	@Override
-	public boolean isUpdateModeNormal(String repoName) {
-		return true;
-	}
-	
-	@Override
-	public boolean createNewVersionOnRewriteMode(Path path) {
-		return false;
-	}
 }

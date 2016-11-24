@@ -118,7 +118,6 @@ public class RepoHandler extends AbstractHandler {
 			}
 		} catch (Exception e) {
 			System.err.println("Error fetching file: "+q.path);
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		return cachedContent;

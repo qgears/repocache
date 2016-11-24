@@ -49,14 +49,4 @@ public class RepoPluginMaven extends AbstractRepoPlugin
 		}
 		return null;
 	}
-	
-	@Override
-	public boolean isUpdateModeNormal(String repoName) {
-		return true;
-	}
-	
-	@Override
-	public boolean createNewVersionOnRewriteMode(Path path) {
-		return false;
-	}
 }

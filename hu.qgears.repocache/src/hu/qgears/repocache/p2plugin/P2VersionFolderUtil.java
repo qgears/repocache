@@ -11,6 +11,7 @@ public class P2VersionFolderUtil {
 	
 	private static P2VersionFolderUtil instance = null;
 	private static String localRepo = null;
+	public static final String P2_PATH = "p2";
 	
 	public P2VersionFolderUtil(String localRepo) {
 		P2VersionFolderUtil.localRepo = localRepo;
@@ -22,12 +23,17 @@ public class P2VersionFolderUtil {
 	}
 
 	public List<String> listFolders (String p2Repo) {
-		File repoFolder = this.getP2VersionFolder(p2Repo);
+		File repoFolder = getP2VersionFolder(p2Repo);
 		List<String> folderList = new ArrayList<>();
 		File[] files = repoFolder.listFiles();
 		for (File dir : files) if (dir.isDirectory()) folderList.add(dir.getName());
 		Collections.sort(folderList);
 		return folderList;
+	}
+	
+	public int getLastVersionUsed(String p2Repo) {
+		File repoFolder = getP2VersionFolder(p2Repo);
+		return getLastVersionUsed(repoFolder);
 	}
 	
 	private int getLastVersionUsed(File repoFolder) {
@@ -47,31 +53,25 @@ public class P2VersionFolderUtil {
 	}
 	
 	public Path getLastVersionPath (String p2Repo) {
-		Path p = new Path("p2/" + p2Repo);
-		File repoFolder = this.getP2VersionFolder(p2Repo);
+		Path p = new Path(P2_PATH);
+		p.add(p2Repo);
+		File repoFolder = getP2VersionFolder(p2Repo);
 		p.add(""+getLastVersionUsed(repoFolder));
 		return p;
 	}
 	
-	public int createNextVersionFolder(String p2Repo) {
-		File repoFolder = this.getP2VersionFolder(p2Repo);
-		int lastVersion = getLastVersionUsed(repoFolder);
-		File f2 = new File(repoFolder.getAbsolutePath() + "/" + (++lastVersion));
-		f2.mkdir();
-		return lastVersion;
-	}
-
 	private File getP2VersionFolder (String p2Repo) {
-		File f = new File(P2VersionFolderUtil.localRepo + "/p2/" + p2Repo);
+		File f = new File("/" + new Path(P2VersionFolderUtil.localRepo).add(P2_PATH).add(p2Repo).toStringPath());
 		return f;
 	}
 	
-	public void createP2VersionFolderIfNotExist (String p2Repo) {
+	public Path createP2VersionFolderIfNotExist (String p2Repo) {
 		File f = getP2VersionFolder(p2Repo);
 		if (!f.exists()) {
 			f.mkdir();
-			createNextVersionFolder(p2Repo);
+			return new Path(P2_PATH).add(p2Repo);
 		}
+		return null;
 	}
 	
 }

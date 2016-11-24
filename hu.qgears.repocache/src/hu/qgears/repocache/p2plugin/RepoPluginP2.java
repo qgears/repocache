@@ -34,7 +34,7 @@ public class RepoPluginP2 extends AbstractRepoPlugin
 	}
 
 	public String getPath() {
-		return "p2";
+		return P2VersionFolderUtil.P2_PATH;
 	}
 	public Map<String, P2RepoConfig> getP2Repos() {
 		return new TreeMap<>(rc.getConfiguration().getP2repos());
@@ -50,23 +50,16 @@ public class RepoPluginP2 extends AbstractRepoPlugin
 		return null;
 	}
 	
-	@Override
-	public boolean isUpdateModeNormal(String repoName) {
+	private boolean isUpdateModeNormal(String repoName) {
 		P2RepoConfig conf = getRepoConfig(repoName);
 		return (conf==null || P2RepoMode.normal.equals(conf.getRepoMode()));
 	}
 	
-	@Override
-	public boolean createNewVersionOnRewriteMode(Path path) {
-		// Exception files (P2 versioning), that can be updated
-		if (!path.folder && path.pieces.size()==3 
-				&& (path.pieces.get(2).equals(P2RepoVersionArtifacts.file)) || path.pieces.get(2).equals(P2RepoVersionContent.file)) {
-		} else {
-			int version = P2VersionFolderUtil.getInstance().createNextVersionFolder(path.pieces.get(1));
-			System.out.println("Update is forbidden, new version created for repo " + path.pieces.get(1) + ", version: " + version);
-			return true;
-		}
-		return false;
+	private boolean createNewVersionOnRewriteMode(Path path) {
+		int lastVersion = P2VersionFolderUtil.getInstance().getLastVersionUsed(path.pieces.get(1));
+		rc.createFolder(new Path(path, ""+(++lastVersion)));
+		System.out.println("Update is forbidden, new version created for repo " + path.pieces.get(1) + ", version: " + lastVersion);
+		return true;
 	}
 	
 	@Override
@@ -99,7 +92,10 @@ public class RepoPluginP2 extends AbstractRepoPlugin
 		P2RepoConfig config = getRepoConfig(localPath.pieces.get(0));
 		if (config != null) {
 			if (localPath.pieces.size()==1) {
-				P2VersionFolderUtil.getInstance().createP2VersionFolderIfNotExist(localPath.pieces.get(0));
+				Path p = P2VersionFolderUtil.getInstance().createP2VersionFolderIfNotExist(localPath.pieces.get(0));
+				if (p!=null){
+					createNewVersionOnRewriteMode(p);
+				}
 				return new P2RepoVersionListing(q, this, localPath.pieces.get(0)).generate();
 			}
 			if(!localPath.folder&&localPath.pieces.size()==2 &&localPath.pieces.get(1).equals(P2RepoVersionArtifacts.file))
@@ -134,10 +130,23 @@ public class RepoPluginP2 extends AbstractRepoPlugin
 				try
 				{
 					QueryResponse response = q.rc.client.get(new HttpGet(q.rc.createTmpFile(q.path), httpPath));
+					if(response!=null&&!(response.equals(cachedContent)))
+					{
+						if (cachedContent != null && !isUpdateModeNormal(localPath.pieces.get(0))) {
+							String currentVersion = localPath.pieces.get(1);
+							Path lastVersion = P2VersionFolderUtil.getInstance().getLastVersionPath(localPath.pieces.get(0));
+							if (lastVersion.getFileName().equals(currentVersion)) {
+								if (createNewVersionOnRewriteMode(lastVersion.removeLast())) return null;
+							} else {
+								System.out.println("Local cache not equal no remote, but P2 version (not last) is readonly.");
+								return null;
+							}
+						}
+					}
 					return response;
 				}catch(FileNotFoundException e)
 				{
-					if(ref.pieces.size()==1 && ref.pieces.get(0).equals("p2.index"))
+					if(ref.pieces.size()==2 && ref.pieces.get(1).equals("p2.index"))
 					{
 						// Workaround missing p2.index file in composited repo
 						return new P2Index(q).generate();
@@ -176,7 +185,6 @@ public class RepoPluginP2 extends AbstractRepoPlugin
 				SAXParser p=SAXParserFactory.newInstance().newSAXParser();
 				p.parse(new ByteArrayInputStream(cachedContent.getResponseAsBytes()), tp);
 			} catch (Exception e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 		}
