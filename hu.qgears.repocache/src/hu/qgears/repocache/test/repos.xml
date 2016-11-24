@@ -1,9 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!-- Example configuration that is used for manual testing. -->
 <repos>
-	<localgitrepo name="local">
-		<path>/tmp/repo2/</path>
-	</localgitrepo>
 	<mavenrepo name="maven-central">
 		<remote>http://repo1.maven.org/maven2/</remote>
 	</mavenrepo>

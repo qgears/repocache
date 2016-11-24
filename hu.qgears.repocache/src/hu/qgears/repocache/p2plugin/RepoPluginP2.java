@@ -57,8 +57,14 @@ public class RepoPluginP2 extends AbstractRepoPlugin
 	
 	private boolean createNewVersionOnRewriteMode(Path path) {
 		int lastVersion = P2VersionFolderUtil.getInstance().getLastVersionUsed(path.pieces.get(1));
-		rc.createFolder(new Path(path, ""+(++lastVersion)));
-		System.out.println("Update is forbidden, new version created for repo " + path.pieces.get(1) + ", version: " + lastVersion);
+		Path placeholderFile=new Path(path).add(""+(++lastVersion)).add(".folder");
+		try {
+			log.info("Update is forbidden, create for repo " + path.pieces.get(1) + ", version: " + lastVersion);
+			rc.createFile(placeholderFile, new byte[]{}, "Auto update create new P2 repo version: ");
+		} catch (IOException e) {
+			log.error("Error ", e);
+
+		}
 		return true;
 	}
 	
@@ -136,9 +142,10 @@ public class RepoPluginP2 extends AbstractRepoPlugin
 							String currentVersion = localPath.pieces.get(1);
 							Path lastVersion = P2VersionFolderUtil.getInstance().getLastVersionPath(localPath.pieces.get(0));
 							if (lastVersion.getFileName().equals(currentVersion)) {
-								if (createNewVersionOnRewriteMode(lastVersion.removeLast())) return null;
+								createNewVersionOnRewriteMode(lastVersion.removeLast());
+								return null;
 							} else {
-								System.out.println("Local cache not equal no remote, but P2 version (not last) is readonly.");
+								log.info("Local cache not equal no remote, but P2 repo " + localPath.pieces.get(0) + "version (not last) is readonly.");
 								return null;
 							}
 						}

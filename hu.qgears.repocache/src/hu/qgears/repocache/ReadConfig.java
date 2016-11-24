@@ -12,6 +12,8 @@ import java.util.TreeMap;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
@@ -24,6 +26,7 @@ import hu.qgears.repocache.p2plugin.P2RepoMode;
  * Configuration parser for repocache implementation.
  */
 public class ReadConfig {
+	private static Logger log=LoggerFactory.getLogger(ReadConfig.class);
 
 	private Map<String, String> mvnrepos = new HashMap<>();
 	private Map<String, String> httprepos = new HashMap<>();
@@ -50,21 +53,12 @@ public class ReadConfig {
 				parseMavenRepos(doc);
 				parseHttpRepos(doc);
 				parseP2Repos(doc);
-				parseLocalGitRepo(doc);
 			}
 		} catch (Exception e) {
 			throw new IOException("Error reading configuration: "+args.config, e);
 		}
 	}
 
-	private void parseLocalGitRepo (Document doc) {
-		NodeList localRepos = doc.getElementsByTagName("localgitrepo");
-		for (int temp = 0; temp < localRepos.getLength(); temp++) {
-			Node localRepo = localRepos.item(temp);
-			String path = getNodeValue("path", localRepo.getChildNodes());
-		}
-	}
-	
 	private void parseMavenRepos (Document doc) {
 		NodeList mavenRepos = doc.getElementsByTagName("mavenrepo");
 		for (int temp = 0; temp < mavenRepos.getLength(); temp++) {
@@ -72,7 +66,7 @@ public class ReadConfig {
 			String repoName = getNodeAttr("name", mavenRepo);
 			String remote = getNodeValue("remote", mavenRepo.getChildNodes());
 			mvnrepos.put(repoName, remote);
-			System.out.println("Maven repo name: " + repoName + ", remote: " + remote);
+			log.info("Maven repo name: " + repoName + ", remote: " + remote);
 		}
 	}
 	
@@ -83,7 +77,7 @@ public class ReadConfig {
 			String repoName = getNodeAttr("name", httpRepo);
 			String remote = getNodeValue("remote", httpRepo.getChildNodes());
 			httprepos.put(repoName, remote);
-			System.out.println("Http repo name: " + repoName + ", remote: " + remote);
+			log.info("Http repo name: " + repoName + ", remote: " + remote);
 		}
 	}
 	
@@ -97,7 +91,7 @@ public class ReadConfig {
 			String selectedMirror = getNodeValue("selectedMirror", p2Repo.getChildNodes());
 			P2RepoMode repoMode = P2RepoMode.parse(getNodeValue("mode", p2Repo.getChildNodes()));
 			p2repos.put(repoName, new P2RepoConfig(file, primaryHost, selectedMirror, repoMode));
-			System.out.println("P2 repo name: " + repoName + ", file: " + file + ", primaryHost: " + primaryHost + ", selectedMirror: " + selectedMirror);
+			log.info("P2 repo name: " + repoName + ", file: " + file + ", primaryHost: " + primaryHost + ", selectedMirror: " + selectedMirror);
 		}
 	}
 	

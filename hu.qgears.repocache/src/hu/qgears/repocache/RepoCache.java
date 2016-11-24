@@ -174,16 +174,14 @@ public class RepoCache {
 		}
 	}
 
-	public void createFolder (Path path) {
-		File f = getWorkingCopyFile(path);
-		f.mkdir();
-		File f2 = new File(f.getAbsolutePath()+"/.folder");
-		try {
-			f2.createNewFile();
-		} catch (IOException e) {
-			e.printStackTrace();
+	public void createFile (Path path, byte[] content, String commitMsg) throws IOException {
+		synchronized (this) {
+			deleteIfExists(path);
+			File f=getWorkingCopyFile(path);
+			f.getParentFile().mkdirs();
+			UtilFile.saveAsFile(f, content);
+			commitTimer.addCommit(commitMsg + path.toStringPath());
 		}
-		commitTimer.addCommit("Auto update folder: " + path.toStringPath());
 	}
 	
 	private void deleteIfExists(Path path) {
@@ -215,36 +213,6 @@ public class RepoCache {
 		return new Path(localPath).add(maintenancefilesprefix + "listing");
 	}
 
-//	private byte[] getFile(ObjectReader reader, Path path)
-//			throws MissingObjectException, IncorrectObjectTypeException, CorruptObjectException, IOException {
-//		ObjectId lastCommitId = repository.resolve(Constants.HEAD);
-//
-//		// a RevWalk allows to walk over commits based on some filtering that is
-//		// defined
-//		try (RevWalk revWalk = new RevWalk(repository)) {
-//			RevCommit commit = revWalk.parseCommit(lastCommitId);
-//			// and using commit's tree find the path
-//			RevTree tree = commit.getTree();
-////			System.out.println("Having tree: " + tree);
-//			return getFile(reader, path, tree);
-//		}
-//	}
-//	private byte[] getFile(ObjectReader reader, Path path, AnyObjectId tree)
-//			throws MissingObjectException, IncorrectObjectTypeException, CorruptObjectException, IOException {
-//		// now try to find a specific file
-//		try (TreeWalk treeWalk = new TreeWalk(repository)) {
-//			treeWalk.addTree(tree);
-//			treeWalk.setRecursive(true);
-//			treeWalk.setFilter(PathFilter.create(path.toStringPath()));
-//			if (!treeWalk.next()) {
-//				return null;
-//			}
-//	
-//			ObjectId objectId = treeWalk.getObjectId(0);
-//			ObjectLoader loader = repository.open(objectId);
-//			return loader.getBytes();
-//		}
-//	}
 	public List<AbstractRepoPlugin> getPlugins()
 	{
 		return plugins;
