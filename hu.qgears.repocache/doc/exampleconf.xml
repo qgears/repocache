@@ -1,5 +1,0 @@
-<repoconfig>
-	<http>
-		<entry url="http://mirror.switch.ch/eclipse/oomph/epp/neon/R1/eclipse-inst-linux64.tar.gz" name="oomphneon"/>
-	</http>
-</repoconfig>

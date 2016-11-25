@@ -54,12 +54,20 @@ Crawling can be started using the crawl link on the bottom part of the listing.
 
 Possible to set on /config page and simple HTTP GET commands:
 
- * default mode: read from cache only, do not use any remote servers
- * update mode: all queries initiate a remote server query and cache is updated if remote source has changed
- * add mode: non-exisiting files are queried from remote and added to cache on demand.
- * No cache transparent proxy mode: turn on this mode and you can download all packages available, even ones that are not available in the repo. (Use it to dry-run installing new features. After validating the install it is possible to turn on "update" or "add" mode which installs all files into cache.)
- * missingFilesTransparentDownload mode: use cache when available but download when not available. Downloaded file is not saved to cache.
+ * READ_ONLY mode: read from cache only, do not use any remote servers
+ * UPDATER mode: all queries initiate a remote server query and setting for the given repo is applied
+
 
  * timed mode: use the selected mode until the timeout then go back to default mode.
 
  * Shawing real folder listing can be enabled/disabled.
+
+=== Repo modes
+ 
+Possible to set using repo modes, such as the followings:
+ 
+ * READ_ONLY mode: read from cache only, do not use any remote servers
+ * UPDATE mode: all queries initiate a remote server query and cache is updated if remote source has changed
+ * ADD_ONLY mode: non-exisiting files are queried from remote and added to cache on demand.
+ * NO_CACHE_TRANSPARENT proxy mode: turn on this mode and you can download all packages available, even ones that are not available in the repo. (Use it to dry-run installing new features. After validating the install it is possible to turn on "update" or "add" mode which installs all files into cache.)
+ * missingFilesTransparentDownload mode: use cache when available but download when not available. Downloaded file is not saved to cache.

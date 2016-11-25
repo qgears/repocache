@@ -2,6 +2,7 @@ package hu.qgears.repocache;
 
 import java.util.Calendar;
 
+import org.eclipse.jgit.util.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -38,7 +39,7 @@ public class ClientSetup {
 	}
 	public void setMode(EClientMode mode, String validInMinute) {
 		this.mode = mode;
-		if (!EClientMode.READ_ONLY.equals(mode)&&validInMinute != null) {
+		if (!EClientMode.READ_ONLY.equals(mode)&& !StringUtils.isEmptyOrNull(validInMinute)) {
 			try {
 				int validity = Integer.parseInt(validInMinute);
 				modeValidTill = Calendar.getInstance();
@@ -48,9 +49,28 @@ public class ClientSetup {
 			}
 		}
 	}
+	
+	private String stillValidInMinutes () {
+		long now = Calendar.getInstance().getTimeInMillis();
+		if (modeValidTill == null) return "FOREVER";
+		long validTill = modeValidTill.getTimeInMillis();
+		long minutes = (validTill - now) / 1000 / 60;
+		return minutes < 0 ? "0" : ""+minutes;
+	}
+	
 	@Override
 	public String toString() {
-		return ""+id+": "+getMode()+" : "+(shawRealFolderListing?"" : "NOT ") + "Shaw real folder listing.";
+		StringBuilder sb = new StringBuilder(id+": ");
+		sb.append(getMode());
+		if (modeValidTill!=null) {
+			sb.append(" (valid for ");
+			sb.append(stillValidInMinutes());
+			sb.append(" minutes)");
+		}
+		sb.append(" : ");
+		sb.append("Real folder listing ");
+		sb.append(shawRealFolderListing ? "ENABLED." : "DISABLED.");
+		return sb.toString();
 	}
 
 	private boolean isModeValid() {

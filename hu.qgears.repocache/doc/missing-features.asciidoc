@@ -1,5 +1,3 @@
-P2RepoMode.rewrite - handle rewrite mode repos correctly (create a new sub-listing for them)
-
 Stop crawling: Ongoing crawlings must be registered. config page should list them with a link, which when called cancels the crawling (after the current file is finished.)
 (Currently setting the client to read only mode fixes this problem.)
 

@@ -47,7 +47,7 @@ public class ConfigHandler {
 			EClientMode emode=(mode==null?null:EClientMode.valueOf(mode));
 			String validInMinute=q.getParameter("validInMinute");
 			String shawRealFolderListing=q.getParameter("shawRealFolderListing");
-			log.info("Setting client mode, client: " + client + ", mode: " + mode + ", validinmin");
+			log.info("Setting client mode, client: " + client + ", mode: " + mode + ", validinmin: " + validInMinute);
 			if(client.equals("this"))
 			{
 				client=q.getClientIdentifier();
