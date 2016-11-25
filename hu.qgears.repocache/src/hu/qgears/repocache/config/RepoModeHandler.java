@@ -77,6 +77,11 @@ public class RepoModeHandler {
 		}
 	}
 
+	public void setRepoMode(String repoName, RepoMode mode) {
+		repoModes.put(repoName, mode);
+		saveRepoModeToXml();
+	}
+	
 	public boolean isRepoUpdatable(String repoName) {
 		RepoMode mode = getRepoMode(repoName);
 		return RepoMode.UPDATE.equals(mode);
@@ -96,7 +101,7 @@ public class RepoModeHandler {
 		return repoModes;
 	}
 	
-	public void saveRepoModeToXml() {
+	private void saveRepoModeToXml() {
 		try {
 			DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
 			DocumentBuilder docBuilder = docFactory.newDocumentBuilder();

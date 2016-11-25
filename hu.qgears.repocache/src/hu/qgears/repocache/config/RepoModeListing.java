@@ -14,17 +14,18 @@ public class RepoModeListing extends AbstractPage {
 	@Override
 	protected void doGenerate() {
 		folder=true;
-		write("<h1>Repo Mode configuration</h1>\n<a href=\"../\">../</a><br/>\n<a href=\"./\">reload</a><br/>\n");
+		write("<script language=\"javascript\" type=\"text/javascript\">\nfunction addParameter(link, param){\n    link += param;\n    return link;\n}\n</script>\n\n<h1>Repo Mode configuration</h1>\n<a href=\"../\">../</a><br/>\n<a href=\"./\">reload</a><br/>\n<h3>Repo mode setup</h3><br/>\nUpdated mode: <select name=\"modename\" id=\"modeid\" value=\"READ_ONLY\">\n  <option>READ_ONLY</option>\n  <option>ADD_ONLY</option>\n  <option>UPDATE</option>\n  <option>NO_CACHE_TRANSPARENT</option>\n</select><br/></br>\n");
 		List<String> allRepos = getQuery().rc.getConfiguration().getAllRepos();
 		for (String repoName : allRepos) {
 			RepoMode mode = getQuery().rc.getRepoModeHandler().getRepoMode(repoName);
-			write("Repo name: ");
+			write("<strong>");
 			writeObject(repoName);
-			write(" : mode=");
+			write("</strong> : ");
 			writeObject(mode);
-			write("<br/>\n");
+			write(" : <a href=\"setRepoMode?repoName=");
+			writeObject(repoName);
+			write("&amp;mode=\" onclick=\"location.href=addParameter(this.href,document.getElementById('modeid').value);return false;\">Update mode</a><br/><br/>\n");
 		}
-		getQuery().rc.getRepoModeHandler().saveRepoModeToXml();
 	}
 	
 }
