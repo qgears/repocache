@@ -23,12 +23,10 @@ abstract public class AbstractPage extends RAbstractTemplatePart
 	}
 	abstract protected void doGenerate();
 	protected void writeHtml(String value) {
-		// TODO Auto-generated method stub
 		writeObject(value);
 	}
 
 	protected void writeValue(String key) {
-		// TODO Auto-generated method stub
 		writeObject(key);
 		
 	}

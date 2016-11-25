@@ -3,7 +3,6 @@ package hu.qgears.repocache.config;
 import hu.qgears.repocache.AbstractPage;
 import hu.qgears.repocache.ClientQuery;
 import hu.qgears.repocache.ClientSetup;
-import hu.qgears.repocache.EClientMode;
 
 public class ConfigListing extends AbstractPage
 {
@@ -17,7 +16,7 @@ public class ConfigListing extends AbstractPage
 		printParameters();
 		write("<h1>Repo Cache configuration</h1>\n<a href=\"../\">../</a><br/>\n<a href=\"./\">reload</a><br/>\nLocal Only: ");
 		writeObject(getQuery().rc.getConfiguration().getCommandLine().localOnly);
-		write("<br/>\n<a href=\"config.xml\">config.xml</a><br/>\nClient IP address: ");
+		write("<br/>\n<a href=\"config.xml\">config.xml</a><br/>\n<a href=\"repoModeConfig\\\">repoModeConfig</a><br/>\nClient IP address: ");
 		writeObject(getQuery().getClientIdentifier());
 		write("<br/>\n<h2>Current client setup</h2>\nUpdater clients:<br/>\n");
 		for(EClientMode m: EClientMode.values())
@@ -36,8 +35,7 @@ public class ConfigListing extends AbstractPage
 		writeObject(getQuery().getClientIdentifier());
 		write("&amp;shawRealFolderListing=true\">Set ");
 		writeObject(getQuery().getClientIdentifier());
-		write(" client to shaw real folder listing.</a><br/>\n");
-		write("<a href=\"setClientMode?client=");
+		write(" client to shaw real folder listing.</a><br/>\n<a href=\"setClientMode?client=");
 		writeObject(getQuery().getClientIdentifier());
 		write("&amp;shawRealFolderListing=false\">Set ");
 		writeObject(getQuery().getClientIdentifier());
@@ -50,9 +48,7 @@ public class ConfigListing extends AbstractPage
 			writeObject(m);
 			write("</a><br/>\n");
 		}
-		write("<a href=\"setClientMode?client=this&amp;shawRealFolderListing=true\">Set this client to shaw real folder listing.</a><br/>\n");
-		write("<a href=\"setClientMode?client=this&amp;shawRealFolderListing=false\">Set this client NOT to shaw real folder listing.</a><br/>\n");
-		write("<ul>\n");
+		write("<a href=\"setClientMode?client=this&amp;shawRealFolderListing=true\">Set this client to shaw real folder listing.</a><br/>\n<a href=\"setClientMode?client=this&amp;shawRealFolderListing=false\">Set this client NOT to shaw real folder listing.</a><br/>\n<ul>\n");
 		synchronized (getQuery().rc.getConfiguration().getClients()) {
 			for(ClientSetup c: getQuery().rc.getConfiguration().getClients().values())
 			{

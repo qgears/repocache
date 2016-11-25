@@ -20,6 +20,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import hu.qgears.commons.UtilFile;
+import hu.qgears.repocache.config.ReadConfig;
+import hu.qgears.repocache.config.RepoModeHandler;
 import hu.qgears.repocache.httpget.StreamingHttpClient;
 import hu.qgears.repocache.httpplugin.RepoPluginHttp;
 import hu.qgears.repocache.mavenplugin.RepoPluginMaven;
@@ -35,6 +37,7 @@ public class RepoCache {
 	private static Logger log=LoggerFactory.getLogger(RepoCache.class);
 	private List<AbstractRepoPlugin> plugins=new ArrayList<>();
 	private ReadConfig configuration;
+	private RepoModeHandler repoModeHandler;
 	private CommitTimer commitTimer;
 	private File worktree;
 	private String repoVersion="Repo Cache 1.0.0 by Q-Gears Kft.\n";
@@ -51,11 +54,13 @@ public class RepoCache {
 		log.info(parsedOptions);
 		clargs.validate();
 		ReadConfig config=new ReadConfig(clargs);
-		RepoCache rc = new RepoCache(config);
+		RepoModeHandler repoModeH = new RepoModeHandler(clargs);
+		RepoCache rc = new RepoCache(config, repoModeH);
 		rc.start();
 	}
-	public RepoCache(ReadConfig configuration) {
+	public RepoCache(ReadConfig configuration, RepoModeHandler repoModeHandler) {
 		this.configuration=configuration;
+		this.repoModeHandler=repoModeHandler;
 	}
 
 	public void start() throws Exception {
@@ -174,6 +179,13 @@ public class RepoCache {
 		}
 	}
 
+	/**
+	 * Creates a file on the given local path with missing folders.
+	 * @param path
+	 * @param content
+	 * @param commitMsg
+	 * @throws IOException
+	 */
 	public void createFile (Path path, byte[] content, String commitMsg) throws IOException {
 		synchronized (this) {
 			deleteIfExists(path);
@@ -230,9 +242,6 @@ public class RepoCache {
 		synchronized (this) {
 			if(qr!=null&&!(qr.equals(cachedContent)))
 			{
-				/*if (cachedContent != null && plugin != null && path.pieces.size()>2 && !plugin.isUpdateModeNormal(path.pieces.get(1))) {
-					if (plugin.createNewVersionOnRewriteMode(path)) return;
-				}*/
 				updateFile(path, qr);
 			}else
 			{
@@ -248,19 +257,29 @@ public class RepoCache {
 	 * @return true means that the remote server should be queried for an update.
 	 */
 	public boolean updateRequired(ClientQuery q, QueryResponse cachedContent) {
-		if(configuration.getCommandLine().localOnly)
-		{
+		if(configuration.getCommandLine().localOnly) {
 			return false;
 		}
-		ClientSetup client=getConfiguration().getClientSetup(q.getClientIdentifier());
-		if(cachedContent!=null)
-		{
-			return client.isUpdater();
+
+		boolean updRequired = true;
+		if (q.path.pieces.size() > 1) {
+			if (cachedContent!=null) {
+				updRequired = getRepoModeHandler().isRepoUpdatable(q.path.pieces.get(1));
+			} else {
+				updRequired = getRepoModeHandler().isRepoAddable(q.path.pieces.get(1));
+			}
 		}
-		return client.isAdder();
+		if(updRequired) {
+			ClientSetup client=getConfiguration().getClientSetup(q.getClientIdentifier());
+			updRequired = !client.isReadonly();
+		}
+		return updRequired;
 	}
 	public ReadConfig getConfiguration() {
 		return configuration;
+	}
+	public RepoModeHandler getRepoModeHandler() {
+		return repoModeHandler;
 	}
 	public CommitTimer getCommitTimer() {
 		return commitTimer;

@@ -9,10 +9,13 @@ import joptsimple.annot.JOSimpleBoolean;
 
 public class CommandLineArgs {
 	private byte[] configOverride;
+	private byte[] repoModeConfigOverride;
 	@JOHelp("Folder that contains the chaced git repository. If not exists then it is created.")
 	public File repo;
 	@JOHelp("Configuration xml file.")
 	public File config;
+	@JOHelp("Repo mode configuration xml file.")
+	public File repoModeConfig;
 	@JOHelp("Http server port that is opened by the server")
 	public int port=8080;
 	@JOHelp("If local only then the cache does not access the remote servers at all.")
@@ -34,6 +37,17 @@ public class CommandLineArgs {
 			if((!config.exists()) || !config.isFile())
 			{
 				throw new IllegalArgumentException("config file does not exist.");
+			}
+		}
+		if(repoModeConfigOverride==null)
+		{
+			if(repoModeConfig==null)
+			{
+				throw new IllegalArgumentException("repo mode config file must be set as a command line parameter.");
+			}
+			if((!repoModeConfig.exists()) || !repoModeConfig.isFile())
+			{
+				throw new IllegalArgumentException("repo mode config file does not exist.");
 			}
 		}
 		if(repo==null)
@@ -62,11 +76,24 @@ public class CommandLineArgs {
 		this.configOverride=bs;
 		return this;
 	}
+	public CommandLineArgs setRepoModeConfigOverride(byte[] bs, String filePath)
+	{
+		this.repoModeConfigOverride=bs;
+		this.repoModeConfig=new File(filePath);
+		return this;
+	}
 	public byte[] openConfigXml() throws IOException {
 		if(configOverride!=null)
 		{
 			return configOverride;
 		}
 		return UtilFile.loadFile(config);
+	}
+	public byte[] openRepoModeConfigXml() throws IOException {
+		if(repoModeConfigOverride!=null)
+		{
+			return repoModeConfigOverride;
+		}
+		return UtilFile.loadFile(repoModeConfig);
 	}
 }

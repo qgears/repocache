@@ -1,11 +1,13 @@
-package hu.qgears.repocache;
+package hu.qgears.repocache.config;
 
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
@@ -15,10 +17,11 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
-import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
+import hu.qgears.repocache.ClientSetup;
+import hu.qgears.repocache.CommandLineArgs;
 import hu.qgears.repocache.p2plugin.P2RepoConfig;
 import hu.qgears.repocache.p2plugin.P2RepoMode;
 
@@ -63,8 +66,8 @@ public class ReadConfig {
 		NodeList mavenRepos = doc.getElementsByTagName("mavenrepo");
 		for (int temp = 0; temp < mavenRepos.getLength(); temp++) {
 			Node mavenRepo = mavenRepos.item(temp);
-			String repoName = getNodeAttr("name", mavenRepo);
-			String remote = getNodeValue("remote", mavenRepo.getChildNodes());
+			String repoName = DomParserUtil.getNodeAttr("name", mavenRepo);
+			String remote = DomParserUtil.getNodeValue("remote", mavenRepo.getChildNodes());
 			mvnrepos.put(repoName, remote);
 			log.info("Maven repo name: " + repoName + ", remote: " + remote);
 		}
@@ -74,8 +77,8 @@ public class ReadConfig {
 		NodeList httpRepos = doc.getElementsByTagName("httprepo");
 		for (int temp = 0; temp < httpRepos.getLength(); temp++) {
 			Node httpRepo = httpRepos.item(temp);
-			String repoName = getNodeAttr("name", httpRepo);
-			String remote = getNodeValue("remote", httpRepo.getChildNodes());
+			String repoName = DomParserUtil.getNodeAttr("name", httpRepo);
+			String remote = DomParserUtil.getNodeValue("remote", httpRepo.getChildNodes());
 			httprepos.put(repoName, remote);
 			log.info("Http repo name: " + repoName + ", remote: " + remote);
 		}
@@ -85,11 +88,11 @@ public class ReadConfig {
 		NodeList p2Repos = doc.getElementsByTagName("p2repo");
 		for (int temp = 0; temp < p2Repos.getLength(); temp++) {
 			Node p2Repo = p2Repos.item(temp);
-			String repoName = getNodeAttr("name", p2Repo);
-			String file = getNodeValue("file", p2Repo.getChildNodes());
-			String primaryHost = getNodeValue("primaryHost", p2Repo.getChildNodes());
-			String selectedMirror = getNodeValue("selectedMirror", p2Repo.getChildNodes());
-			P2RepoMode repoMode = P2RepoMode.parse(getNodeValue("mode", p2Repo.getChildNodes()));
+			String repoName = DomParserUtil.getNodeAttr("name", p2Repo);
+			String file = DomParserUtil.getNodeValue("file", p2Repo.getChildNodes());
+			String primaryHost = DomParserUtil.getNodeValue("primaryHost", p2Repo.getChildNodes());
+			String selectedMirror = DomParserUtil.getNodeValue("selectedMirror", p2Repo.getChildNodes());
+			P2RepoMode repoMode = P2RepoMode.parse(DomParserUtil.getNodeValue("mode", p2Repo.getChildNodes()));
 			p2repos.put(repoName, new P2RepoConfig(file, primaryHost, selectedMirror, repoMode));
 			log.info("P2 repo name: " + repoName + ", file: " + file + ", primaryHost: " + primaryHost + ", selectedMirror: " + selectedMirror);
 		}
@@ -107,34 +110,17 @@ public class ReadConfig {
 		return p2repos;
 	}
 	
-	public File getLocalGitRepo() {
-		return args.repo;
-	}
-
-	private String getNodeAttr(String attrName, Node node ) {
-	    NamedNodeMap attrs = node.getAttributes();
-	    for (int y = 0; y < attrs.getLength(); y++ ) {
-	        Node attr = attrs.item(y);
-	        if (attr.getNodeName().equalsIgnoreCase(attrName)) {
-	            return attr.getNodeValue();
-	        }
-	    }
-	    return "";
+	public List<String> getAllRepos() {
+		List<String> allRepos = new ArrayList<>();
+		allRepos.addAll(mvnrepos.keySet());
+		allRepos.addAll(httprepos.keySet());
+		allRepos.addAll(p2repos.keySet());
+		Collections.sort(allRepos);
+		return allRepos;
 	}
 	
-	protected String getNodeValue(String tagName, NodeList nodes ) {
-	    for ( int x = 0; x < nodes.getLength(); x++ ) {
-	        Node node = nodes.item(x);
-	        if (node.getNodeName().equalsIgnoreCase(tagName)) {
-	            NodeList childNodes = node.getChildNodes();
-	            for (int y = 0; y < childNodes.getLength(); y++ ) {
-	                Node data = childNodes.item(y);
-	                if ( data.getNodeType() == Node.TEXT_NODE )
-	                    return data.getNodeValue();
-	            }
-	        }
-	    }
-	    return "";
+	public File getLocalGitRepo() {
+		return args.repo;
 	}
 
 	public CommandLineArgs getCommandLine() {

@@ -2,6 +2,8 @@ package hu.qgears.repocache;
 
 import java.util.Calendar;
 
+import hu.qgears.repocache.config.EClientMode;
+
 public class ClientSetup {
 	
 	private String id;
@@ -16,10 +18,16 @@ public class ClientSetup {
 		this.mode=EClientMode.normal;
 	}
 
+	public boolean isReadonly() {
+		return getMode()==EClientMode.normal;
+	}
+	
+	@Deprecated
 	public boolean isUpdater() {
 		return getMode()==EClientMode.updater;
 	}
 
+	@Deprecated
 	public boolean isAdder() {
 		return getMode()==EClientMode.updater||getMode()==EClientMode.adder;
 	}
@@ -50,6 +58,7 @@ public class ClientSetup {
 	public String toString() {
 		return ""+id+": "+getMode()+" : "+(shawRealFolderListing?"" : "NOT ") + "Shaw real folder listing.";
 	}
+	@Deprecated
 	public boolean isNoCacheTransparent() {
 		return getMode()==EClientMode.noCacheTransparent;
 	}

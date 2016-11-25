@@ -8,12 +8,16 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.eclipse.jetty.server.Request;
 import org.eclipse.jetty.server.handler.AbstractHandler;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import hu.qgears.repocache.config.ConfigHandler;
 import hu.qgears.repocache.folderlisting.CrawlExecutor;
 import hu.qgears.repocache.folderlisting.RealFolderListing;
 
 public class RepoHandler extends AbstractHandler {
+	private static Logger log=LoggerFactory.getLogger(RepoHandler.class);
+	
 	private RepoCache rc;
 	public RepoHandler(RepoCache rc) {
 		this.rc = rc;
@@ -57,8 +61,9 @@ public class RepoHandler extends AbstractHandler {
 	}
 
 	public QueryResponse getQueryResponse(ClientQuery q) throws IOException {
-		if(rc.getConfiguration().getClientSetup(q.getClientIdentifier()).isNoCacheTransparent())
+		if(q.path.pieces.size()>1 && rc.getRepoModeHandler().isRepoTransparent(q.path.pieces.get(1)))
 		{
+			log.trace("Getting response from transparent repo : " + q.path.pieces.get(1));
 			QueryResponse qr=getResponseFromPlugin(q, null, true);
 			return qr;
 		}

@@ -4,7 +4,6 @@ import java.io.IOException;
 
 import hu.qgears.repocache.ClientQuery;
 import hu.qgears.repocache.ClientSetup;
-import hu.qgears.repocache.EClientMode;
 import hu.qgears.repocache.QueryResponse;
 import hu.qgears.repocache.QueryResponseByteArray;
 import hu.qgears.repocache.RepoHandler;
@@ -19,6 +18,10 @@ public class ConfigHandler {
 		if(q.path.eq(1, "config.xml"))
 		{
 			ret=new QueryResponseByteArray("config.xml", q.rc.getConfiguration().getConfigXml());
+		}
+		if(q.path.eq(1, "repoModeConfig"))
+		{
+			ret=new RepoModeListing(q).generate();
 		}
 		if(q.path.pieces.size()==1)
 		{
@@ -50,7 +53,6 @@ public class ConfigHandler {
 			try {
 				q.rc.getCommitTimer().executeCommit();
 			} catch (Exception e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 			q.sendRedirect("./");
@@ -61,7 +63,6 @@ public class ConfigHandler {
 			try {
 				q.rc.getCommitTimer().executeRevert();
 			} catch (Exception e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 			q.sendRedirect("./");
