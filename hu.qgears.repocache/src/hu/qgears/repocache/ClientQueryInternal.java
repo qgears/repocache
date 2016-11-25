@@ -25,12 +25,10 @@ public class ClientQueryInternal extends ClientQuery
 
 	@Override
 	public void sendRedirect(String string) throws IOException {
-		// TODO Auto-generated method stub
 	}
 
 	@Override
 	public void reply(QueryResponse response) throws IOException {
-		// TODO Auto-generated method stub
 		
 	}
 

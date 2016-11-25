@@ -20,7 +20,6 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
-import hu.qgears.repocache.ClientSetup;
 import hu.qgears.repocache.CommandLineArgs;
 import hu.qgears.repocache.p2plugin.P2RepoConfig;
 import hu.qgears.repocache.p2plugin.P2RepoMode;

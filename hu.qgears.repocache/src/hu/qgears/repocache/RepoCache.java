@@ -20,6 +20,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import hu.qgears.commons.UtilFile;
+import hu.qgears.repocache.config.ClientSetup;
 import hu.qgears.repocache.config.ReadConfig;
 import hu.qgears.repocache.config.RepoModeHandler;
 import hu.qgears.repocache.httpget.StreamingHttpClient;

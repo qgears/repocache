@@ -7,9 +7,12 @@ import java.io.InputStream;
 import java.io.OutputStream;
 
 import org.apache.commons.io.IOUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 abstract public class QueryResponse implements AutoCloseable
 {
+	private static Logger log=LoggerFactory.getLogger(QueryResponse.class);
 	public String url;
 	public boolean folder;
 	public File fileSystemFolder;
@@ -39,8 +42,7 @@ abstract public class QueryResponse implements AutoCloseable
 				try {
 					return contentEq(other);
 				} catch (Exception e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
+					log.error("Error comparing query response content. other: " + other, e);
 				}
 			}
 			return false;

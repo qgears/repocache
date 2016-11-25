@@ -10,6 +10,8 @@ import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import hu.qgears.repocache.ClientQuery;
 import hu.qgears.repocache.ClientQueryInternal;
@@ -18,6 +20,7 @@ import hu.qgears.repocache.QueryResponse;
 import hu.qgears.repocache.RepoHandler;
 
 public class CrawlExecutor {
+	private static Logger log=LoggerFactory.getLogger(CrawlExecutor.class);
 
 	public void handle(RepoHandler rh, ClientQuery q) throws IOException {
 		try(OutputStream os=q.createReplyStream("text/html"))
@@ -64,14 +67,12 @@ public class CrawlExecutor {
 							}
 						}catch(Exception ex)
 						{
-							// TODO Auto-generated catch block
-							ex.printStackTrace();
+							log.error("Error handling internal request.", ex);
 						}
 					}
 				}
 			} catch (Exception e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+				log.error("Error getting response.", e);
 			}
 		}
 	}

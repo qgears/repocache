@@ -6,6 +6,8 @@ import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import hu.qgears.repocache.QueryResponse;
 
@@ -13,6 +15,7 @@ import hu.qgears.repocache.QueryResponse;
  * Parse result HTML and convert absolute lints to relative so that they work on the mirror site.
  */
 public class UrlFixer {
+	private static Logger log=LoggerFactory.getLogger(UrlFixer.class);
 
 	public static void fixUrls(QueryResponse queryResponse) {
 		// Fix absolute URL-s
@@ -60,8 +63,7 @@ public class UrlFixer {
 			queryResponse.updateContent(doc.toString().getBytes(StandardCharsets.UTF_8));
 		}catch(Exception e)
 		{
-			// TODO
-			e.printStackTrace();
+			log.error("Error fixing URL: " + queryResponse.url, e);
 		}
 	}
 	private static String getWithoutServer(String fixedurl) {
@@ -74,7 +76,6 @@ public class UrlFixer {
 				return fixedurl.substring(newidx);
 			}
 		}
-		// TODO Auto-generated method stub
 		return null;
 	}
 

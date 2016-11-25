@@ -2,7 +2,6 @@ package hu.qgears.repocache.config;
 
 import hu.qgears.repocache.AbstractPage;
 import hu.qgears.repocache.ClientQuery;
-import hu.qgears.repocache.ClientSetup;
 
 public class ConfigListing extends AbstractPage
 {

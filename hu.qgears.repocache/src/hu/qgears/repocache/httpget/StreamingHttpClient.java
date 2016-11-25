@@ -19,7 +19,7 @@ import hu.qgears.repocache.QueryResponse;
 
 public class StreamingHttpClient {
 	public static final int bufferSize=1024*1024;
-	final static Logger log=LoggerFactory.getLogger(StreamingHttpClient.class);
+	final static Logger logger=LoggerFactory.getLogger(StreamingHttpClient.class);
 	/**
 	 * 
 	 * @param get
@@ -52,7 +52,7 @@ public class StreamingHttpClient {
 				try {
 					l=Long.parseLong(h.getValue());
 				} catch (Exception e) {
-					e.printStackTrace();
+					logger.error("Error parsing response header length, value: " + h.getValue(), e);
 				}
 			}
 			long sum=0;

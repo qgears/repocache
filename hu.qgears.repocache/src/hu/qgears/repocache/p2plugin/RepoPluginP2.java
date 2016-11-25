@@ -180,7 +180,7 @@ public class RepoPluginP2 extends AbstractRepoPlugin
 		try {
 			rh.getQueryResponse(subq);
 		} catch (IOException e) {
-			e.printStackTrace();
+			log.error("Error updating path: " + relpath.toStringPath(), e);
 		}
 	}
 	
@@ -192,7 +192,7 @@ public class RepoPluginP2 extends AbstractRepoPlugin
 				SAXParser p=SAXParserFactory.newInstance().newSAXParser();
 				p.parse(new ByteArrayInputStream(cachedContent.getResponseAsBytes()), tp);
 			} catch (Exception e) {
-				e.printStackTrace();
+				log.error("Error parsing timestamp from cached content.", e);
 			}
 		}
 		return tp.getTimestamp();

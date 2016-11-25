@@ -6,7 +6,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import hu.qgears.repocache.ClientQuery;
-import hu.qgears.repocache.ClientSetup;
 import hu.qgears.repocache.QueryResponse;
 import hu.qgears.repocache.QueryResponseByteArray;
 import hu.qgears.repocache.RepoHandler;
@@ -67,7 +66,7 @@ public class ConfigHandler {
 			try {
 				q.rc.getCommitTimer().executeCommit();
 			} catch (Exception e) {
-				e.printStackTrace();
+				log.error("Error on executing manual commit.", e);
 			}
 			q.sendRedirect("./");
 			return;
@@ -77,7 +76,7 @@ public class ConfigHandler {
 			try {
 				q.rc.getCommitTimer().executeRevert();
 			} catch (Exception e) {
-				e.printStackTrace();
+				log.error("Error on executing manual revert.", e);
 			}
 			q.sendRedirect("./");
 			return;

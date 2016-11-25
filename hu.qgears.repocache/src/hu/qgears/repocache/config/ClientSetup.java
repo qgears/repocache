@@ -1,12 +1,10 @@
-package hu.qgears.repocache;
+package hu.qgears.repocache.config;
 
 import java.util.Calendar;
 
 import org.eclipse.jgit.util.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import hu.qgears.repocache.config.EClientMode;
 
 public class ClientSetup {
 	private static Logger log=LoggerFactory.getLogger(ClientSetup.class);

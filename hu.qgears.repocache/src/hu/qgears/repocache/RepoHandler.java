@@ -11,6 +11,7 @@ import org.eclipse.jetty.server.handler.AbstractHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import hu.qgears.repocache.config.ClientSetup;
 import hu.qgears.repocache.config.ConfigHandler;
 import hu.qgears.repocache.folderlisting.CrawlExecutor;
 import hu.qgears.repocache.folderlisting.RealFolderListing;
@@ -44,7 +45,6 @@ public class RepoHandler extends AbstractHandler {
 				{
 					redirectToFolder(q);
 					return;
-	//				response.sendRedirect(q.path.pieces.get(q.path.pieces.size()-1)+"/");
 				}else
 				{
 					response.setContentType(q.getMimeType());
@@ -122,8 +122,7 @@ public class RepoHandler extends AbstractHandler {
 				return new StatusPage(q).generate();
 			}
 		} catch (Exception e) {
-			System.err.println("Error fetching file: "+q.path);
-			e.printStackTrace();
+			log.error("Error fetching file: "+q.path, e);
 		}
 		return cachedContent;
 	}
