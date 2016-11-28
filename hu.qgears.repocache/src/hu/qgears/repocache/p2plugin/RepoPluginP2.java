@@ -104,27 +104,27 @@ public class RepoPluginP2 extends AbstractRepoPlugin
 				}
 				return new P2RepoVersionListing(q, this, localPath.pieces.get(0)).generate();
 			}
-			if(!localPath.folder&&localPath.pieces.size()==2 &&localPath.pieces.get(1).equals(P2RepoVersionArtifacts.file))
+			if(!localPath.folder&&localPath.pieces.size()==2 && P2RepoVersionArtifacts.fileNames.contains(localPath.pieces.get(1)))
 			{
 				Path relpath = P2VersionFolderUtil.getInstance().getLastVersionPath(localPath.pieces.get(0));
-				updateLatestListings(q, relpath);
+				updateLatestListings(q, relpath, config.getBaseUrl());
 				long timestamp=parseTimeStamp(cachedContent);
-				QueryResponse ret=new P2RepoVersionArtifacts(q, this, timestamp, localPath.pieces.get(0)).generate();
+				QueryResponse ret=new P2RepoVersionArtifacts(q, timestamp, localPath.pieces.get(0)).generate();
 				if(!ret.equals(cachedContent))
 				{
 					// In case the listing has changed also update the timestamp
-					ret=new P2RepoVersionArtifacts(q, this, System.currentTimeMillis(), localPath.pieces.get(0)).generate();
+					ret=new P2RepoVersionArtifacts(q, System.currentTimeMillis(), localPath.pieces.get(0)).generate();
 				}
 				return ret;
-			} else if(!localPath.folder&&localPath.pieces.size()==2 &&localPath.pieces.get(1).equals(P2RepoVersionContent.file)) {
+			} else if(!localPath.folder&&localPath.pieces.size()==2 && P2RepoVersionContent.fileNames.contains(localPath.pieces.get(1))) {
 				Path relpath = P2VersionFolderUtil.getInstance().getLastVersionPath(localPath.pieces.get(0));
-				updateLatestListings(q, relpath);
+				updateLatestListings(q, relpath, config.getBaseUrl());
 				long timestamp=parseTimeStamp(cachedContent);
-				QueryResponse ret=new P2RepoVersionContent(q, this, timestamp, localPath.pieces.get(0)).generate();
+				QueryResponse ret=new P2RepoVersionContent(q, timestamp, localPath.pieces.get(0)).generate();
 				if(!ret.equals(cachedContent))
 				{
 					// In case the listing has changed also update the timestamp
-					ret=new P2RepoVersionContent(q, this, System.currentTimeMillis(), localPath.pieces.get(0)).generate();
+					ret=new P2RepoVersionContent(q, System.currentTimeMillis(), localPath.pieces.get(0)).generate();
 				}
 				return ret;
 			}
@@ -168,20 +168,49 @@ public class RepoPluginP2 extends AbstractRepoPlugin
 		return null;
 	}
 
-	private void updateLatestListings(ClientQuery q, Path relpath) {
-		// Update compositeArtifact
-		updatePath(q, new Path(relpath, "compositeArtifacts.xml"));
-		// Update compositeContent
-		updatePath(q, new Path(relpath, "compositeContent.xml"));
+	private void updateLatestListings(ClientQuery q, Path relpath, String baseUrl) {
+		// Getting the repo descriptor file (which is first not null), and update it!
+		boolean found = false;
+		for (String fileName : P2RepoVersionArtifacts.fileNames) {
+			if (getResponseForHttpGet(q, baseUrl, fileName) != null) {
+				found = updatePath(q, new Path(relpath, fileName));
+			}
+		}
+		if (!found) {
+			log.warn("No artifact descriptor file was found for P2 repo: " + relpath.pieces.get(1));
+		}
+		
+		// Getting the repo content descriptor file (which is first not null), and update it!
+		found = false;
+		for (String fileName : P2RepoVersionContent.fileNames) {
+			if (getResponseForHttpGet(q, baseUrl, fileName) != null) {
+				found = updatePath(q, new Path(relpath, fileName));
+			}
+		}
+		if (!found) {
+			log.warn("No content descriptor file was found for P2 repo: " + relpath.pieces.get(1));
+		}
 	}
 
-	private void updatePath (ClientQuery q, Path relpath) {
+	private QueryResponse getResponseForHttpGet (ClientQuery q, String baseUrl, String fileName) {
+		String httpPath = baseUrl + fileName;
+		try {
+			QueryResponse response = q.rc.client.get(new HttpGet(q.rc.createTmpFile(q.path), httpPath));
+			return response;
+		} catch (Exception e) {
+			log.debug("Http path get exception. httpPath: " + httpPath, e);
+		}
+		return null;
+	}
+	
+	private boolean updatePath (ClientQuery q, Path relpath) {
 		ClientQueryInternal subq=new ClientQueryInternal(rc, relpath, q);
 		try {
 			rh.getQueryResponse(subq);
 		} catch (IOException e) {
 			log.error("Error updating path: " + relpath.toStringPath(), e);
 		}
+		return true;
 	}
 	
 	private long parseTimeStamp(QueryResponse cachedContent) {

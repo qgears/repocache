@@ -88,11 +88,12 @@ public class ReadConfig {
 		for (int temp = 0; temp < p2Repos.getLength(); temp++) {
 			Node p2Repo = p2Repos.item(temp);
 			String repoName = DomParserUtil.getNodeAttr("name", p2Repo);
+			String repoDesc = DomParserUtil.getNodeValue("desc", p2Repo.getChildNodes());
 			String file = DomParserUtil.getNodeValue("file", p2Repo.getChildNodes());
 			String primaryHost = DomParserUtil.getNodeValue("primaryHost", p2Repo.getChildNodes());
 			String selectedMirror = DomParserUtil.getNodeValue("selectedMirror", p2Repo.getChildNodes());
 			P2RepoMode repoMode = P2RepoMode.parse(DomParserUtil.getNodeValue("mode", p2Repo.getChildNodes()));
-			p2repos.put(repoName, new P2RepoConfig(file, primaryHost, selectedMirror, repoMode));
+			p2repos.put(repoName, new P2RepoConfig(file, primaryHost, selectedMirror, repoMode, repoDesc));
 			log.info("P2 repo name: " + repoName + ", file: " + file + ", primaryHost: " + primaryHost + ", selectedMirror: " + selectedMirror);
 		}
 	}

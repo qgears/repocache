@@ -1,8 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!-- Example configuration that is used for manual testing. -->
 <repos>
+	<mavenrepo name="apache-snapshots">
+		<remote>https://repository.apache.org/snapshots/</remote>
+	</mavenrepo>
 	<mavenrepo name="maven-central">
+		<desc>Maven central repository</desc>
 		<remote>http://repo1.maven.org/maven2/</remote>
+	</mavenrepo>
+	<mavenrepo name="codehouse-snapshots">
+		<remote>https://nexus.codehaus.org/snapshots/</remote>
 	</mavenrepo>
 	<mavenrepo name="maven-inquery">
 		<remote>http://repo.eclipse.org/content/groups/emf-incquery/</remote>
@@ -13,40 +20,141 @@
 	<mavenrepo name="maven-rcptt-snap">
 		<remote>http://repo.eclipse.org/content/repositories/rcptt-snapshots/</remote>
 	</mavenrepo>
-	<mavenrepo name="maven-jenkins">
+	<mavenrepo name="jenkins-cli">
 		<remote>http://repo.jenkins-ci.org/public/</remote>
 	</mavenrepo>
 	<httprepo name="oomphneon">
 		<remote>http://mirror.switch.ch/eclipse/oomph/epp/neon/</remote>
 	</httprepo>
-	<httprepo name="test">
-		<remote>http://localhost:8081/</remote>
-	</httprepo>
-	<httprepo name="ubuntu-releases-16.04.1">
-		<remote>http://releases.ubuntu.com/16.04.1/</remote>
-	</httprepo>
-	<httprepo name="ubuntu-releases-16.10">
-		<remote>http://releases.ubuntu.com/16.10/</remote>
-	</httprepo>
+	<p2repo name="code-recommenders">
+		<desc>Code recommenders (snipmatch)</desc>
+		<file>recommenders/updates/stable/</file>
+		<primaryHost>http://download.eclipse.org/</primaryHost>
+		<selectedMirror>ttp://mirror.tspu.ru/eclipse/</selectedMirror>
+	</p2repo>
 	<p2repo name="qgears-opensource">
-		<file>p2/qgears-opensource</file>
-		<primaryHost>http://localhost:8082/</primaryHost>
-		<selectedMirror>http://localhost:8082/</selectedMirror>
-		<mode>replace</mode>
+		<file>opensource/updates</file>
+		<primaryHost>http://qgears.com/</primaryHost>
+		<selectedMirror>http://qgears.com/</selectedMirror>
 	</p2repo>
-	<p2repo name="eclipse-neon">
-		<file>technology/epp/packages/neon</file>
+	<p2repo name="eclipse-indigo">
+		<file>indigo-mirror/</file>
+		<primaryHost>http://192.168.1.116/mirror/</primaryHost>
+		<selectedMirror>http://192.168.1.116/mirror/</selectedMirror>
+	</p2repo>
+	<p2repo name="eclipse-luna">
+		<file>releases/luna/</file>
+		<primaryHost>http://download.eclipse.org/</primaryHost>
+		<selectedMirror>ttp://mirror.tspu.ru/eclipse/</selectedMirror>
+	</p2repo>
+	<p2repo name="eclipse-mars">
+		<file>eclipse-mars-mirror/</file>
+		<primaryHost>http://192.168.1.116/mirror/</primaryHost>
+		<selectedMirror>http://192.168.1.116/mirror/</selectedMirror>
+	</p2repo>
+	<p2repo name="eclipse-sirius-luna">
+		<file>sirius/updates/releases/3.0.0/luna/</file>
 		<primaryHost>http://download.eclipse.org/</primaryHost>
 		<selectedMirror>http://mirror.tspu.ru/eclipse/</selectedMirror>
-		<mode>normal</mode>
 	</p2repo>
-	<p2repo name="eclipse-release-neon-201610111000">
-		<file>releases/neon/201610111000</file>
+	<p2repo name="eclipse-sirius-mars">
+		<file>sirius/updates/releases/3.0.0/mars/</file>
 		<primaryHost>http://download.eclipse.org/</primaryHost>
 		<selectedMirror>http://mirror.tspu.ru/eclipse/</selectedMirror>
 	</p2repo>
-	<p2repo name="oomph-updates-milestone-latest">
-		<file>oomph/updates/milestone/latest</file>
+	<p2repo name="ecore-docgen">
+		<file>jenkins/job/EcoreDocGen/lastSuccessfulBuild/artifact/releng/hu.qgears.gendoc.update/target/repository/</file>
+		<primaryHost>http://192.168.1.116:8080/</primaryHost>
+		<selectedMirror>http://192.168.1.116:8080/</selectedMirror>
+	</p2repo>
+	<p2repo name="ecoretools">
+		<desc>Ecore Tools</desc>
+		<file>ecoretools/updates/releases/2.0.3/luna/</file>
+		<primaryHost>http://download.eclipse.org/</primaryHost>
+		<selectedMirror>http://mirror.tspu.ru/eclipse/</selectedMirror>
+	</p2repo>
+	<p2repo name="emf-diffmerge">
+		<file>emf-diffmerge-0.1-mirror/</file>
+		<primaryHost>http://192.168.1.116/mirror/</primaryHost>
+		<selectedMirror>http://192.168.1.116/mirror/</selectedMirror>
+	</p2repo>
+	<p2repo name="emf-diffmerge-0.5">
+		<file>diffmerge/releases/0.5.0/emf-diffmerge-site/</file>
+		<primaryHost>http://download.eclipse.org/</primaryHost>
+		<selectedMirror>http://mirror.tspu.ru/eclipse/</selectedMirror>
+	</p2repo>
+	<p2repo name="emf-forms">
+		<file>ecp/releases/releases_16/</file>
+		<primaryHost>http://download.eclipse.org/</primaryHost>
+		<selectedMirror>http://mirror.tspu.ru/eclipse/</selectedMirror>
+	</p2repo>
+	<p2repo name="emf">
+		<file>emf-repo/</file>
+		<primaryHost>http://192.168.1.116/mirror/</primaryHost>
+		<selectedMirror>http://192.168.1.116/mirror/</selectedMirror>
+	</p2repo>
+	<p2repo name="eef">
+		<desc>Extended editing framework 1.4 M7</desc>
+		<file>modeling/emft/eef/updates/milestones/1.4/S201406041355/</file>
+		<primaryHost>http://download.eclipse.org/</primaryHost>
+		<selectedMirror>http://mirror.tspu.ru/eclipse/</selectedMirror>
+	</p2repo>
+	<p2repo name="incquery">
+		<file>incquery/updates-extra/release</file>
+		<primaryHost>http://download.eclipse.org/</primaryHost>
+		<selectedMirror>http://mirror.tspu.ru/eclipse/</selectedMirror>
+	</p2repo>
+	<p2repo name="pydev-eclipse">
+		<desc>PyDev update site</desc>
+		<file>fabioz/pydev/5.2.0/</file>
+		<primaryHost>https://dl.bintray.com/</primaryHost>
+		<selectedMirror>https://dl.bintray.com/</selectedMirror>
+	</p2repo>
+	<p2repo name="rcptt">
+		<file>rcptt/</file>
+		<primaryHost>http://192.168.1.116/mirror/</primaryHost>
+		<selectedMirror>http://192.168.1.116/mirror/</selectedMirror>
+	</p2repo>
+	<p2repo name="sonar">
+		<file>eclipse/eclipse/</file>
+		<primaryHost>http://downloads.sonarsource.com/</primaryHost>
+		<selectedMirror>http://downloads.sonarsource.com/</selectedMirror>
+	</p2repo>
+	<p2repo name="subversive-mars">
+		<file>projects/subversive/download/eclipse/5.0/mars-site/</file>
+		<primaryHost>http://community.polarion.com/</primaryHost>
+		<selectedMirror>http://community.polarion.com/</selectedMirror>
+	</p2repo>
+	<p2repo name="subversive">
+		<file>technology/subversive/1.1/update-site</file>
+		<primaryHost>http://download.eclipse.org/</primaryHost>
+		<selectedMirror>http://mirror.tspu.ru/eclipse/</selectedMirror>
+	</p2repo>
+	<p2repo name="target-dsl-editor">
+		<file>fr.obeo.releng.targetplatform/p2/</file>
+		<primaryHost>http://mbarbero.github.io/</primaryHost>
+		<selectedMirror>http://mbarbero.github.io/</selectedMirror>
+	</p2repo>
+	<p2repo name="viatra">
+		<desc>VIATRA release</desc>
+		<file>viatra/updates/release</file>
+		<primaryHost>http://download.eclipse.org/</primaryHost>
+		<selectedMirror>http://mirror.tspu.ru/eclipse/</selectedMirror>
+	</p2repo>
+	<p2repo name="wings-devenv-extensions">
+		<desc>Wings development environment extensions</desc>
+		<file>jenkins/job/Wings_Validation_IncQuery_Tools/lastSuccessfulBuild/artifact/com.bbraun.wings.validation.incquery.devtools.p2/target/repository/</file>
+		<primaryHost>http://192.168.1.116:8080/</primaryHost>
+		<selectedMirror>http://192.168.1.116:8080/</selectedMirror>
+	</p2repo>
+	<p2repo name="xpand-2.0.0">
+		<file>xpand-2.0.0/</file>
+		<primaryHost>http://192.168.1.116/mirror/</primaryHost>
+		<selectedMirror>http://192.168.1.116/mirror/</selectedMirror>
+	</p2repo>
+	<p2repo name="xtext">
+		<desc>XText All in one</desc>
+		<file>modeling/tmf/xtext/updates/composite/releases/</file>
 		<primaryHost>http://download.eclipse.org/</primaryHost>
 		<selectedMirror>http://mirror.tspu.ru/eclipse/</selectedMirror>
 	</p2repo>

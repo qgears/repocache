@@ -1,19 +1,19 @@
 package hu.qgears.repocache.p2plugin;
 
+import java.util.Arrays;
 import java.util.List;
 
 import hu.qgears.repocache.AbstractPage;
 import hu.qgears.repocache.ClientQuery;
 
 public class P2RepoVersionArtifacts extends AbstractPage {
-	public static String file="compositeArtifacts.xml";
+	//public static String file="compositeArtifacts.xml";
+	public static List<String> fileNames= Arrays.asList("compositeArtifacts.xml", "artifacts.xml", "artifacts.jar");
 	private long timestamp;
-	private RepoPluginP2 p2;
 	private String p2Repo;
 
-	public P2RepoVersionArtifacts(ClientQuery query, RepoPluginP2 p2, long timestamp,String p2Repo) {
+	public P2RepoVersionArtifacts(ClientQuery query, long timestamp,String p2Repo) {
 		super(query);
-		this.p2=p2;
 		this.timestamp=timestamp;
 		this.p2Repo = p2Repo;
 	}

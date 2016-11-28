@@ -1,19 +1,18 @@
 package hu.qgears.repocache.p2plugin;
 
+import java.util.Arrays;
 import java.util.List;
 
 import hu.qgears.repocache.AbstractPage;
 import hu.qgears.repocache.ClientQuery;
 
 public class P2RepoVersionContent extends AbstractPage {
-	private RepoPluginP2 p2;
 	private long timestamp;
-	public static String file="compositeContent.xml";
+	public static List<String> fileNames= Arrays.asList("compositeContent.xml", "content.xml", "content.jar");
 	private String p2Repo;
 
-	public P2RepoVersionContent(ClientQuery query, RepoPluginP2 p2, long timestamp, String p2Repo) {
+	public P2RepoVersionContent(ClientQuery query, long timestamp, String p2Repo) {
 		super(query);
-		this.p2=p2;
 		this.timestamp=timestamp;
 		this.p2Repo = p2Repo;
 	}

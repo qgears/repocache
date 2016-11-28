@@ -7,7 +7,7 @@ public class P2RepoConfig {
 	/**
 	 * See: http://www.eclipse.org/downloads/download.php?file=/technology/epp/packages/neon/&protocol=http&format=xml
 	 */
-	private String mirrorQuery="http://www.eclipse.org/downloads/download.php";
+	//private String mirrorQuery="http://www.eclipse.org/downloads/download.php";
 	/**
 	 * Path of the repo within the downlaod server.
 	 * Eg: "technology/epp/packages/neon"
@@ -24,12 +24,14 @@ public class P2RepoConfig {
 	 */
 	private String selectedMirror;
 	private P2RepoMode repoMode;
-	public P2RepoConfig(String file, String primaryHost, String selectedMirror, P2RepoMode repoMode) {
+	private String repoDesc;
+	public P2RepoConfig(String file, String primaryHost, String selectedMirror, P2RepoMode repoMode, String repoDesc) {
 		super();
 		this.file = file;
 		this.primaryHost = primaryHost;
 		this.selectedMirror = selectedMirror;
 		this.repoMode=repoMode;
+		this.repoDesc=repoDesc;
 	}
 	public String getBaseUrl() {
 		return selectedMirror+file+"/";
@@ -42,6 +44,9 @@ public class P2RepoConfig {
 	}
 	public P2RepoMode getRepoMode() {
 		return repoMode;
+	}
+	public String getRepoDesc() {
+		return repoDesc;
 	}
 	
 }
