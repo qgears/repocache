@@ -33,7 +33,7 @@ public class ReadConfig {
 	private Map<String, String> mvnrepos = new HashMap<>();
 	private Map<String, String> httprepos = new HashMap<>();
 	private Map<String, P2RepoConfig> p2repos = new HashMap<>();
-	private Map<String, ClientSetup> clients=Collections.synchronizedMap(new TreeMap<>());
+	private Map<String, ClientSetup> clients=Collections.synchronizedMap(new TreeMap<String, ClientSetup>());
 	private CommandLineArgs args;
 	private byte[] configXml;
 	
