@@ -33,9 +33,9 @@
 		<selectedMirror>ttp://mirror.tspu.ru/eclipse/</selectedMirror>
 	</p2repo>
 	<p2repo name="qgears-opensource">
-		<file>opensource/updates</file>
-		<primaryHost>http://qgears.com/</primaryHost>
-		<selectedMirror>http://qgears.com/</selectedMirror>
+		<file>update-sites/qgears-opensource-repo-public/</file>
+		<primaryHost>http://192.168.1.116/</primaryHost>
+		<selectedMirror>http://192.168.1.116/</selectedMirror>
 	</p2repo>
 	<p2repo name="eclipse-indigo">
 		<file>indigo-mirror/</file>
@@ -45,7 +45,7 @@
 	<p2repo name="eclipse-luna">
 		<file>releases/luna/</file>
 		<primaryHost>http://download.eclipse.org/</primaryHost>
-		<selectedMirror>ttp://mirror.tspu.ru/eclipse/</selectedMirror>
+		<selectedMirror>http://mirror.tspu.ru/eclipse/</selectedMirror>
 	</p2repo>
 	<p2repo name="eclipse-mars">
 		<file>eclipse-mars-mirror/</file>

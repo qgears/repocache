@@ -70,6 +70,7 @@ public class RepoPluginP2 extends AbstractRepoPlugin
 	
 	@Override
 	public QueryResponse getOnlineResponse(Path localPath, ClientQuery q, QueryResponse cachedContent, boolean netAllowed) throws IOException {
+		log.info("Getting online response for path: " + localPath.toStringPath());
 		if(localPath.pieces.size()==0)
 		{
 			return new P2Listing(q, this).generate();
@@ -127,6 +128,10 @@ public class RepoPluginP2 extends AbstractRepoPlugin
 					ret=new P2RepoVersionContent(q, System.currentTimeMillis(), localPath.pieces.get(0)).generate();
 				}
 				return ret;
+			} else if(!localPath.folder&&localPath.pieces.size()==2 && localPath.pieces.get(1).equals(P2Index.filename)) {
+				Path relpath = P2VersionFolderUtil.getInstance().getLastVersionPath(localPath.pieces.get(0));
+				updateLatestP2Index(q, relpath, config.getBaseUrl());
+				return null;
 			}
 			Path ref = new Path(localPath).remove(0);
 			ref.remove(0);
@@ -153,7 +158,7 @@ public class RepoPluginP2 extends AbstractRepoPlugin
 					return response;
 				}catch(FileNotFoundException e)
 				{
-					if(ref.pieces.size()==2 && ref.pieces.get(1).equals("p2.index"))
+					if(ref.pieces.size()==1 && ref.pieces.get(0).equals(P2Index.filename))
 					{
 						// Workaround missing p2.index file in composited repo
 						return new P2Index(q).generate();
@@ -162,12 +167,16 @@ public class RepoPluginP2 extends AbstractRepoPlugin
 				}
 			}else
 			{
-				log.info("File in cache is not updated: "+q.path);
+				log.info("File in cache is not updated, net not allowed: "+q.path);
 			}
 		}
 		return null;
 	}
 
+	private void updateLatestP2Index(ClientQuery q, Path relpath, String baseUrl) {
+		updatePath(q, new Path(relpath, P2Index.filename));
+	}
+	
 	private void updateLatestListings(ClientQuery q, Path relpath, String baseUrl) {
 		// Getting the repo descriptor file (which is first not null), and update it!
 		boolean found = false;

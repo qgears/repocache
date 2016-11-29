@@ -5,6 +5,8 @@ import hu.qgears.repocache.ClientQuery;
 
 public class P2Index extends AbstractPage {
 
+	public static String filename = "p2.index";
+	
 	public P2Index(ClientQuery query) {
 		super(query);
 	}

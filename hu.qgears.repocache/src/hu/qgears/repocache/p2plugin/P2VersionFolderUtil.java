@@ -56,7 +56,10 @@ public class P2VersionFolderUtil {
 		Path p = new Path(P2_PATH);
 		p.add(p2Repo);
 		File repoFolder = getP2VersionFolder(p2Repo);
-		p.add(""+getLastVersionUsed(repoFolder));
+		int lastVersion = getLastVersionUsed(repoFolder);
+		// if there was no version, lastVersion is 1.
+		if (lastVersion < 1) lastVersion = 1;
+		p.add(""+lastVersion);
 		return p;
 	}
 	
