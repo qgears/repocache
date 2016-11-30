@@ -2,8 +2,8 @@ package hu.qgears.repocache.config;
 
 import java.io.IOException;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 import hu.qgears.repocache.ClientQuery;
 import hu.qgears.repocache.QueryResponse;
@@ -11,7 +11,7 @@ import hu.qgears.repocache.QueryResponseByteArray;
 import hu.qgears.repocache.RepoHandler;
 
 public class ConfigHandler {
-	private static Logger log=LoggerFactory.getLogger(ConfigHandler.class);
+	private static Log log=LogFactory.getLog(ConfigHandler.class);
 	
 	public void handle(ClientQuery q) throws IOException {
 		QueryResponse ret=null;

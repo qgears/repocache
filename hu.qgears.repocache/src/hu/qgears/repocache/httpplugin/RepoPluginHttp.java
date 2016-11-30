@@ -4,8 +4,8 @@ import java.io.IOException;
 import java.util.Map;
 import java.util.TreeMap;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 import hu.qgears.repocache.AbstractRepoPlugin;
 import hu.qgears.repocache.ClientQuery;
@@ -16,7 +16,7 @@ import hu.qgears.repocache.httpget.HttpGet;
 
 public class RepoPluginHttp extends AbstractRepoPlugin
 {
-	private Logger log=LoggerFactory.getLogger(getClass());
+	private Log log=LogFactory.getLog(getClass());
 	private RepoCache rc;
 
 	public RepoPluginHttp(RepoCache rc) {

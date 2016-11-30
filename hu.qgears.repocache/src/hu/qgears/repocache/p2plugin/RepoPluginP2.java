@@ -9,8 +9,8 @@ import java.util.TreeMap;
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 import hu.qgears.repocache.AbstractRepoPlugin;
 import hu.qgears.repocache.ClientQuery;
@@ -24,7 +24,7 @@ import hu.qgears.repocache.httpget.HttpGet;
 
 public class RepoPluginP2 extends AbstractRepoPlugin
 {
-	private Logger log=LoggerFactory.getLogger(RepoPluginP2.class);
+	private Log log=LogFactory.getLog(RepoPluginP2.class);
 	private RepoCache rc;
 	private RepoHandler rh;
 
@@ -109,29 +109,37 @@ public class RepoPluginP2 extends AbstractRepoPlugin
 			{
 				Path relpath = P2VersionFolderUtil.getInstance().getLastVersionPath(localPath.pieces.get(0));
 				updateLatestListings(q, relpath, config.getBaseUrl());
-				long timestamp=parseTimeStamp(cachedContent);
-				QueryResponse ret=new P2RepoVersionArtifacts(q, timestamp, localPath.pieces.get(0)).generate();
-				if(!ret.equals(cachedContent))
-				{
-					// In case the listing has changed also update the timestamp
-					ret=new P2RepoVersionArtifacts(q, System.currentTimeMillis(), localPath.pieces.get(0)).generate();
+				if (P2RepoVersionArtifacts.file.equals(localPath.pieces.get(1))) {
+					long timestamp=parseTimeStamp(cachedContent);
+					QueryResponse ret=new P2RepoVersionArtifacts(q, timestamp, localPath.pieces.get(0)).generate();
+					if(!ret.equals(cachedContent))
+					{
+						// In case the listing has changed also update the timestamp
+						ret=new P2RepoVersionArtifacts(q, System.currentTimeMillis(), localPath.pieces.get(0)).generate();
+					}
+					return ret;
+				} else {
+					return null;
 				}
-				return ret;
 			} else if(!localPath.folder&&localPath.pieces.size()==2 && P2RepoVersionContent.fileNames.contains(localPath.pieces.get(1))) {
 				Path relpath = P2VersionFolderUtil.getInstance().getLastVersionPath(localPath.pieces.get(0));
 				updateLatestListings(q, relpath, config.getBaseUrl());
-				long timestamp=parseTimeStamp(cachedContent);
-				QueryResponse ret=new P2RepoVersionContent(q, timestamp, localPath.pieces.get(0)).generate();
-				if(!ret.equals(cachedContent))
-				{
-					// In case the listing has changed also update the timestamp
-					ret=new P2RepoVersionContent(q, System.currentTimeMillis(), localPath.pieces.get(0)).generate();
+				if (P2RepoVersionContent.file.equals(localPath.pieces.get(1))) {
+					long timestamp=parseTimeStamp(cachedContent);
+					QueryResponse ret=new P2RepoVersionContent(q, timestamp, localPath.pieces.get(0)).generate();
+					if(!ret.equals(cachedContent))
+					{
+						// In case the listing has changed also update the timestamp
+						ret=new P2RepoVersionContent(q, System.currentTimeMillis(), localPath.pieces.get(0)).generate();
+					}
+					return ret;
+				} else {
+					return null;
 				}
-				return ret;
-			} else if(!localPath.folder&&localPath.pieces.size()==2 && localPath.pieces.get(1).equals(P2Index.filename)) {
+/*			} else if(!localPath.folder&&localPath.pieces.size()==2 && localPath.pieces.get(1).equals(P2Index.filename)) {
 				Path relpath = P2VersionFolderUtil.getInstance().getLastVersionPath(localPath.pieces.get(0));
 				updateLatestP2Index(q, relpath, config.getBaseUrl());
-				return null;
+				return null;*/
 			}
 			Path ref = new Path(localPath).remove(0);
 			ref.remove(0);
@@ -158,11 +166,11 @@ public class RepoPluginP2 extends AbstractRepoPlugin
 					return response;
 				}catch(FileNotFoundException e)
 				{
-					if(ref.pieces.size()==1 && ref.pieces.get(0).equals(P2Index.filename))
+					/*if(ref.pieces.size()==1 && ref.pieces.get(0).equals(P2Index.filename))
 					{
 						// Workaround missing p2.index file in composited repo
 						return new P2Index(q).generate();
-					}
+					}*/
 					throw e;
 				}
 			}else

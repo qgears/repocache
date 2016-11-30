@@ -18,8 +18,8 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.w3c.dom.Attr;
 import org.w3c.dom.DOMException;
 import org.w3c.dom.Document;
@@ -30,7 +30,7 @@ import org.w3c.dom.NodeList;
 import hu.qgears.repocache.CommandLineArgs;
 
 public class RepoModeHandler {
-	private static Logger log=LoggerFactory.getLogger(RepoModeHandler.class);
+	private static Log log=LogFactory.getLog(RepoModeHandler.class);
 	
 	private CommandLineArgs args;
 	private byte[] repoModeConfigXml;

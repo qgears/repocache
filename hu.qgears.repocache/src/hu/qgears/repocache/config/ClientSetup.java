@@ -2,12 +2,12 @@ package hu.qgears.repocache.config;
 
 import java.util.Calendar;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.eclipse.jgit.util.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public class ClientSetup {
-	private static Logger log=LoggerFactory.getLogger(ClientSetup.class);
+	private static Log log=LogFactory.getLog(ClientSetup.class);
 	
 	private String id;
 	EClientMode mode;

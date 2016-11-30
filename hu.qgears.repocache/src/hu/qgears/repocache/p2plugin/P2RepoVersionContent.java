@@ -7,8 +7,9 @@ import hu.qgears.repocache.AbstractPage;
 import hu.qgears.repocache.ClientQuery;
 
 public class P2RepoVersionContent extends AbstractPage {
+	public static String file="compositeContent.xml";
 	private long timestamp;
-	public static List<String> fileNames= Arrays.asList("compositeContent.xml", "content.xml", "content.jar");
+	public static List<String> fileNames= Arrays.asList("p2.index", "compositeContent.xml", "content.xml", "content.jar", "content.xml.xz", "compositeContent.jar", "site.xml");
 	private String p2Repo;
 
 	public P2RepoVersionContent(ClientQuery query, long timestamp, String p2Repo) {

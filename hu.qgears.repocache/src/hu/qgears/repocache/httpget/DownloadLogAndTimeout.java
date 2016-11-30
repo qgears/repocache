@@ -3,14 +3,14 @@ package hu.qgears.repocache.httpget;
 import java.util.concurrent.Callable;
 
 import org.apache.commons.httpclient.methods.GetMethod;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 import hu.qgears.commons.UtilTimer;
 
 public class DownloadLogAndTimeout implements AutoCloseable, Callable<Object>
 {
-	private Logger log=LoggerFactory.getLogger(DownloadLogAndTimeout.class);
+	private Log log=LogFactory.getLog(DownloadLogAndTimeout.class);
 	private GetMethod method;
 	private String url="none";
 	private long t0=System.nanoTime();

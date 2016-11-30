@@ -6,6 +6,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.Status;
@@ -16,8 +18,6 @@ import org.eclipse.jgit.lib.ObjectReader;
 import org.eclipse.jgit.lib.Repository;
 import org.eclipse.jgit.revwalk.RevCommit;
 import org.eclipse.jgit.treewalk.TreeWalk;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import hu.qgears.commons.UtilFile;
 import hu.qgears.repocache.config.ClientSetup;
@@ -35,7 +35,7 @@ public class RepoCache {
 	public Git git;
 	public StreamingHttpClient client = new StreamingHttpClient();
 	public static final String maintenancefilesprefix = "XXXRepoCache.";
-	private static Logger log=LoggerFactory.getLogger(RepoCache.class);
+	private static Log log=LogFactory.getLog(RepoCache.class);
 	private List<AbstractRepoPlugin> plugins=new ArrayList<>();
 	private ReadConfig configuration;
 	private RepoModeHandler repoModeHandler;

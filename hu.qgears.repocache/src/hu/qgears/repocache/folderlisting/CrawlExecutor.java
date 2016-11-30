@@ -6,12 +6,12 @@ import java.io.OutputStreamWriter;
 import java.io.Writer;
 import java.nio.charset.StandardCharsets;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import hu.qgears.repocache.ClientQuery;
 import hu.qgears.repocache.ClientQueryInternal;
@@ -20,7 +20,7 @@ import hu.qgears.repocache.QueryResponse;
 import hu.qgears.repocache.RepoHandler;
 
 public class CrawlExecutor {
-	private static Logger log=LoggerFactory.getLogger(CrawlExecutor.class);
+	private static Log log=LogFactory.getLog(CrawlExecutor.class);
 
 	public void handle(RepoHandler rh, ClientQuery q) throws IOException {
 		try(OutputStream os=q.createReplyStream("text/html"))

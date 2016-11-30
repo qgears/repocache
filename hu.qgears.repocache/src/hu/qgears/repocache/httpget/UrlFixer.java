@@ -2,12 +2,12 @@ package hu.qgears.repocache.httpget;
 
 import java.nio.charset.StandardCharsets;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import hu.qgears.repocache.QueryResponse;
 
@@ -15,7 +15,7 @@ import hu.qgears.repocache.QueryResponse;
  * Parse result HTML and convert absolute lints to relative so that they work on the mirror site.
  */
 public class UrlFixer {
-	private static Logger log=LoggerFactory.getLogger(UrlFixer.class);
+	private static Log log=LogFactory.getLog(UrlFixer.class);
 
 	public static void fixUrls(QueryResponse queryResponse) {
 		// Fix absolute URL-s

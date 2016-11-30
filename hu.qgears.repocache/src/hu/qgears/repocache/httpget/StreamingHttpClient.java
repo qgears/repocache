@@ -12,14 +12,14 @@ import org.apache.commons.httpclient.HttpException;
 import org.apache.commons.httpclient.HttpStatus;
 import org.apache.commons.httpclient.methods.GetMethod;
 import org.apache.commons.httpclient.params.HttpMethodParams;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 import hu.qgears.repocache.QueryResponse;
 
 public class StreamingHttpClient {
 	public static final int bufferSize=1024*1024;
-	final static Logger logger=LoggerFactory.getLogger(StreamingHttpClient.class);
+	final static Log logger=LogFactory.getLog(StreamingHttpClient.class);
 	/**
 	 * 
 	 * @param get

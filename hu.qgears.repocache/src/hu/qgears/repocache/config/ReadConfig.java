@@ -14,8 +14,8 @@ import java.util.TreeMap;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -28,7 +28,7 @@ import hu.qgears.repocache.p2plugin.P2RepoMode;
  * Configuration parser for repocache implementation.
  */
 public class ReadConfig {
-	private static Logger log=LoggerFactory.getLogger(ReadConfig.class);
+	private static Log log=LogFactory.getLog(ReadConfig.class);
 
 	private Map<String, String> mvnrepos = new HashMap<>();
 	private Map<String, String> httprepos = new HashMap<>();

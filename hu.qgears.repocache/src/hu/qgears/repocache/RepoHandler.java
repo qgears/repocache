@@ -6,10 +6,10 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.eclipse.jetty.server.Request;
 import org.eclipse.jetty.server.handler.AbstractHandler;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import hu.qgears.repocache.config.ClientSetup;
 import hu.qgears.repocache.config.ConfigHandler;
@@ -17,7 +17,7 @@ import hu.qgears.repocache.folderlisting.CrawlExecutor;
 import hu.qgears.repocache.folderlisting.RealFolderListing;
 
 public class RepoHandler extends AbstractHandler {
-	private static Logger log=LoggerFactory.getLogger(RepoHandler.class);
+	private static Log log=LogFactory.getLog(RepoHandler.class);
 	
 	private RepoCache rc;
 	public RepoHandler(RepoCache rc) {
@@ -26,38 +26,32 @@ public class RepoHandler extends AbstractHandler {
 
 	public void handle(String target, Request baseRequest, HttpServletRequest request, HttpServletResponse response)
 			throws IOException, ServletException {
+		log.info("Handling request, path info: " + baseRequest.getPathInfo());
 		ClientQuery q=new ClientQueryHttp(target, baseRequest, request, response, rc, new Path(baseRequest.getPathInfo()));
-		if(q.path.eq(0, "config"))
-		{
+		if(q.path.eq(0, "config")) {
 			new ConfigHandler().handle(q);
-			return;
-		}
-		if(q.getParameter("crawl")!=null)
-		{
+		} else if(q.getParameter("crawl")!=null) {
 			new CrawlExecutor().handle(this, q);
-			return;
-		}
-		try(QueryResponse cachedContent=getQueryResponse(q))
-		{
-			if(cachedContent!=null)
-			{
-				if(!q.path.folder && cachedContent.folder)
-				{
-					redirectToFolder(q);
-					return;
-				}else
-				{
-					response.setContentType(q.getMimeType());
-					response.setStatus(HttpServletResponse.SC_OK);
-					baseRequest.setHandled(true);
-					cachedContent.streamTo(response.getOutputStream());
-					if(cachedContent.fileSystemFolder!=null)
-					{
-						appendRealFolderListing(q, response, cachedContent);
+		} else {
+			try(QueryResponse cachedContent=getQueryResponse(q)) {
+				if(cachedContent!=null) {
+					if(!q.path.folder && cachedContent.folder) {
+						redirectToFolder(q);
+					} else {
+						response.setContentType(q.getMimeType());
+						response.setStatus(HttpServletResponse.SC_OK);
+						baseRequest.setHandled(true);
+						cachedContent.streamTo(response.getOutputStream());
+						if(cachedContent.fileSystemFolder!=null) {
+							appendRealFolderListing(q, response, cachedContent);
+						}
 					}
+				} else {
+					response.setStatus(HttpServletResponse.SC_NOT_FOUND);
 				}
 			}
 		}
+		log.info("Handling request response status: " + response.getStatus() + ", type: " + response.getContentType());
 	}
 
 	public QueryResponse getQueryResponse(ClientQuery q) throws IOException {

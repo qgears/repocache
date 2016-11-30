@@ -7,12 +7,12 @@ import java.io.InputStream;
 import java.io.OutputStream;
 
 import org.apache.commons.io.IOUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 abstract public class QueryResponse implements AutoCloseable
 {
-	private static Logger log=LoggerFactory.getLogger(QueryResponse.class);
+	private static Log log=LogFactory.getLog(QueryResponse.class);
 	public String url;
 	public boolean folder;
 	public File fileSystemFolder;

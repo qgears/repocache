@@ -26,13 +26,16 @@
 	<httprepo name="oomphneon">
 		<remote>http://mirror.switch.ch/eclipse/oomph/epp/neon/</remote>
 	</httprepo>
+<!--	<httprepo name="qgears-opensource">
+		<remote>http://192.168.1.116/update-sites/qgears-opensource-repo-public/</remote>
+	</httprepo> -->
 	<p2repo name="code-recommenders">
 		<desc>Code recommenders (snipmatch)</desc>
 		<file>recommenders/updates/stable/</file>
 		<primaryHost>http://download.eclipse.org/</primaryHost>
 		<selectedMirror>ttp://mirror.tspu.ru/eclipse/</selectedMirror>
 	</p2repo>
-	<p2repo name="qgears-opensource">
+ 	<p2repo name="qgears-opensource">
 		<file>update-sites/qgears-opensource-repo-public/</file>
 		<primaryHost>http://192.168.1.116/</primaryHost>
 		<selectedMirror>http://192.168.1.116/</selectedMirror>
