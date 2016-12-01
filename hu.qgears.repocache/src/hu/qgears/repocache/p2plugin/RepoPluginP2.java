@@ -70,7 +70,7 @@ public class RepoPluginP2 extends AbstractRepoPlugin
 	
 	@Override
 	public QueryResponse getOnlineResponse(Path localPath, ClientQuery q, QueryResponse cachedContent, boolean netAllowed) throws IOException {
-		log.info("Getting online response for path: " + localPath.toStringPath());
+		log.debug("Getting online response for path: " + localPath.toStringPath());
 		if(localPath.pieces.size()==0)
 		{
 			return new P2Listing(q, this).generate();
@@ -105,41 +105,31 @@ public class RepoPluginP2 extends AbstractRepoPlugin
 				}
 				return new P2RepoVersionListing(q, this, localPath.pieces.get(0)).generate();
 			}
-			if(!localPath.folder&&localPath.pieces.size()==2 && P2RepoVersionArtifacts.fileNames.contains(localPath.pieces.get(1)))
+			if(!localPath.folder&&localPath.pieces.size()==2 && P2RepoVersionArtifacts.file.equals(localPath.pieces.get(1)))
 			{
 				Path relpath = P2VersionFolderUtil.getInstance().getLastVersionPath(localPath.pieces.get(0));
 				updateLatestListings(q, relpath, config.getBaseUrl());
-				if (P2RepoVersionArtifacts.file.equals(localPath.pieces.get(1))) {
-					long timestamp=parseTimeStamp(cachedContent);
-					QueryResponse ret=new P2RepoVersionArtifacts(q, timestamp, localPath.pieces.get(0)).generate();
-					if(!ret.equals(cachedContent))
-					{
-						// In case the listing has changed also update the timestamp
-						ret=new P2RepoVersionArtifacts(q, System.currentTimeMillis(), localPath.pieces.get(0)).generate();
-					}
-					return ret;
-				} else {
-					return null;
+				long timestamp=parseTimeStamp(cachedContent);
+				QueryResponse ret=new P2RepoVersionArtifacts(q, timestamp, localPath.pieces.get(0)).generate();
+				if(!ret.equals(cachedContent))
+				{
+					// In case the listing has changed also update the timestamp
+					ret=new P2RepoVersionArtifacts(q, System.currentTimeMillis(), localPath.pieces.get(0)).generate();
 				}
-			} else if(!localPath.folder&&localPath.pieces.size()==2 && P2RepoVersionContent.fileNames.contains(localPath.pieces.get(1))) {
+				return ret;
+			} else if(!localPath.folder&&localPath.pieces.size()==2 && P2RepoVersionContent.file.equals(localPath.pieces.get(1))) {
 				Path relpath = P2VersionFolderUtil.getInstance().getLastVersionPath(localPath.pieces.get(0));
 				updateLatestListings(q, relpath, config.getBaseUrl());
-				if (P2RepoVersionContent.file.equals(localPath.pieces.get(1))) {
-					long timestamp=parseTimeStamp(cachedContent);
-					QueryResponse ret=new P2RepoVersionContent(q, timestamp, localPath.pieces.get(0)).generate();
-					if(!ret.equals(cachedContent))
-					{
-						// In case the listing has changed also update the timestamp
-						ret=new P2RepoVersionContent(q, System.currentTimeMillis(), localPath.pieces.get(0)).generate();
-					}
-					return ret;
-				} else {
-					return null;
+				long timestamp=parseTimeStamp(cachedContent);
+				QueryResponse ret=new P2RepoVersionContent(q, timestamp, localPath.pieces.get(0)).generate();
+				if(!ret.equals(cachedContent))
+				{
+					// In case the listing has changed also update the timestamp
+					ret=new P2RepoVersionContent(q, System.currentTimeMillis(), localPath.pieces.get(0)).generate();
 				}
-/*			} else if(!localPath.folder&&localPath.pieces.size()==2 && localPath.pieces.get(1).equals(P2Index.filename)) {
-				Path relpath = P2VersionFolderUtil.getInstance().getLastVersionPath(localPath.pieces.get(0));
-				updateLatestP2Index(q, relpath, config.getBaseUrl());
-				return null;*/
+				return ret;
+			} else if(!localPath.folder&&localPath.pieces.size()==2) {
+				return null;
 			}
 			Path ref = new Path(localPath).remove(0);
 			ref.remove(0);
@@ -181,10 +171,6 @@ public class RepoPluginP2 extends AbstractRepoPlugin
 		return null;
 	}
 
-	private void updateLatestP2Index(ClientQuery q, Path relpath, String baseUrl) {
-		updatePath(q, new Path(relpath, P2Index.filename));
-	}
-	
 	private void updateLatestListings(ClientQuery q, Path relpath, String baseUrl) {
 		// Getting the repo descriptor file (which is first not null), and update it!
 		boolean found = false;

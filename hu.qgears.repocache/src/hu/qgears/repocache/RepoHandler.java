@@ -116,7 +116,7 @@ public class RepoHandler extends AbstractHandler {
 				return new StatusPage(q).generate();
 			}
 		} catch (Exception e) {
-			log.error("Error fetching file: "+q.path, e);
+			log.info("Error fetching file: "+q.path + ", message: " + e.getMessage());
 		}
 		return cachedContent;
 	}

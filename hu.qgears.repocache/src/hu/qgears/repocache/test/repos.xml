@@ -157,8 +157,10 @@
 	</p2repo>
 	<p2repo name="xtext">
 		<desc>XText All in one</desc>
-		<file>modeling/tmf/xtext/updates/composite/releases/</file>
-		<primaryHost>http://download.eclipse.org/</primaryHost>
-		<selectedMirror>http://mirror.tspu.ru/eclipse/</selectedMirror>
+		<file>xtext/</file>
+		<primaryHost>http://192.168.1.116/mirror/</primaryHost>
+		<selectedMirror>http://192.168.1.116/mirror/</selectedMirror>
+<!--		<primaryHost>http://download.eclipse.org/</primaryHost>
+		<selectedMirror>http://mirror.tspu.ru/eclipse/</selectedMirror> -->
 	</p2repo>
 </repos>
