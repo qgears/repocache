@@ -14,46 +14,30 @@
 	<mavenrepo name="maven-inquery">
 		<remote>http://repo.eclipse.org/content/groups/emf-incquery/</remote>
 	</mavenrepo>
-	<mavenrepo name="maven-rcptt-rel">
+<!--	<mavenrepo name="maven-rcptt-rel">
 		<remote>http://repo.eclipse.org/content/repositories/rcptt-releases/</remote>
 	</mavenrepo>
 	<mavenrepo name="maven-rcptt-snap">
 		<remote>http://repo.eclipse.org/content/repositories/rcptt-snapshots/</remote>
-	</mavenrepo>
+	</mavenrepo> -->
 	<mavenrepo name="jenkins-cli">
 		<remote>http://repo.jenkins-ci.org/public/</remote>
 	</mavenrepo>
-	<httprepo name="oomphneon">
+	<!-- oomph-hoz kellő repo-k -->
+<!--	<httprepo name="oomphneon">
 		<remote>http://mirror.switch.ch/eclipse/oomph/epp/neon/</remote>
 	</httprepo>
-<!--	<httprepo name="qgears-opensource">
-		<remote>http://192.168.1.116/update-sites/qgears-opensource-repo-public/</remote>
-	</httprepo> -->
 	<p2repo name="code-recommenders">
 		<desc>Code recommenders (snipmatch)</desc>
 		<file>recommenders/updates/stable/</file>
 		<primaryHost>http://download.eclipse.org/</primaryHost>
 		<selectedMirror>ttp://mirror.tspu.ru/eclipse/</selectedMirror>
 	</p2repo>
- 	<p2repo name="qgears-opensource">
-		<file>update-sites/qgears-opensource-repo-public/</file>
-		<primaryHost>http://192.168.1.116/</primaryHost>
-		<selectedMirror>http://192.168.1.116/</selectedMirror>
-	</p2repo>
-	<p2repo name="eclipse-indigo">
-		<file>indigo-mirror/</file>
-		<primaryHost>http://192.168.1.116/mirror/</primaryHost>
-		<selectedMirror>http://192.168.1.116/mirror/</selectedMirror>
-	</p2repo>
-	<p2repo name="eclipse-luna">
-		<file>releases/luna/</file>
+	<p2repo name="ecoretools">
+		<desc>Ecore Tools</desc>
+		<file>ecoretools/updates/releases/2.0.3/luna/</file>
 		<primaryHost>http://download.eclipse.org/</primaryHost>
 		<selectedMirror>http://mirror.tspu.ru/eclipse/</selectedMirror>
-	</p2repo>
-	<p2repo name="eclipse-mars">
-		<file>eclipse-mars-mirror/</file>
-		<primaryHost>http://192.168.1.116/mirror/</primaryHost>
-		<selectedMirror>http://192.168.1.116/mirror/</selectedMirror>
 	</p2repo>
 	<p2repo name="eclipse-sirius-luna">
 		<file>sirius/updates/releases/3.0.0/luna/</file>
@@ -64,59 +48,12 @@
 		<file>sirius/updates/releases/3.0.0/mars/</file>
 		<primaryHost>http://download.eclipse.org/</primaryHost>
 		<selectedMirror>http://mirror.tspu.ru/eclipse/</selectedMirror>
-	</p2repo>
-	<p2repo name="ecore-docgen">
-		<file>jenkins/job/EcoreDocGen/lastSuccessfulBuild/artifact/releng/hu.qgears.gendoc.update/target/repository/</file>
-		<primaryHost>http://192.168.1.116:8080/</primaryHost>
-		<selectedMirror>http://192.168.1.116:8080/</selectedMirror>
-	</p2repo>
-	<p2repo name="ecoretools">
-		<desc>Ecore Tools</desc>
-		<file>ecoretools/updates/releases/2.0.3/luna/</file>
-		<primaryHost>http://download.eclipse.org/</primaryHost>
-		<selectedMirror>http://mirror.tspu.ru/eclipse/</selectedMirror>
-	</p2repo>
-	<p2repo name="emf-diffmerge">
-		<file>emf-diffmerge-0.1-mirror/</file>
-		<primaryHost>http://192.168.1.116/mirror/</primaryHost>
-		<selectedMirror>http://192.168.1.116/mirror/</selectedMirror>
-	</p2repo>
-	<p2repo name="emf-diffmerge-0.5">
-		<file>diffmerge/releases/0.5.0/emf-diffmerge-site/</file>
-		<primaryHost>http://download.eclipse.org/</primaryHost>
-		<selectedMirror>http://mirror.tspu.ru/eclipse/</selectedMirror>
-	</p2repo>
-	<p2repo name="emf-forms">
-		<file>ecp/releases/releases_16/</file>
-		<primaryHost>http://download.eclipse.org/</primaryHost>
-		<selectedMirror>http://mirror.tspu.ru/eclipse/</selectedMirror>
-	</p2repo>
-	<p2repo name="emf">
-		<file>emf-repo/</file>
-		<primaryHost>http://192.168.1.116/mirror/</primaryHost>
-		<selectedMirror>http://192.168.1.116/mirror/</selectedMirror>
-	</p2repo>
-	<p2repo name="eef">
-		<desc>Extended editing framework 1.4 M7</desc>
-		<file>modeling/emft/eef/updates/milestones/1.4/S201406041355/</file>
-		<primaryHost>http://download.eclipse.org/</primaryHost>
-		<selectedMirror>http://mirror.tspu.ru/eclipse/</selectedMirror>
-	</p2repo>
-	<p2repo name="incquery">
-		<file>incquery/updates-extra/release</file>
-		<primaryHost>http://download.eclipse.org/</primaryHost>
-		<selectedMirror>http://mirror.tspu.ru/eclipse/</selectedMirror>
-	</p2repo>
+	</p2repo> 
 	<p2repo name="pydev-eclipse">
 		<desc>PyDev update site</desc>
 		<file>fabioz/pydev/5.2.0/</file>
 		<primaryHost>https://dl.bintray.com/</primaryHost>
 		<selectedMirror>https://dl.bintray.com/</selectedMirror>
-	</p2repo>
-	<p2repo name="rcptt">
-		<file>rcptt/</file>
-		<primaryHost>http://192.168.1.116/mirror/</primaryHost>
-		<selectedMirror>http://192.168.1.116/mirror/</selectedMirror>
 	</p2repo>
 	<p2repo name="sonar">
 		<file>eclipse/eclipse/</file>
@@ -138,29 +75,57 @@
 		<primaryHost>http://mbarbero.github.io/</primaryHost>
 		<selectedMirror>http://mbarbero.github.io/</selectedMirror>
 	</p2repo>
-	<p2repo name="viatra">
+	<p2repo name="wings-devenv-extensions">
+		<desc>Wings development environment extensions</desc>
+		<file>jenkins/job/Wings_Validation_IncQuery_Tools/lastSuccessfulBuild/artifact/common/editor/incquery/devtools/com.bbraun.wings.validation.incquery.devtools.p2/target/repository/</file>
+		<primaryHost>http://192.168.1.116:8080/</primaryHost>
+		<selectedMirror>http://192.168.1.116:8080/</selectedMirror>
+	</p2repo>
+	-->
+	<httprepo name="qgears-opensource">
+		<remote>http://192.168.1.116/update-sites/qgears-opensource-repo-public/</remote>
+	</httprepo>
+	<httprepo name="eclipse-indigo">
+		<remote>http://192.168.1.116/mirror/indigo-mirror/</remote>
+	</httprepo>
+	<httprepo name="eclipse-luna">
+		<remote>http://download.eclipse.org/releases/luna/</remote>
+	</httprepo>
+	<httprepo name="eclipse-mars">
+		<remote>http://192.168.1.116/mirror/eclipse-mars-mirror/</remote>
+	</httprepo>
+	<!-- Wings-hez kell, össze kellene merge-elni, szállíjuk a Braun-nak -->
+<!--	<p2repo name="emf-diffmerge">
+		<file>emf-diffmerge-0.1-mirror/</file>
+		<primaryHost>http://192.168.1.116/mirror/</primaryHost>
+		<selectedMirror>http://192.168.1.116/mirror/</selectedMirror>
+	</p2repo>
+	<p2repo name="emf-diffmerge-0.5">
+		<file>diffmerge/releases/0.5.0/emf-diffmerge-site/</file>
+		<primaryHost>http://download.eclipse.org/</primaryHost>
+		<selectedMirror>http://mirror.tspu.ru/eclipse/</selectedMirror>
+	</p2repo>
+	<p2repo name="incquery">
+		<file>incquery/updates-extra/release</file>
+		<primaryHost>http://download.eclipse.org/</primaryHost>
+		<selectedMirror>http://mirror.tspu.ru/eclipse/</selectedMirror>
+	</p2repo>
+	<httprepo name="rcptt">
+		<remote>http://192.168.1.116/mirror/rcptt/</remote>
+	</httprepo>
+	-->
+	<httprepo name="emf">
+		<remote>http://192.168.1.116/mirror/emf-repo/</remote>
+	</httprepo>
+	<!-- Kísérletezés alatt, jövőbeli fejlesztés -->
+<!--	<p2repo name="viatra">
 		<desc>VIATRA release</desc>
 		<file>viatra/updates/release</file>
 		<primaryHost>http://download.eclipse.org/</primaryHost>
 		<selectedMirror>http://mirror.tspu.ru/eclipse/</selectedMirror>
-	</p2repo>
-	<p2repo name="wings-devenv-extensions">
-		<desc>Wings development environment extensions</desc>
-		<file>jenkins/job/Wings_Validation_IncQuery_Tools/lastSuccessfulBuild/artifact/com.bbraun.wings.validation.incquery.devtools.p2/target/repository/</file>
-		<primaryHost>http://192.168.1.116:8080/</primaryHost>
-		<selectedMirror>http://192.168.1.116:8080/</selectedMirror>
-	</p2repo>
-	<p2repo name="xpand-2.0.0">
-		<file>xpand-2.0.0/</file>
-		<primaryHost>http://192.168.1.116/mirror/</primaryHost>
-		<selectedMirror>http://192.168.1.116/mirror/</selectedMirror>
-	</p2repo>
-	<p2repo name="xtext">
+	</p2repo>-->
+	<httprepo name="xtext">
 		<desc>XText All in one</desc>
-		<file>xtext/</file>
-		<primaryHost>http://192.168.1.116/mirror/</primaryHost>
-		<selectedMirror>http://192.168.1.116/mirror/</selectedMirror>
-<!--		<primaryHost>http://download.eclipse.org/</primaryHost>
-		<selectedMirror>http://mirror.tspu.ru/eclipse/</selectedMirror> -->
-	</p2repo>
+		<remote>http://192.168.1.116/mirror/xtext/</remote>
+	</httprepo>
 </repos>
