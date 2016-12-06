@@ -82,6 +82,44 @@
 		<selectedMirror>http://192.168.1.116:8080/</selectedMirror>
 	</p2repo>
 	-->
+	<!-- Oomph installer repositories for SpaceII dev environment. -->
+	<p2repo name="target-dsl-editor">
+		<file>fr.obeo.releng.targetplatform/p2/</file>
+		<primaryHost>http://mbarbero.github.io/</primaryHost>
+		<selectedMirror>http://mbarbero.github.io/</selectedMirror>
+	</p2repo>
+	<p2repo name="pydev-eclipse">
+		<desc>PyDev update site</desc>
+		<file>fabioz/pydev/5.2.0/</file>
+		<primaryHost>https://dl.bintray.com/</primaryHost>
+		<selectedMirror>https://dl.bintray.com/</selectedMirror>
+	</p2repo>
+	<p2repo name="incquery">
+		<file>incquery/updates-extra/release</file>
+		<primaryHost>http://download.eclipse.org/</primaryHost>
+		<selectedMirror>http://mirror.tspu.ru/eclipse/</selectedMirror>
+	</p2repo>
+	<p2repo name="sonar">
+		<file>eclipse/eclipse/</file>
+		<primaryHost>http://downloads.sonarsource.com/</primaryHost>
+		<selectedMirror>http://downloads.sonarsource.com/</selectedMirror>
+	</p2repo>
+	<p2repo name="eclipse-mars-epp">
+		<file>technology/epp/packages/mars</file>
+		<primaryHost>http://download.eclipse.org/</primaryHost>
+		<selectedMirror>http://mirror.tspu.ru/eclipse/</selectedMirror>
+	</p2repo>
+	<p2repo name="oomph-updates">
+		<file>oomph/updates/milestone/latest</file>
+		<primaryHost>http://download.eclipse.org/</primaryHost>
+		<selectedMirror>http://mirror.tspu.ru/eclipse/</selectedMirror>
+	</p2repo>
+	<p2repo name="egit-updates">
+		<file>egit/updates</file>
+		<primaryHost>http://download.eclipse.org/</primaryHost>
+		<selectedMirror>http://mirror.tspu.ru/eclipse/</selectedMirror>
+	</p2repo>
+	<!-- Oomph installer repositories. -->
 	<httprepo name="qgears-opensource">
 		<remote>http://192.168.1.116/update-sites/qgears-opensource-repo-public/</remote>
 	</httprepo>

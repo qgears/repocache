@@ -65,6 +65,9 @@ public class RepoCache {
 	}
 
 	public void start() throws Exception {
+		// register Message as shutdown hook
+		Runtime.getRuntime().addShutdownHook(new RepoShutdown());
+
 		commitTimer=new CommitTimer(this);
 		File wc=configuration.getLocalGitRepo();
 		new P2VersionFolderUtil(wc.getAbsolutePath());
@@ -289,4 +292,22 @@ public class RepoCache {
 	public File createTmpFile(Path path) {
 		return new File(configuration.getCommandLine().downloadsFolder, ""+ctr.incrementAndGet());
 	}
+
+	/**
+	 * Shutdown hook
+	 * When system exit, make an explicite commit on git. (Git stays clean)
+	 * @author akos
+	 *
+	 */
+	class RepoShutdown extends Thread {
+		public void run() {
+			log.info("ShutdownHook Bye!");
+			try {
+				commitTimer.executeCommit();
+			} catch (Exception e) {
+				log.error("Error commiting in shutdown hook!", e);
+			}
+		}
+	}
+
 }
