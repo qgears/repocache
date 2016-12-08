@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Example configuration that is used for manual testing. -->
+<repos>
+	<httprepo name="ubuntu-archive">
+		<remote>http://hu.archive.ubuntu.com/ubuntu/</remote>
+	</httprepo>
+	<httprepo name="ubuntu-security">
+		<remote>http://security.ubuntu.com/ubuntu</remote>
+	</httprepo>
+</repos>

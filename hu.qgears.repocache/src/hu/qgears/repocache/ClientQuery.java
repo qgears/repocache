@@ -1,14 +1,21 @@
 package hu.qgears.repocache;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.nio.file.Files;
 import java.util.Set;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.eclipse.jgit.util.StringUtils;
 
 import hu.qgears.rtemplate.runtime.ICodeGeneratorContext;
 import hu.qgears.rtemplate.runtime.TemplateTracker;
 
 abstract public class ClientQuery implements ICodeGeneratorContext
 {
+	private static Log log=LogFactory.getLog(ClientQuery.class);
 	public final RepoCache rc;
 	public final Path path;
 	
@@ -47,19 +54,13 @@ abstract public class ClientQuery implements ICodeGeneratorContext
 		if(path.folder)
 		{
 			return "text/html;charset=utf-8";
-		}else if(path.getFileName()!=null)
-		{
-			if(path.getFileName().endsWith(".xml"))
-			{
-				return "application/xml";
-			}else if(path.getFileName().endsWith(".jar"))
-			{
-				return "application/java-archive";
-			}else if(path.getFileName().endsWith(".html"))
-			{
-				return "text/html";
-			}
 		}
-		return "application/data";
+		String mimeType = "";
+		try {
+			mimeType = Files.probeContentType(new File(path.getFileName()).toPath());
+		} catch (IOException e) {
+			log.error("Error getting file mime type. path: " + path, e);
+		}
+		return StringUtils.isEmptyOrNull(mimeType) ? "application/data" : mimeType;
 	}
 }

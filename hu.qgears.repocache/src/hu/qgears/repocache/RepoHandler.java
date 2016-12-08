@@ -40,6 +40,7 @@ public class RepoHandler extends AbstractHandler {
 					} else {
 						response.setContentType(q.getMimeType());
 						response.setStatus(HttpServletResponse.SC_OK);
+						response.setContentLength(cachedContent.getResponseAsBytes().length);
 						baseRequest.setHandled(true);
 						cachedContent.streamTo(response.getOutputStream());
 						if(cachedContent.fileSystemFolder!=null) {
