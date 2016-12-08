@@ -24,6 +24,7 @@ import hu.qgears.repocache.httpget.DownloadLogAndTimeout;
 
 /**
  * Minimal proxy implementation. Basic for proxying all downloads.
+ * For details see: https://searchcode.com/codesearch/view/22939320/
  */
 public class ProxyHandler extends AbstractHandler {
 
