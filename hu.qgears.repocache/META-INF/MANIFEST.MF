@@ -3,7 +3,7 @@ Bundle-ManifestVersion: 2
 Bundle-Name: Repocache
 Bundle-SymbolicName: hu.qgears.repocache
 Bundle-Version: 1.0.0.qualifier
-Bundle-RequiredExecutionEnvironment: JavaSE-1.8
+Bundle-RequiredExecutionEnvironment: JavaSE-1.7
 Require-Bundle: org.eclipse.jgit;bundle-version="4.1.0",
  org.slf4j.api;bundle-version="1.7.2",
  org.eclipse.jetty.http;bundle-version="9.2.13",
