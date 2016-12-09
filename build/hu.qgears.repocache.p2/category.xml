@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<site>
+
+	<!-- Opensource utils category -->
+	<category-def name="Q-Gears repository cache" label="Q-Gears repository cache" />
+	<category-def name="Q-Gears repository cache sources" label="Q-Gears repository cache developer resources">
+		<description>
+			Source bundles of Q-Gears repository cache
+		</description>
+	</category-def>
+	<plugin id="hu.qgears.utils.feature">
+		<category name="Q-Gears lib tools" />
+	</plugin>
+	
+	<bundle id="hu.qgears.repocache">
+		<category name="Repocache" />
+	</bundle>
+	<bundle id="hu.qgears.repocache.source">
+		<category name="Repocache sources" />
+	</bundle>
+</site>
