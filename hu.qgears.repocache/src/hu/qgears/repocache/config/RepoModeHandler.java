@@ -46,12 +46,14 @@ public class RepoModeHandler {
 	private void parseConfig() throws IOException {
 		try {
 			repoModeConfigXml=args.openRepoModeConfigXml();
-			DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
-			DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
-			try(InputStream configXMLInputStream=new ByteArrayInputStream(repoModeConfigXml))
-			{
-				Document doc = dBuilder.parse(configXMLInputStream);
-				parseRepoModes(doc);
+			if (repoModeConfigXml != null) {
+				DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
+				DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
+				try(InputStream configXMLInputStream=new ByteArrayInputStream(repoModeConfigXml))
+				{
+					Document doc = dBuilder.parse(configXMLInputStream);
+					parseRepoModes(doc);
+				}
 			}
 		} catch (Exception e) {
 			throw new IOException("Error reading configuration: "+args.config, e);

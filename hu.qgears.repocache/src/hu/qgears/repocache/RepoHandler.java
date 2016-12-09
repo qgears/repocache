@@ -48,7 +48,21 @@ public class RepoHandler extends AbstractHandler {
 						}
 					}
 				} else {
-					response.setStatus(HttpServletResponse.SC_NOT_FOUND);
+					if (q.path.folder) {
+						QueryResponse qr = rc.loadDirFromCache(q.path);
+						if (qr != null) {
+							response.setContentType(q.getMimeType());
+							response.setStatus(HttpServletResponse.SC_OK);
+							baseRequest.setHandled(true);
+							QueryResponse r2=new RealFolderListing(q, qr).generate();
+							r2.streamTo(response.getOutputStream());
+							response.setContentLength(r2.getResponseAsBytes().length);
+						} else {
+							response.setStatus(HttpServletResponse.SC_NOT_FOUND);
+						}
+					} else {
+						response.setStatus(HttpServletResponse.SC_NOT_FOUND);
+					}
 				}
 			}
 		}

@@ -150,6 +150,19 @@ public class RepoCache {
 		}
 	}
 
+	public QueryResponse loadDirFromCache(Path path) throws IOException {
+		if(path.pieces.size()==0) {
+			return null;
+		}
+		File file=getDir(path);
+		if (file != null) {
+			QueryResponse qr = new QueryResponseFile(path.toStringPath(), file, true);
+			qr.fileSystemFolder=getWorkingCopyFile(path);
+			return qr;
+		}
+		return null;
+	}
+	
 	private QueryResponse loadFromCache(Path path, boolean folder) throws IOException {
 		if(path.pieces.size()==0)
 		{
@@ -219,6 +232,15 @@ public class RepoCache {
 	private File getFile(Path path) throws IOException {
 		File f=getWorkingCopyFile(path);
 		if(!f.exists()||f.isDirectory())
+		{
+			return null;
+		}
+		return f;
+	}
+
+	private File getDir(Path path) throws IOException {
+		File f=getWorkingCopyFile(path);
+		if(!f.exists()||!f.isDirectory())
 		{
 			return null;
 		}

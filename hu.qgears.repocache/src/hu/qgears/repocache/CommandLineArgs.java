@@ -45,10 +45,6 @@ public class CommandLineArgs {
 			{
 				throw new IllegalArgumentException("repo mode config file must be set as a command line parameter.");
 			}
-			if((!repoModeConfig.exists()) || !repoModeConfig.isFile())
-			{
-				throw new IllegalArgumentException("repo mode config file does not exist.");
-			}
 		}
 		if(repo==null)
 		{
@@ -89,11 +85,17 @@ public class CommandLineArgs {
 		}
 		return UtilFile.loadFile(config);
 	}
-	public byte[] openRepoModeConfigXml() throws IOException {
+	public byte[] openRepoModeConfigXml() {
 		if(repoModeConfigOverride!=null)
 		{
 			return repoModeConfigOverride;
 		}
-		return UtilFile.loadFile(repoModeConfig);
+		byte[] ret = null;
+		try {
+			ret = UtilFile.loadFile(repoModeConfig);
+		} catch (IOException e) {
+			System.out.println("Repomode config file missing.");
+		}
+		return ret;
 	}
 }
