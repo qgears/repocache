@@ -8,7 +8,7 @@ import org.apache.commons.logging.LogFactory;
 import hu.qgears.repocache.ClientQuery;
 import hu.qgears.repocache.QueryResponse;
 import hu.qgears.repocache.QueryResponseByteArray;
-import hu.qgears.repocache.RepoHandler;
+import hu.qgears.repocache.handler.RepoHandler;
 
 public class ConfigHandler {
 	private static Log log=LogFactory.getLog(ConfigHandler.class);

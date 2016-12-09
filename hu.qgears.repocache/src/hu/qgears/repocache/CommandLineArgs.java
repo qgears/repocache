@@ -18,6 +18,8 @@ public class CommandLineArgs {
 	public File repoModeConfig;
 	@JOHelp("Http server port that is opened by the server")
 	public int port=8080;
+	@JOHelp("Http proxy server port that is opened by the server")
+	public Integer proxyPort=null;
 	@JOHelp("If local only then the cache does not access the remote servers at all.")
 	@JOSimpleBoolean
 	public boolean localOnly;

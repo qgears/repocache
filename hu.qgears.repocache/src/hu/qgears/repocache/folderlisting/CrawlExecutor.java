@@ -17,12 +17,12 @@ import hu.qgears.repocache.ClientQuery;
 import hu.qgears.repocache.ClientQueryInternal;
 import hu.qgears.repocache.Path;
 import hu.qgears.repocache.QueryResponse;
-import hu.qgears.repocache.RepoHandler;
+import hu.qgears.repocache.handler.MyRequestHandler;
 
 public class CrawlExecutor {
 	private static Log log=LogFactory.getLog(CrawlExecutor.class);
 
-	public void handle(RepoHandler rh, ClientQuery q) throws IOException {
+	public void handle(MyRequestHandler rh, ClientQuery q) throws IOException {
 		try(OutputStream os=q.createReplyStream("text/html"))
 		{
 			try(Writer w=new OutputStreamWriter(os, StandardCharsets.UTF_8))
@@ -34,7 +34,7 @@ public class CrawlExecutor {
 			}
 		}
 	}
-	private void handleInternal(RepoHandler rh, ClientQuery q, Writer w) throws IOException
+	private void handleInternal(MyRequestHandler rh, ClientQuery q, Writer w) throws IOException
 	{
 		w.write("Querying: "+q.path.toStringPath()+"\n");
 		w.flush();

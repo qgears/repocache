@@ -18,8 +18,8 @@ import hu.qgears.repocache.ClientQueryInternal;
 import hu.qgears.repocache.Path;
 import hu.qgears.repocache.QueryResponse;
 import hu.qgears.repocache.RepoCache;
-import hu.qgears.repocache.RepoHandler;
 import hu.qgears.repocache.TimestampParser;
+import hu.qgears.repocache.handler.RepoHandler;
 import hu.qgears.repocache.httpget.HttpGet;
 
 public class RepoPluginP2 extends AbstractRepoPlugin

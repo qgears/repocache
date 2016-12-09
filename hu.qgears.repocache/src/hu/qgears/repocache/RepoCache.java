@@ -23,8 +23,11 @@ import hu.qgears.commons.UtilFile;
 import hu.qgears.repocache.config.ClientSetup;
 import hu.qgears.repocache.config.ReadConfig;
 import hu.qgears.repocache.config.RepoModeHandler;
+import hu.qgears.repocache.handler.ProxyRepoHandler;
+import hu.qgears.repocache.handler.RepoHandler;
 import hu.qgears.repocache.httpget.StreamingHttpClient;
 import hu.qgears.repocache.httpplugin.RepoPluginHttp;
+import hu.qgears.repocache.httpplugin.RepoPluginProxy;
 import hu.qgears.repocache.mavenplugin.RepoPluginMaven;
 import hu.qgears.repocache.p2plugin.P2VersionFolderUtil;
 import hu.qgears.repocache.p2plugin.RepoPluginP2;
@@ -52,7 +55,7 @@ public class RepoCache {
 		cl.printHelpOn(System.out);
 		cl.parseArgs(args);
 		String parsedOptions=cl.optionsToString();
-		log.info(parsedOptions);
+		log.info("Options:\n" + parsedOptions);
 		clargs.validate();
 		ReadConfig config=new ReadConfig(clargs);
 		RepoModeHandler repoModeH = new RepoModeHandler(clargs);
@@ -107,12 +110,40 @@ public class RepoCache {
 		plugins.add(new RepoPluginHttp(this));
 		plugins.add(new RepoPluginMaven(this));
 
+		Integer proxyPort = configuration.getCommandLine().proxyPort;
+		if (proxyPort != null) {
+			ProxyRepoHandler prh = new ProxyRepoHandler(RepoCache.this);
+			new ProxyServerThread(proxyPort, prh).start();	// READ_ONLY mode
+			new ProxyServerThread(proxyPort+1, prh).start();// UPDATE mode
+			plugins.add(new RepoPluginProxy(this));
+		}
+		
 		Server server = new Server(configuration.getCommandLine().port);
 		server.setHandler(rh);
 		server.start();
 		server.join();
 	}
 
+	public class ProxyServerThread extends Thread {
+		private int proxyPort;
+		private ProxyRepoHandler prh;
+		public ProxyServerThread (int proxyPort, ProxyRepoHandler prh) {
+			this.proxyPort = proxyPort;
+			this.prh = prh;
+		}
+	    public void run() {
+			//ProxyRepoHandler prh = new ProxyRepoHandler(RepoCache.this);
+			Server proxyServer = new Server(proxyPort);
+			proxyServer.setHandler(prh);
+			try {
+				proxyServer.start();
+				proxyServer.join();
+			} catch (Exception e) {
+				log.error("Error starting proxy server on port: " + proxyPort, e);
+			}
+	    }
+	}
+	
 	public void assertStatusClean() throws IOException, NoWorkTreeException, GitAPIException {
 		synchronized (this) {
 			Status status=git.status().call();
@@ -264,7 +295,7 @@ public class RepoCache {
 	 * @throws IOException
 	 * @throws GitAPIException
 	 */
-	public void updateResponse(Path path, QueryResponse cachedContent, QueryResponse qr, AbstractRepoPlugin plugin) throws NoFilepatternException, IOException, GitAPIException {
+	public void updateResponse(Path path, QueryResponse cachedContent, QueryResponse qr) throws NoFilepatternException, IOException, GitAPIException {
 		synchronized (this) {
 			if(qr!=null&&!(qr.equals(cachedContent)))
 			{
@@ -288,13 +319,22 @@ public class RepoCache {
 		}
 
 		boolean updRequired = true;
-		if (q.path.pieces.size() > 1) {
+		// Update req by repo
+		String repoName = null;
+		if (q.path.pieces.size() > 0 && "proxy".equals(q.path.pieces.get(0))) {
+			repoName = "proxy-repo";
+		} else if (q.path.pieces.size() > 1) {
+			repoName = q.path.pieces.get(1);
+		}
+		if (repoName != null) {
 			if (cachedContent!=null) {
-				updRequired = getRepoModeHandler().isRepoUpdatable(q.path.pieces.get(1));
+				updRequired = getRepoModeHandler().isRepoUpdatable(repoName);
 			} else {
-				updRequired = getRepoModeHandler().isRepoAddable(q.path.pieces.get(1));
+				updRequired = getRepoModeHandler().isRepoAddable(repoName);
 			}
 		}
+		
+		// Update req enabled by client
 		if(updRequired) {
 			ClientSetup client=getConfiguration().getClientSetup(q.getClientIdentifier());
 			updRequired = !client.isReadonly();

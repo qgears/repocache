@@ -115,6 +115,9 @@ public class ReadConfig {
 		allRepos.addAll(mvnrepos.keySet());
 		allRepos.addAll(httprepos.keySet());
 		allRepos.addAll(p2repos.keySet());
+		if (args.proxyPort != null) {
+			allRepos.add("proxy-repo");
+		}
 		Collections.sort(allRepos);
 		return allRepos;
 	}

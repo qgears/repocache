@@ -21,6 +21,7 @@ public class TestSetup {
 			System.out.println("Error loading repomodes file: " + e.getMessage());
 		}
 		clargs.setRepoModeConfigOverride(repomodes, "/home/akos/Downloads/repomodes.xml");
+		clargs.proxyPort = 9000;
 		ReadConfig conf=new ReadConfig(clargs);
 		RepoModeHandler hand=new RepoModeHandler(clargs);
 		new RepoCache(conf, hand).start();
