@@ -26,9 +26,6 @@ public class ClientQueryHttp extends ClientQuery
 	public String getClientIdentifier() {
 		return baseRequest.getRemoteAddr();
 	}
-	public String getBaseUrl() {
-		return baseRequest.getRequestURL().toString();
-	}
 	@Override
 	public String getParameter(String string) {
 		return baseRequest.getParameter(string);

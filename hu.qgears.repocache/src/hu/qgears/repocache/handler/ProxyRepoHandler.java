@@ -26,7 +26,7 @@ public class ProxyRepoHandler extends MyRequestHandler {
 			throws IOException, ServletException {
 		Path path = new Path("proxy/"+baseRequest.getServerName()+baseRequest.getRequestURI());
 		ClientQuery q=new ClientQueryHttp(target, baseRequest, request, response, rc, path);
-		log.info("Path for proxy request is: " + q.path);
+		log.info("Path for proxy request is: " + q.path + ", localPort: " + baseRequest.getLocalPort());
 		super.handleQlientQuery(q, baseRequest, response);
 	}
 

@@ -336,9 +336,15 @@ public class RepoCache {
 		
 		// Update req enabled by client
 		if(updRequired) {
-			ClientSetup client=getConfiguration().getClientSetup(q.getClientIdentifier());
-			updRequired = !client.isReadonly();
+			if (q.path.pieces.size() > 0 && "proxy".equals(q.path.pieces.get(0))) {
+				int localPort = ((ClientQueryHttp)q).baseRequest.getLocalPort();
+				updRequired = (localPort > configuration.getCommandLine().proxyPort);
+			} else {
+				ClientSetup client=getConfiguration().getClientSetup(q.getClientIdentifier());
+				updRequired = !client.isReadonly();
+			}
 		}
+		log.debug("Update required for path: " + q.path + "=" + updRequired);
 		return updRequired;
 	}
 	public ReadConfig getConfiguration() {

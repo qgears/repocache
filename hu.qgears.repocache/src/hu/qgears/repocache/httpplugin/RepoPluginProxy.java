@@ -33,9 +33,9 @@ public class RepoPluginProxy extends AbstractRepoPlugin {
 	public QueryResponse getOnlineResponse(Path localPath, ClientQuery q, QueryResponse cachedContent, boolean netAllowed) throws IOException {
 		if(localPath.pieces.size()==0)
 		{
-			return null;//new HttpListing(q, this).generate(); //TODO
+			return null;
 		}
-		String httpPath = ((ClientQueryHttp)q).getBaseUrl();
+		String httpPath = ((ClientQueryHttp)q).baseRequest.getRequestURL().toString();
 		if(!netAllowed)
 		{
 			log.info("Path not updated from remote server: "+ httpPath +" local path: "+localPath);
