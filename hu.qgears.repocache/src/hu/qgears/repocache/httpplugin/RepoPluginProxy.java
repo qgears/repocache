@@ -9,7 +9,6 @@ import org.apache.commons.logging.LogFactory;
 
 import hu.qgears.repocache.AbstractRepoPlugin;
 import hu.qgears.repocache.ClientQuery;
-import hu.qgears.repocache.ClientQueryHttp;
 import hu.qgears.repocache.Path;
 import hu.qgears.repocache.QueryResponse;
 import hu.qgears.repocache.RepoCache;
@@ -31,16 +30,18 @@ public class RepoPluginProxy extends AbstractRepoPlugin {
 	}
 	@Override
 	public QueryResponse getOnlineResponse(Path localPath, ClientQuery q, QueryResponse cachedContent, boolean netAllowed) throws IOException {
-		if(localPath.pieces.size()==0)
+		if(localPath.pieces.size()<2)
 		{
 			return null;
 		}
-		String httpPath = ((ClientQueryHttp)q).baseRequest.getRequestURL().toString();
+		Path httpPath2 = new Path(localPath).remove(0);
+		String httpPath = "http://" + httpPath2.toStringPath();
 		if(!netAllowed)
 		{
 			log.info("Path not updated from remote server: "+ httpPath +" local path: "+localPath);
 			return null;
 		}
+		log.info("Update from remote server: "+ httpPath +" local path: "+localPath);
 		QueryResponse response = q.rc.client.get(new HttpGet(q.rc.createTmpFile(q.path), httpPath));
 		return response;
 	}

@@ -11,7 +11,7 @@ import hu.qgears.repocache.config.RepoModeHandler;
 public class TestSetup {
 	public static void main(String[] args) throws Exception {
 		CommandLineArgs clargs=new CommandLineArgs();
-		clargs.repo=new File("/tmp/repo4");
+		clargs.repo=new File("/tmp/repo3");
 		clargs.downloadsFolder=new File("/tmp/repoDownloads");
 		clargs.setConfigOverride(UtilFile.loadFile(TestSetup.class.getResource("ubiRepos.xml")));
 		byte[] repomodes = null;
@@ -21,7 +21,7 @@ public class TestSetup {
 			System.out.println("Error loading repomodes file: " + e.getMessage());
 		}
 		clargs.setRepoModeConfigOverride(repomodes, "/home/akos/Downloads/repomodes.xml");
-		clargs.proxyPort = 9000;
+		clargs.setProxyPort(9000);
 		ReadConfig conf=new ReadConfig(clargs);
 		RepoModeHandler hand=new RepoModeHandler(clargs);
 		new RepoCache(conf, hand).start();

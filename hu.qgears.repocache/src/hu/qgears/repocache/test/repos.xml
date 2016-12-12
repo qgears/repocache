@@ -1,6 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!-- Example configuration that is used for manual testing. -->
 <repos>
+	<proxyrepo>
+		<originalURL>http://archive.ubuntu.com/ubuntu/</originalURL>
+		<selectedMirror>http://hu.archive.ubuntu.com/ubuntu/</selectedMirror>
+	</proxyrepo>
 	<mavenrepo name="apache-snapshots">
 		<remote>https://repository.apache.org/snapshots/</remote>
 	</mavenrepo>

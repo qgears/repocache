@@ -27,7 +27,7 @@ public class RepoHandler extends MyRequestHandler {
 	@Override
 	public void handle(String target, Request baseRequest, HttpServletRequest request, HttpServletResponse response)
 			throws IOException, ServletException {
-		log.info("Handling request, path info: " + baseRequest.getPathInfo());
+		log.info("Handling request arrived, path info: " + baseRequest.getPathInfo());
 		ClientQuery q=new ClientQueryHttp(target, baseRequest, request, response, super.rc, new Path(baseRequest.getPathInfo()));
 		if(q.path.eq(0, "config")) {
 			new ConfigHandler().handle(q);

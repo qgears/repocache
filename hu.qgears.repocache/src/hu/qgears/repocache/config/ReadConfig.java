@@ -33,6 +33,7 @@ public class ReadConfig {
 	private Map<String, String> mvnrepos = new HashMap<>();
 	private Map<String, String> httprepos = new HashMap<>();
 	private Map<String, P2RepoConfig> p2repos = new HashMap<>();
+	private Map<String, String> proxyrepos = new HashMap<>();
 	private Map<String, ClientSetup> clients=Collections.synchronizedMap(new TreeMap<String, ClientSetup>());
 	private CommandLineArgs args;
 	private byte[] configXml;
@@ -55,6 +56,7 @@ public class ReadConfig {
 				parseMavenRepos(doc);
 				parseHttpRepos(doc);
 				parseP2Repos(doc);
+				parseProxyRepos(doc);
 			}
 		} catch (Exception e) {
 			throw new IOException("Error reading configuration: "+args.config, e);
@@ -98,6 +100,17 @@ public class ReadConfig {
 		}
 	}
 	
+	private void parseProxyRepos (Document doc) {
+		NodeList proxyRepos = doc.getElementsByTagName("proxyrepo");
+		for (int temp = 0; temp < proxyRepos.getLength(); temp++) {
+			Node proxyRepo = proxyRepos.item(temp);
+			String originalURL = DomParserUtil.getNodeValue("originalURL", proxyRepo.getChildNodes());
+			String selectedMirror = DomParserUtil.getNodeValue("selectedMirror", proxyRepo.getChildNodes());
+			proxyrepos.put(originalURL, selectedMirror);
+			log.info("Proxy repo originalURL: " + originalURL + ", selectedMirror: " + selectedMirror);
+		}
+	}
+	
 	public Map<String, String> getMvnrepos() {
 		return mvnrepos;
 	}
@@ -110,12 +123,16 @@ public class ReadConfig {
 		return p2repos;
 	}
 	
+	public Map<String, String> getProxyrepos() {
+		return proxyrepos;
+	}
+	
 	public List<String> getAllRepos() {
 		List<String> allRepos = new ArrayList<>();
 		allRepos.addAll(mvnrepos.keySet());
 		allRepos.addAll(httprepos.keySet());
 		allRepos.addAll(p2repos.keySet());
-		if (args.proxyPort != null) {
+		if (args.hasProxyPortDefined()) {
 			allRepos.add("proxy-repo");
 		}
 		Collections.sort(allRepos);

@@ -110,11 +110,10 @@ public class RepoCache {
 		plugins.add(new RepoPluginHttp(this));
 		plugins.add(new RepoPluginMaven(this));
 
-		Integer proxyPort = configuration.getCommandLine().proxyPort;
-		if (proxyPort != null) {
+		if (configuration.getCommandLine().hasProxyPortDefined()) {
 			ProxyRepoHandler prh = new ProxyRepoHandler(RepoCache.this);
-			new ProxyServerThread(proxyPort, prh).start();	// READ_ONLY mode
-			new ProxyServerThread(proxyPort+1, prh).start();// UPDATE mode
+			new ProxyServerThread(configuration.getCommandLine().getProxyPortReadonly(), prh).start();	// READ_ONLY mode
+			new ProxyServerThread(configuration.getCommandLine().getProxyPortUpdate(), prh).start();// UPDATE mode
 			plugins.add(new RepoPluginProxy(this));
 		}
 		
@@ -338,7 +337,7 @@ public class RepoCache {
 		if(updRequired) {
 			if (q.path.pieces.size() > 0 && "proxy".equals(q.path.pieces.get(0))) {
 				int localPort = ((ClientQueryHttp)q).baseRequest.getLocalPort();
-				updRequired = (localPort > configuration.getCommandLine().proxyPort);
+				updRequired = (configuration.getCommandLine().hasProxyPortDefined() && localPort == configuration.getCommandLine().getProxyPortUpdate());
 			} else {
 				ClientSetup client=getConfiguration().getClientSetup(q.getClientIdentifier());
 				updRequired = !client.isReadonly();
