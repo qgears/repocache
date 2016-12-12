@@ -8,10 +8,6 @@
 			Source bundles of Q-Gears repository cache
 		</description>
 	</category-def>
-	<plugin id="hu.qgears.utils.feature">
-		<category name="Q-Gears lib tools" />
-	</plugin>
-	
 	<bundle id="hu.qgears.repocache">
 		<category name="Repocache" />
 	</bundle>
