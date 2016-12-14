@@ -19,7 +19,7 @@ public class CommandLineArgs {
 	@JOHelp("Http server port that is opened by the server")
 	public int port=8080;
 	@JOHelp("Http proxy server port that is opened by the server")
-	private Integer proxyPort=null;
+	public int proxyPort=-1;
 	@JOHelp("If local only then the cache does not access the remote servers at all.")
 	@JOSimpleBoolean
 	public boolean localOnly;
@@ -104,7 +104,7 @@ public class CommandLineArgs {
 		this.proxyPort = proxyPort;
 	}
 	public boolean hasProxyPortDefined() {
-		return proxyPort != null;
+		return proxyPort>-1;
 	}
 	public Integer getProxyPortReadonly() {
 		return hasProxyPortDefined() ? proxyPort : null;
