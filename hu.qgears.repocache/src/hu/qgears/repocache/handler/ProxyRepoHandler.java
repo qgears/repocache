@@ -1,7 +1,6 @@
 package hu.qgears.repocache.handler;
 
 import java.io.IOException;
-import java.util.Map;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -26,24 +25,11 @@ public class ProxyRepoHandler extends MyRequestHandler {
 	public void handle(String target, Request baseRequest, HttpServletRequest request, HttpServletResponse response)
 			throws IOException, ServletException {
 		log.info("Proxy request arrived, URL: " + baseRequest.getRequestURL());
-		String replacedUrl = replaceMirrorUrl(baseRequest.getRequestURL().toString());
-		Path path = new Path("proxy/http/"+replacedUrl);
+		Path path = new Path("proxy/http/"+baseRequest.getServerName()+baseRequest.getRequestURI());
 		ClientQuery q=new ClientQueryHttp(target, baseRequest, request, response, rc, path);
 		log.info("Path for proxy request is: " + q.path + ", localPort: " + baseRequest.getLocalPort());
 		super.handleQlientQuery(q, baseRequest, response);
 		log.info("Proxy request response status: " + response.getStatus() + ", type: " + response.getContentType());
 	}
 
-	private String replaceMirrorUrl (String baseUrl) {
-		String replacedUrl = baseUrl;
-		Map<String, String> urls = rc.getConfiguration().getProxyrepos();
-		for (String url : urls.keySet()) {
-			if (baseUrl.startsWith(url)) {
-				replacedUrl = urls.get(url) + baseUrl.substring(url.length());
-				break;
-			}
-		}
-		if (replacedUrl.startsWith("http://")) replacedUrl = replacedUrl.substring(7);
-		return replacedUrl;
-	}
 }

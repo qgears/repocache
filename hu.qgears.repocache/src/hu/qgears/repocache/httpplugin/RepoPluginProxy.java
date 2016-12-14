@@ -9,6 +9,7 @@ import org.apache.commons.logging.LogFactory;
 
 import hu.qgears.repocache.AbstractRepoPlugin;
 import hu.qgears.repocache.ClientQuery;
+import hu.qgears.repocache.ClientQueryHttp;
 import hu.qgears.repocache.Path;
 import hu.qgears.repocache.QueryResponse;
 import hu.qgears.repocache.RepoCache;
@@ -34,8 +35,7 @@ public class RepoPluginProxy extends AbstractRepoPlugin {
 		{
 			return null;
 		}
-		Path httpPath2 = new Path(localPath).remove(0);
-		String httpPath = "http://" + httpPath2.toStringPath();
+		String httpPath = replaceMirrorUrl(((ClientQueryHttp)q).baseRequest.getRequestURL().toString());
 		if(!netAllowed)
 		{
 			log.info("Path not updated from remote server: "+ httpPath +" local path: "+localPath);
@@ -46,4 +46,17 @@ public class RepoPluginProxy extends AbstractRepoPlugin {
 		return response;
 	}
 
+	private String replaceMirrorUrl (String baseUrl) {
+		String replacedUrl = baseUrl;
+		Map<String, String> urls = rc.getConfiguration().getProxyrepos();
+		int usedLength = 0;
+		for (String url : urls.keySet()) {
+			// Replace with the most specific (=longest) matching url
+			if (baseUrl.startsWith(url) && url.length()>usedLength) {
+				usedLength = url.length();
+				replacedUrl = urls.get(url) + baseUrl.substring(url.length());
+			}
+		}
+		return replacedUrl;
+	}
 }

@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Example configuration that is used for manual testing. -->
+<repos>
+	<proxyrepo>
+		<originalURL>http://download.eclipse.org/</originalURL>
+		<selectedMirror>http://mirror.tspu.ru/eclipse/</selectedMirror>
+	</proxyrepo>
+	<proxyrepo>
+		<originalURL>http://www.eclipse.org/</originalURL>
+		<selectedMirror>http://mirror.tspu.ru/eclipse/</selectedMirror>
+	</proxyrepo>
+	<proxyrepo>
+		<originalURL>http://download.eclipse.org/releases/mars/201602261000</originalURL>
+		<selectedMirror>http://192.168.1.116/mirror/eclipse-mars-mirror/</selectedMirror>
+	</proxyrepo>
+</repos>

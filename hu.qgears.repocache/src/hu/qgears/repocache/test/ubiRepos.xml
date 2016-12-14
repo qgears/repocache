@@ -5,10 +5,4 @@
 		<originalURL>http://archive.ubuntu.com/ubuntu/</originalURL>
 		<selectedMirror>http://hu.archive.ubuntu.com/ubuntu/</selectedMirror>
 	</proxyrepo>
-<!-- 	<httprepo name="ubuntu-archive">
-		<remote>http://hu.archive.ubuntu.com/ubuntu/</remote>
-	</httprepo>
-	<httprepo name="ubuntu-security">
-		<remote>http://security.ubuntu.com/ubuntu</remote>
-	</httprepo>-->
 </repos>
