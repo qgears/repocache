@@ -71,3 +71,9 @@ Possible to set using repo modes, such as the followings:
  * ADD_ONLY mode: non-exisiting files are queried from remote and added to cache on demand.
  * NO_CACHE_TRANSPARENT proxy mode: turn on this mode and you can download all packages available, even ones that are not available in the repo. (Use it to dry-run installing new features. After validating the install it is possible to turn on "update" or "add" mode which installs all files into cache.)
  * missingFilesTransparentDownload mode: use cache when available but download when not available. Downloaded file is not saved to cache.
+
+ === Repocache as proxy server
+ 
+ Repocache can act as a proxy server if command line arg proxyPort is defined. In case of proxy mode two other ports are opened, the given default proxyPort is READONLY and a second UPDATE mode port (READONLY port + 1) - same as modes of operation by client IP. All response for incoming requests to the proxy server are cached to the same git repository.
+
+ 

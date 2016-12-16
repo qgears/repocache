@@ -4,6 +4,4 @@ Stop crawling: Ongoing crawlings must be registered. config page should list the
 * missingFilesTransparentDownload mode: use cache when available but download when not available. Downloaded file is not saved to c
 Add crawling result in a single commit (but do not lock the repository while crawling - makes it hard).
 
-Auto "Compress" commits into single commit which are done is a short time.
 
-Generate configuration file for Oomph, maven, etc. (on a web handler below /config) This file can be directly used to set up these tools.

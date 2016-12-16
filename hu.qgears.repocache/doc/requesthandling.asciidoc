@@ -27,6 +27,7 @@ Plugin types:
  * http
  * p2
  * maven
+ * proxy
  
 A single plugin handles the followings:
 
