@@ -3,12 +3,15 @@ package hu.qgears.repocache;
 import java.io.IOException;
 import java.util.concurrent.Callable;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.api.errors.NoFilepatternException;
 
 import hu.qgears.commons.UtilTimer;
 
 public class CommitTimer implements Callable<Object>{
+	private static Log log=LogFactory.getLog(CommitTimer.class);
 	private RepoCache rc;
 	private StringBuilder commitMessage=new StringBuilder();
 	private long lastUpdate;
@@ -41,6 +44,7 @@ public class CommitTimer implements Callable<Object>{
 				rc.git.add().addFilepattern(".").call();
 				rc.git.commit().setMessage(commitMessage.toString()).call();
 				rc.assertStatusClean();
+				log.info("Git commit executed!");
 				commitMessage=new StringBuilder();
 			}
 		}
@@ -54,6 +58,7 @@ public class CommitTimer implements Callable<Object>{
 				rc.git.stashCreate().call();
 				rc.git.stashDrop().call();
 				rc.assertStatusClean();
+				log.info("Git revert executed!");
 				commitMessage=new StringBuilder();
 			}
 		}

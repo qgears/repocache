@@ -73,7 +73,7 @@ public class DownloadLogAndTimeout implements AutoCloseable, Callable<Object>
 			bps=(sum*1000/dt);
 			remaining=l-sum;
 			float eta=((float)remaining/bps);
-			log.info("Download progress: "+url+" "+sum+"/"+l+" "+bps+"BPS ETA: "+eta+" seconds");
+			log.debug("Download progress: "+url+" "+sum+"/"+l+" "+bps+"BPS ETA: "+eta+" seconds");
 			reinit=!closed;
 			close=(dt>timeoutReply&&sum==0l)||(bps<minBps&&dt>timeoutReply);
 		}

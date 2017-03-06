@@ -87,20 +87,18 @@ public class RepoCache {
 		}
 		git = Git.open(wc);
 		repository=git.getRepository();
-		System.out.println("Folder: " + repository.getDirectory());
-		System.out.println("Branch: " + repository.getBranch());
-		System.out.println("IsBare: " + repository.isBare());
+		log.info("Git params: folder: " + repository.getDirectory() + ", branch: " + repository.getBranch() + ", isBare: " + repository.isBare());
 		worktree=git.getRepository().getWorkTree();
 		assertStatusClean();
 		try (ObjectReader reader = repository.newObjectReader()) {
 			for (RevCommit rc : git.log().addPath("alma.txt").call()) {
-				System.out.println("revcommit: " + rc.getFullMessage());
+				log.debug("revcommit: " + rc.getFullMessage());
 				// .. and narrow it down to the single file's path
 				TreeWalk treewalk = TreeWalk.forPath(reader, "alma.txt", rc.getTree());
 				if (treewalk != null) {
 					// use the blob id to read the file's data
 					byte[] data = reader.open(treewalk.getObjectId(0)).getBytes();
-					System.out.println("file content: '" + new String(data, "utf-8") + "'");
+					log.debug("file content: '" + new String(data, "utf-8") + "'");
 				} else {
 				}
 			}
@@ -120,6 +118,7 @@ public class RepoCache {
 		Server server = new Server(configuration.getCommandLine().port);
 		server.setHandler(rh);
 		server.start();
+		log.info("RepoCache started....");
 		server.join();
 	}
 
@@ -146,7 +145,7 @@ public class RepoCache {
 	public void assertStatusClean() throws IOException, NoWorkTreeException, GitAPIException {
 		synchronized (this) {
 			Status status=git.status().call();
-			log.info("Git status clean: "+status.isClean());
+			log.debug("Git status clean: "+status.isClean());
 			if(!status.isClean())
 			{
 				throw new IOException("git repo is not clean");
@@ -301,7 +300,7 @@ public class RepoCache {
 				updateFile(path, qr);
 			}else
 			{
-				log.info("Path did not change: "+path.toStringPath());
+				log.debug("Path did not change: "+path.toStringPath());
 			}
 		}
 	}

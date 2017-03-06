@@ -38,10 +38,10 @@ public class RepoPluginProxy extends AbstractRepoPlugin {
 		String httpPath = replaceMirrorUrl(((ClientQueryHttp)q).baseRequest.getRequestURL().toString());
 		if(!netAllowed)
 		{
-			log.info("Path not updated from remote server: "+ httpPath +" local path: "+localPath);
+			log.debug("Path not updated from remote server: "+ httpPath +" local path: "+localPath);
 			return null;
 		}
-		log.info("Update from remote server: "+ httpPath +" local path: "+localPath);
+		log.debug("Update from remote server: "+ httpPath +" local path: "+localPath);
 		QueryResponse response = q.rc.client.get(new HttpGet(q.rc.createTmpFile(q.path), httpPath));
 		return response;
 	}

@@ -165,7 +165,7 @@ public class RepoPluginP2 extends AbstractRepoPlugin
 				}
 			}else
 			{
-				log.info("File in cache is not updated, net not allowed: "+q.path);
+				log.debug("File in cache is not updated, net not allowed: "+q.path);
 			}
 		}
 		return null;

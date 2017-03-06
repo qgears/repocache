@@ -145,7 +145,7 @@ public class RepoModeHandler {
 
 			transformer.transform(source, result);
 
-			log.info("Repo mode configuration file updated. path: " + args.repoModeConfig.getAbsolutePath());
+			log.debug("Repo mode configuration file updated. path: " + args.repoModeConfig.getAbsolutePath());
 		} catch (DOMException e) {
 			log.error("Error saving repo mode configuration.", e);
 		} catch (ParserConfigurationException e) {

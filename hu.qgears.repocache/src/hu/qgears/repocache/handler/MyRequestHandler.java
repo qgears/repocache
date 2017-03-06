@@ -27,52 +27,6 @@ public abstract class MyRequestHandler extends AbstractHandler {
 		this.rc = rc;
 	}
 
-/*	@Override
-	public void handle(String target, Request baseRequest, HttpServletRequest request, HttpServletResponse response)
-			throws IOException, ServletException {
-		log.info("Handling request, path info: " + baseRequest.getPathInfo());
-		ClientQuery q=new ClientQueryHttp(target, baseRequest, request, response, rc, new Path(baseRequest.getPathInfo()));
-		if(q.path.eq(0, "config")) {
-			new ConfigHandler().handle(q);
-		} else if(q.getParameter("crawl")!=null) {
-			new CrawlExecutor().handle(this, q);
-		} else {
-			try(QueryResponse cachedContent=getQueryResponse(q)) {
-				if(cachedContent!=null) {
-					if(!q.path.folder && cachedContent.folder) {
-						redirectToFolder(q);
-					} else {
-						response.setContentType(q.getMimeType());
-						response.setStatus(HttpServletResponse.SC_OK);
-						response.setContentLength(cachedContent.getResponseAsBytes().length);
-						baseRequest.setHandled(true);
-						cachedContent.streamTo(response.getOutputStream());
-						if(cachedContent.fileSystemFolder!=null) {
-							appendRealFolderListing(q, response, cachedContent);
-						}
-					}
-				} else {
-					if (q.path.folder) {
-						QueryResponse qr = rc.loadDirFromCache(q.path);
-						if (qr != null) {
-							response.setContentType(q.getMimeType());
-							response.setStatus(HttpServletResponse.SC_OK);
-							baseRequest.setHandled(true);
-							QueryResponse r2=new RealFolderListing(q, qr).generate();
-							r2.streamTo(response.getOutputStream());
-							response.setContentLength(r2.getResponseAsBytes().length);
-						} else {
-							response.setStatus(HttpServletResponse.SC_NOT_FOUND);
-						}
-					} else {
-						response.setStatus(HttpServletResponse.SC_NOT_FOUND);
-					}
-				}
-			}
-		}
-		log.info("Handling request response status: " + response.getStatus() + ", type: " + response.getContentType());
-	}*/
-
 	protected void handleQlientQuery (ClientQuery q, Request baseRequest, HttpServletResponse response) throws IOException, ServletException {
 		try(QueryResponse cachedContent=getQueryResponse(q)) {
 			if(cachedContent!=null) {
@@ -157,7 +111,7 @@ public abstract class MyRequestHandler extends AbstractHandler {
 				return new StatusPage(q).generate();
 			}
 		} catch (Exception e) {
-			log.info("Error fetching file: "+q.path + ", message: " + e.getMessage());
+			log.debug("Error fetching file: "+q.path + ", message: " + e.getMessage());
 		}
 		return cachedContent;
 	}

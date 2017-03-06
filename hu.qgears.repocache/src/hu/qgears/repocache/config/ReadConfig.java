@@ -70,7 +70,7 @@ public class ReadConfig {
 			String repoName = DomParserUtil.getNodeAttr("name", mavenRepo);
 			String remote = DomParserUtil.getNodeValue("remote", mavenRepo.getChildNodes());
 			mvnrepos.put(repoName, remote);
-			log.info("Maven repo name: " + repoName + ", remote: " + remote);
+			log.debug("Maven repo name: " + repoName + ", remote: " + remote);
 		}
 	}
 	
@@ -81,7 +81,7 @@ public class ReadConfig {
 			String repoName = DomParserUtil.getNodeAttr("name", httpRepo);
 			String remote = DomParserUtil.getNodeValue("remote", httpRepo.getChildNodes());
 			httprepos.put(repoName, remote);
-			log.info("Http repo name: " + repoName + ", remote: " + remote);
+			log.debug("Http repo name: " + repoName + ", remote: " + remote);
 		}
 	}
 	
@@ -96,7 +96,7 @@ public class ReadConfig {
 			String selectedMirror = DomParserUtil.getNodeValue("selectedMirror", p2Repo.getChildNodes());
 			P2RepoMode repoMode = P2RepoMode.parse(DomParserUtil.getNodeValue("mode", p2Repo.getChildNodes()));
 			p2repos.put(repoName, new P2RepoConfig(file, primaryHost, selectedMirror, repoMode, repoDesc));
-			log.info("P2 repo name: " + repoName + ", file: " + file + ", primaryHost: " + primaryHost + ", selectedMirror: " + selectedMirror);
+			log.debug("P2 repo name: " + repoName + ", file: " + file + ", primaryHost: " + primaryHost + ", selectedMirror: " + selectedMirror);
 		}
 	}
 	
