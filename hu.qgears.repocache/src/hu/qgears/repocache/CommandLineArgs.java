@@ -25,6 +25,9 @@ public class CommandLineArgs {
 	public boolean localOnly;
 	@JOHelp("Downloads folder. Should be on the same physical device as the repo so files can be moved into repo by cheap move command.")
 	public File downloadsFolder;
+	@JOHelp("Configure log4j to log to console.")
+	@JOSimpleBoolean
+	public boolean log4jToConsole;
 	/**
 	 * Validate parameters if they are valid to start the repo cache server.
 	 */

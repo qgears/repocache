@@ -8,6 +8,10 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.log4j.ConsoleAppender;
+import org.apache.log4j.Level;
+import org.apache.log4j.Logger;
+import org.apache.log4j.PatternLayout;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.Status;
@@ -54,6 +58,17 @@ public class RepoCache {
 		System.out.println("Repository cache program. Usage:\n");
 		cl.printHelpOn(System.out);
 		cl.parseArgs(args);
+		if(clargs.log4jToConsole)
+		{
+			ConsoleAppender console = new ConsoleAppender(); //create appender
+			//configure the appender
+			String PATTERN = "%d [%p|%c|%C{1}] %m%n";
+			console.setLayout(new PatternLayout(PATTERN)); 
+			console.setThreshold(Level.ALL);
+			console.activateOptions();
+			//add appender to any Logger (here is root)
+			Logger.getRootLogger().addAppender(console);
+		}
 		String parsedOptions=cl.optionsToString();
 		log.info("Options:\n" + parsedOptions);
 		clargs.validate();
@@ -129,7 +144,7 @@ public class RepoCache {
 			this.proxyPort = proxyPort;
 			this.prh = prh;
 		}
-	    public void run() {
+		public void run() {
 			//ProxyRepoHandler prh = new ProxyRepoHandler(RepoCache.this);
 			Server proxyServer = new Server(proxyPort);
 			proxyServer.setHandler(prh);
@@ -139,7 +154,7 @@ public class RepoCache {
 			} catch (Exception e) {
 				log.error("Error starting proxy server on port: " + proxyPort, e);
 			}
-	    }
+		}
 	}
 	
 	public void assertStatusClean() throws IOException, NoWorkTreeException, GitAPIException {
