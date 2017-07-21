@@ -54,7 +54,6 @@ public class DownloadLogAndTimeout implements AutoCloseable, Callable<Object>
 
 	@Override
 	public Object call() throws Exception {
-		boolean reinit;
 		boolean close;
 		long bps;
 		long remaining;
@@ -74,15 +73,13 @@ public class DownloadLogAndTimeout implements AutoCloseable, Callable<Object>
 			remaining=l-sum;
 			float eta=((float)remaining/bps);
 			log.debug("Download progress: "+url+" "+sum+"/"+l+" "+bps+"BPS ETA: "+eta+" seconds");
-			reinit=!closed;
 			close=(dt>timeoutReply&&sum==0l)||(bps<minBps&&dt>timeoutReply);
 		}
 		if(close)
 		{
 			log.error("Download stalled - abort: "+url+" "+sum+"/"+l+" "+bps+"BPS"+" ETA: "+((float)remaining/bps)+" seconds");
 			method.abort();
-		}
-		if(reinit)
+		} else 
 		{
 			UtilTimer.getInstance().executeTimeout(1000, this);
 		}
