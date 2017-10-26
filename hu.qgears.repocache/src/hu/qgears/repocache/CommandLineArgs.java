@@ -10,7 +10,7 @@ import joptsimple.annot.JOSimpleBoolean;
 public class CommandLineArgs {
 	private byte[] configOverride;
 	private byte[] repoModeConfigOverride;
-	@JOHelp("Folder that contains the chaced git repository. If not exists then it is created.")
+	@JOHelp("Folder that contains the cached git repository. If not exists then it is created.")
 	public File repo;
 	@JOHelp("Configuration xml file.")
 	public File config;
