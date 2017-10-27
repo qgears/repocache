@@ -19,9 +19,15 @@ abstract public class AbstractPage extends RAbstractTemplatePart
 	public QueryResponse generate() throws IOException {
 		doGenerate();
 		finishDeferredParts();
-		return new QueryResponseByteArray("", getTemplateState().getOut().toString().getBytes(StandardCharsets.UTF_8), folder);
+		return new QueryResponseByteArray("", getTemplateState().getOut().toString().getBytes(
+				StandardCharsets.UTF_8), folder);
 	}
+	
+	/**
+	 * Emits the textual reply body, such as a HTML or XML document.  
+	 */
 	abstract protected void doGenerate();
+	
 	protected void writeHtml(String value) {
 		writeObject(value);
 	}
