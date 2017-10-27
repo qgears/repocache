@@ -1,17 +1,21 @@
 package hu.qgears.repocache.config;
 
-import hu.qgears.repocache.AbstractPage;
+import hu.qgears.repocache.AbstractHTMLPage;
 import hu.qgears.repocache.ClientQuery;
 
-public class ConfigListing extends AbstractPage
-{
+public class ConfigListing extends AbstractHTMLPage {
 
 	public ConfigListing(ClientQuery query) {
 		super(query);
 	}
+	
+	@Override
+	protected String getTitleFragment() {
+		return "Config";
+	}
 
 	@Override
-	protected void doGenerate() {
+	protected void writeHTMLBody() {
 		printParameters();
 		write("<script language=\"javascript\" type=\"text/javascript\">\nfunction addParameter(link, param){\n    link += param;\n    return link;\n}\n</script>\n\n<h1>Repo Cache configuration</h1>\n<a href=\"../\">../</a><br/>\n<a href=\"./\">reload</a><br/>\nLocal Only: ");
 		writeObject(getQuery().rc.getConfiguration().getCommandLine().localOnly);
@@ -65,7 +69,7 @@ public class ConfigListing extends AbstractPage
 				write("</li>\n");
 			}
 		}
-		write("<h2>Current staging area</h2>\n(Added but not committed changes.)\n<a href=\"commit\">Execute commit now</a>\n<a href=\"revert\">Execute revert</a>\n<pre>\n");
+		write("</ul>\n<h2>Current staging area</h2>\n(Added but not committed changes.)\n<a href=\"commit\">Execute commit now</a>\n<a href=\"revert\">Execute revert</a>\n<pre>\n");
 		writeHtml(getQuery().rc.getCommitTimer().getCurrentStagingMessage());
 		write("\n</pre>\n");
 	}
