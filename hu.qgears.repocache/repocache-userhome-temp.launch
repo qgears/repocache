@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<launchConfiguration type="org.eclipse.jdt.launching.localJavaApplication">
+<listAttribute key="org.eclipse.debug.core.MAPPED_RESOURCE_PATHS">
+<listEntry value="/hu.qgears.repocache/src/hu/qgears/repocache/RepoCache.java"/>
+</listAttribute>
+<listAttribute key="org.eclipse.debug.core.MAPPED_RESOURCE_TYPES">
+<listEntry value="1"/>
+</listAttribute>
+<booleanAttribute key="org.eclipse.jdt.launching.ATTR_USE_START_ON_FIRST_THREAD" value="true"/>
+<stringAttribute key="org.eclipse.jdt.launching.MAIN_TYPE" value="hu.qgears.repocache.RepoCache"/>
+<stringAttribute key="org.eclipse.jdt.launching.PROGRAM_ARGUMENTS" value="--repo ${system_property:user.home}/tmp/repocache-testing/repo&#10;--config ${system_property:user.home}/tmp/repocache-testing/repos.xml&#10;--repoModeConfig ${system_property:user.home}/tmp/repocache-testing/repomodes.xml&#10;--downloadsFolder ${system_property:user.home}/tmp/repocache-testing/downoads &#10;--port 18082 --proxyPort 19082"/>
+<stringAttribute key="org.eclipse.jdt.launching.PROJECT_ATTR" value="hu.qgears.repocache"/>
+<stringAttribute key="org.eclipse.jdt.launching.VM_ARGUMENTS" value="-Dlog4j.configuration=file:${workspace_loc:/hu.qgears.repocache/doc/log4j.properties}"/>
+</launchConfiguration>
