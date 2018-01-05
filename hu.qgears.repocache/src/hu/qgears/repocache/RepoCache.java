@@ -2,6 +2,7 @@ package hu.qgears.repocache;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.InetSocketAddress;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -13,6 +14,7 @@ import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.apache.log4j.PatternLayout;
 import org.eclipse.jetty.server.Server;
+import org.eclipse.jetty.server.ServerConnector;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.Status;
 import org.eclipse.jgit.api.errors.GitAPIException;
@@ -27,11 +29,14 @@ import hu.qgears.commons.UtilFile;
 import hu.qgears.repocache.config.ClientSetup;
 import hu.qgears.repocache.config.ReadConfig;
 import hu.qgears.repocache.config.RepoModeHandler;
+import hu.qgears.repocache.handler.MyRequestHandler;
 import hu.qgears.repocache.handler.ProxyRepoHandler;
 import hu.qgears.repocache.handler.RepoHandler;
 import hu.qgears.repocache.httpget.StreamingHttpClient;
 import hu.qgears.repocache.httpplugin.RepoPluginHttp;
 import hu.qgears.repocache.httpplugin.RepoPluginProxy;
+import hu.qgears.repocache.https.DynamicSSLProxyConnector;
+import hu.qgears.repocache.https.HttpsProxyServer;
 import hu.qgears.repocache.mavenplugin.RepoPluginMaven;
 import hu.qgears.repocache.p2plugin.P2VersionFolderUtil;
 import hu.qgears.repocache.p2plugin.RepoPluginP2;
@@ -123,38 +128,56 @@ public class RepoCache {
 		plugins.add(new RepoPluginHttp(this));
 		plugins.add(new RepoPluginMaven(this));
 
-		if (configuration.getCommandLine().hasProxyPortDefined()) {
-			ProxyRepoHandler prh = new ProxyRepoHandler(RepoCache.this);
-			new ProxyServerThread(configuration.getCommandLine().getProxyPortReadonly(), prh).start();	// READ_ONLY mode
-			new ProxyServerThread(configuration.getCommandLine().getProxyPortUpdate(), prh).start();// UPDATE mode
+		CommandLineArgs args=configuration.getCommandLine();
+		if (args.hasProxyPortDefined()) {
+			startProxyServer(args.serverHost, args.getProxyPortReadonly(), new ProxyRepoHandler(RepoCache.this));	// READ_ONLY mode
+			startProxyServer(args.serverHost,args.getProxyPortUpdate(), new ProxyRepoHandler(RepoCache.this).setUpdateProxyPort(true));// UPDATE mode
 			plugins.add(new RepoPluginProxy(this));
+		}
+
+		if (configuration.getCommandLine().hasHttpsProxyPortDefined()) {
+			String localHost="127.0.0.1";
+			int readOnlyPlaintext=startProxyServer(localHost, 0, new ProxyRepoHandler(RepoCache.this).setHttps(true));	// READ_ONLY mode
+			int updatePlaintext=startProxyServer(localHost, 0, new ProxyRepoHandler(RepoCache.this).setHttps(true));// UPDATE mode
+			DynamicSSLProxyConnector creadonly=new DynamicSSLProxyConnector(args, localHost, readOnlyPlaintext);
+			DynamicSSLProxyConnector cupdate=new DynamicSSLProxyConnector(args, localHost, updatePlaintext);
+			new HttpsProxyServer(args, args.serverHost, args.getHttpsProxyPortReadonly(), creadonly).start();
+			new HttpsProxyServer(args, args.serverHost, args.getHttpsProxyPortUpdate(), cupdate).start();
 		}
 		
 		Server server = new Server(configuration.getCommandLine().port);
 		server.setHandler(rh);
 		server.start();
 		log.info("RepoCache started....");
+		
+//		Server s2=new Server();
+//        ServerConnector connector=new ServerConnector(s2);
+//        connector.setHost(args.getServerHost());
+//        connector.setPort(9999);
+//        s2.addConnector(connector);
+//		s2.start();
+//		System.out.println(" s2 connectors: "+s2.getConnectors().length+" "+s2.getConnectors()[0]);
+
+		
 		server.join();
+		
 	}
 
-	public class ProxyServerThread extends Thread {
-		private int proxyPort;
-		private ProxyRepoHandler prh;
-		public ProxyServerThread (int proxyPort, ProxyRepoHandler prh) {
-			this.proxyPort = proxyPort;
-			this.prh = prh;
-		}
-		public void run() {
-			//ProxyRepoHandler prh = new ProxyRepoHandler(RepoCache.this);
-			Server proxyServer = new Server(proxyPort);
-			proxyServer.setHandler(prh);
-			try {
-				proxyServer.start();
-				proxyServer.join();
-			} catch (Exception e) {
-				log.error("Error starting proxy server on port: " + proxyPort, e);
-			}
-		}
+	/**
+	 * 
+	 * @param host
+	 * @param port
+	 * @param prh
+	 * @return the port on which the server has started.
+	 * @throws Exception
+	 */
+	private int startProxyServer(String host, int port, MyRequestHandler prh) throws Exception
+	{
+		Server proxyServer = new Server(new InetSocketAddress(host, port));
+		proxyServer.setHandler(prh);
+		proxyServer.start();
+		ServerConnector sc=(ServerConnector)proxyServer.getConnectors()[0];
+		return sc.getLocalPort();
 	}
 	
 	public void assertStatusClean() throws IOException, NoWorkTreeException, GitAPIException {
@@ -326,7 +349,7 @@ public class RepoCache {
 	 * @param cachedContent
 	 * @return true means that the remote server should be queried for an update.
 	 */
-	public boolean updateRequired(ClientQuery q, QueryResponse cachedContent) {
+	public boolean updateRequired(ClientQuery q, QueryResponse cachedContent, boolean updaterProxyPort) {
 		if(configuration.getCommandLine().localOnly) {
 			return false;
 		}
@@ -350,8 +373,7 @@ public class RepoCache {
 		// Update req enabled by client
 		if(updRequired) {
 			if (q.path.pieces.size() > 0 && "proxy".equals(q.path.pieces.get(0))) {
-				int localPort = ((ClientQueryHttp)q).baseRequest.getLocalPort();
-				updRequired = (configuration.getCommandLine().hasProxyPortDefined() && localPort == configuration.getCommandLine().getProxyPortUpdate());
+				updRequired = (configuration.getCommandLine().hasProxyPortDefined() && updaterProxyPort);
 			} else {
 				ClientSetup client=getConfiguration().getClientSetup(q.getClientIdentifier());
 				updRequired = !client.isReadonly();

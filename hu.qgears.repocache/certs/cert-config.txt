@@ -1,0 +1,12 @@
+ distinguished_name	= req_distinguished_name
+ prompt			= no
+
+ [ req_distinguished_name ]
+ C			= HU
+ ST			= Hungary
+ L			= Budapest
+ O			= Q-Gears Kft.Organization Name
+ OU			= squid.qgears.com
+ CN			= Q-Gears Repocache
+ emailAddress		= root@qgears.com
+

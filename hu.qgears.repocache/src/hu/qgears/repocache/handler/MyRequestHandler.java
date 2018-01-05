@@ -23,6 +23,7 @@ public abstract class MyRequestHandler extends AbstractHandler {
 	private static Log log=LogFactory.getLog(RepoHandler.class);
 	
 	protected RepoCache rc;
+	protected boolean updateProxyPort;
 	public MyRequestHandler(RepoCache rc) {
 		this.rc = rc;
 	}
@@ -70,7 +71,7 @@ public abstract class MyRequestHandler extends AbstractHandler {
 			return qr;
 		}
 		QueryResponse cachedContent=rc.getCache(q.path);
-		QueryResponse qr=getResponseFromPlugin(q, cachedContent, q.rc.updateRequired(q, cachedContent));
+		QueryResponse qr=getResponseFromPlugin(q, cachedContent, q.rc.updateRequired(q, cachedContent, updateProxyPort));
 		if(qr!=null)
 		{
 			try
