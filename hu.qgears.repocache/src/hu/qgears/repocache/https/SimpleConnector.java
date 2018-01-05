@@ -10,7 +10,7 @@ public class SimpleConnector implements IConnector
 		try
 		{
 			tg=new Socket(targethost, targetport);
-			return new Connection(tg);
+			return new Connection("passthrough "+targethost+":"+targetport,tg, false);
 		}catch(Exception e)
 		{
 			throw new NoConnectException(e);

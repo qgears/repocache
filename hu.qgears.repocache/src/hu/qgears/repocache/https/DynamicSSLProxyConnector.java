@@ -3,6 +3,7 @@ package hu.qgears.repocache.https;
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.net.Socket;
+import java.util.function.Function;
 
 import javax.net.ssl.SSLServerSocket;
 import javax.net.ssl.SSLServerSocketFactory;
@@ -16,9 +17,9 @@ import hu.qgears.repocache.CommandLineArgs;
 public class DynamicSSLProxyConnector implements IConnector
 {
 	private String connectHost;
-	private int connectPort;
+	private Function<Object, Integer> connectPort;
 	private CommandLineArgs args;
-	public DynamicSSLProxyConnector(CommandLineArgs args, String connectHost, int connectPort) {
+	public DynamicSSLProxyConnector(CommandLineArgs args, String connectHost, Function<Object, Integer> connectPort) {
 		this.args=args;
 		this.connectHost=connectHost;
 		this.connectPort=connectPort;
@@ -31,8 +32,7 @@ public class DynamicSSLProxyConnector implements IConnector
 			final SSLServerSocket ss=(SSLServerSocket)fact.createServerSocket();
 			ss.bind(new InetSocketAddress("127.0.0.1", 0));
 			int port=ss.getLocalPort();
-			System.out.println("SSH Port: "+port);
-			new Thread("SSH Server accept thread"){
+			new Thread("SSH Server accept thread "+targethost+":"+targetport){
 				public void run() {
 					try {
 						Socket client;
@@ -49,7 +49,6 @@ public class DynamicSSLProxyConnector implements IConnector
 								e.printStackTrace();
 							}
 						}
-						System.out.println("SSH single thread connected!");
 						handleDecodedClient(client, targethost, targetport);
 					} catch (IOException e) {
 						// TODO Auto-generated catch block
@@ -60,7 +59,7 @@ public class DynamicSSLProxyConnector implements IConnector
 			try
 			{
 				Socket s=new Socket("localhost", port);
-				return new Connection(s);
+				return new Connection("SSL MITM "+targethost+":"+targetport, s, false);
 			}catch(Exception e)
 			{
 				throw new NoConnectException("Problem");
@@ -72,10 +71,11 @@ public class DynamicSSLProxyConnector implements IConnector
 
 	protected void handleDecodedClient(Socket client, String targethost, int targetport) {
 		try {
-			Socket proxy=new Socket(connectHost, connectPort);
-			try(Connection c=new Connection(proxy))
+			Socket proxy=new Socket(connectHost, connectPort.apply(this));
+			System.err.println("Connected to: "+connectHost+":"+connectPort.apply(this));
+			try(Connection c=new Connection("SSL plaintext "+targethost+":"+targetport, proxy, false))
 			{
-				c.connectStreams(client.getInputStream(), client.getOutputStream());
+				c.connectStreams(client, client.getInputStream(), client.getOutputStream());
 			}
 		} catch (Exception e) {
 			// TODO Auto-generated catch block

@@ -5,21 +5,32 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.Socket;
 
-import hu.qgears.commons.ConnectStreams;
-
-class Connection implements IConnection
+class Connection implements IConnection, Runnable
 {
-	Socket tg;
-	public Connection(Socket tg) {
+	private Socket tg;
+	private String name;
+	private Socket c;
+	private boolean log;
+	public Connection(String name, Socket tg, boolean log) {
 		super();
+		this.name=name;
 		this.tg = tg;
+		this.log=log;
 	}
 	@Override
-	public void connectStreams(InputStream is, OutputStream os) throws Exception {
-		Thread t1=ConnectStreams.startStreamThread(is, tg.getOutputStream());
-		Thread t2=ConnectStreams.startStreamThread(tg.getInputStream(), os);
+	public void connectStreams(Socket c, InputStream is, OutputStream os) throws Exception {
+		this.c=c;
+		HttpsConnectStreams t1=new HttpsConnectStreams(name+" send", is, tg.getOutputStream()).setAfterCallback(this).setOs2(createLogger()).start();
+		HttpsConnectStreams t2=new HttpsConnectStreams(name+" receive", tg.getInputStream(), os).setAfterCallback(this).setOs2(createLogger()).start();
 		t1.join();
 		t2.join();
+		if(log)
+		{
+			System.err.println("---------------CONN CLOSED -------------");
+		}
+	}
+	private OutputStream createLogger() {
+		return log?System.err:null;
 	}
 	@Override
 	public void close() {
@@ -28,6 +39,17 @@ class Connection implements IConnection
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
+		}
+	}
+	@Override
+	public void run() {
+		try {
+			c.close();
+		} catch (IOException e) {
+		}
+		try {
+			tg.close();
+		} catch (IOException e) {
 		}
 	}
 }

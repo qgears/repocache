@@ -5,10 +5,12 @@ import java.io.IOException;
 
 import hu.qgears.commons.UtilFile;
 import hu.qgears.repocache.ssh.SSLDynamicCert;
+import hu.qgears.tools.AbstractTool.IArgs;
 import joptsimple.annot.JOHelp;
 import joptsimple.annot.JOSimpleBoolean;
 
-public class CommandLineArgs {
+public class CommandLineArgs implements IArgs
+{
 	private byte[] configOverride;
 	private byte[] repoModeConfigOverride;
 	@JOHelp("Folder that contains the cached git repository. If not exists then it is created.")

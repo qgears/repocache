@@ -2,10 +2,10 @@ package hu.qgears.repocache;
 
 import java.io.File;
 import java.io.IOException;
-import java.net.InetSocketAddress;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.function.Function;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -20,10 +20,7 @@ import org.eclipse.jgit.api.Status;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.api.errors.NoFilepatternException;
 import org.eclipse.jgit.errors.NoWorkTreeException;
-import org.eclipse.jgit.lib.ObjectReader;
 import org.eclipse.jgit.lib.Repository;
-import org.eclipse.jgit.revwalk.RevCommit;
-import org.eclipse.jgit.treewalk.TreeWalk;
 
 import hu.qgears.commons.UtilFile;
 import hu.qgears.repocache.config.ClientSetup;
@@ -36,7 +33,7 @@ import hu.qgears.repocache.httpget.StreamingHttpClient;
 import hu.qgears.repocache.httpplugin.RepoPluginHttp;
 import hu.qgears.repocache.httpplugin.RepoPluginProxy;
 import hu.qgears.repocache.https.DynamicSSLProxyConnector;
-import hu.qgears.repocache.https.HttpsProxyServer;
+import hu.qgears.repocache.https.HttpsProxyLifecycle;
 import hu.qgears.repocache.mavenplugin.RepoPluginMaven;
 import hu.qgears.repocache.p2plugin.P2VersionFolderUtil;
 import hu.qgears.repocache.p2plugin.RepoPluginP2;
@@ -63,6 +60,9 @@ public class RepoCache {
 		System.out.println("Repository cache program. Usage:\n");
 		cl.printHelpOn(System.out);
 		cl.parseArgs(args);
+		exec(clargs);
+	}
+	public static int exec(CommandLineArgs clargs) throws Exception {
 		if(clargs.log4jToConsole)
 		{
 			ConsoleAppender console = new ConsoleAppender(); //create appender
@@ -74,13 +74,14 @@ public class RepoCache {
 			//add appender to any Logger (here is root)
 			Logger.getRootLogger().addAppender(console);
 		}
-		String parsedOptions=cl.optionsToString();
-		log.info("Options:\n" + parsedOptions);
+		//String parsedOptions=cl.optionsToString();
+		//log.info("Options:\n" + parsedOptions);
 		clargs.validate();
 		ReadConfig config=new ReadConfig(clargs);
 		RepoModeHandler repoModeH = new RepoModeHandler(clargs);
 		RepoCache rc = new RepoCache(config, repoModeH);
 		rc.start();
+		return 0;
 	}
 	public RepoCache(ReadConfig configuration, RepoModeHandler repoModeHandler) {
 		this.configuration=configuration;
@@ -88,6 +89,7 @@ public class RepoCache {
 	}
 
 	public void start() throws Exception {
+		CommandLineArgs args=getConfiguration().getCommandLine();
 		// register Message as shutdown hook
 		Runtime.getRuntime().addShutdownHook(new RepoShutdown());
 
@@ -110,74 +112,72 @@ public class RepoCache {
 		log.info("Git params: folder: " + repository.getDirectory() + ", branch: " + repository.getBranch() + ", isBare: " + repository.isBare());
 		worktree=git.getRepository().getWorkTree();
 		assertStatusClean();
-		try (ObjectReader reader = repository.newObjectReader()) {
-			for (RevCommit rc : git.log().addPath("alma.txt").call()) {
-				log.debug("revcommit: " + rc.getFullMessage());
-				// .. and narrow it down to the single file's path
-				TreeWalk treewalk = TreeWalk.forPath(reader, "alma.txt", rc.getTree());
-				if (treewalk != null) {
-					// use the blob id to read the file's data
-					byte[] data = reader.open(treewalk.getObjectId(0)).getBytes();
-					log.debug("file content: '" + new String(data, "utf-8") + "'");
-				} else {
-				}
-			}
-		}
+		DispatchByPortHandler dispatchHandler=new DispatchByPortHandler();
 		RepoHandler rh = new RepoHandler(this);
 		plugins.add(new RepoPluginP2(this, rh));
 		plugins.add(new RepoPluginHttp(this));
 		plugins.add(new RepoPluginMaven(this));
 
-		CommandLineArgs args=configuration.getCommandLine();
+		Server server = new Server();
+		
+		ServerConnector sc=new ServerConnector(server);
+		sc.setHost(args.serverHost);
+		sc.setPort(args.port);
+		dispatchHandler.addHandler(sc, rh);
+		
+		server.addConnector(sc);
+
 		if (args.hasProxyPortDefined()) {
-			startProxyServer(args.serverHost, args.getProxyPortReadonly(), new ProxyRepoHandler(RepoCache.this));	// READ_ONLY mode
-			startProxyServer(args.serverHost,args.getProxyPortUpdate(), new ProxyRepoHandler(RepoCache.this).setUpdateProxyPort(true));// UPDATE mode
+			startProxyServer(server, dispatchHandler, args.serverHost, args.getProxyPortReadonly(), new ProxyRepoHandler(RepoCache.this));	// READ_ONLY mode
+			startProxyServer(server, dispatchHandler, args.serverHost,args.getProxyPortUpdate(), new ProxyRepoHandler(RepoCache.this).setUpdateProxyPort(true));// UPDATE mode
 			plugins.add(new RepoPluginProxy(this));
 		}
 
-		if (configuration.getCommandLine().hasHttpsProxyPortDefined()) {
+		if (args.hasHttpsProxyPortDefined()) {
 			String localHost="127.0.0.1";
-			int readOnlyPlaintext=startProxyServer(localHost, 0, new ProxyRepoHandler(RepoCache.this).setHttps(true));	// READ_ONLY mode
-			int updatePlaintext=startProxyServer(localHost, 0, new ProxyRepoHandler(RepoCache.this).setHttps(true));// UPDATE mode
-			DynamicSSLProxyConnector creadonly=new DynamicSSLProxyConnector(args, localHost, readOnlyPlaintext);
-			DynamicSSLProxyConnector cupdate=new DynamicSSLProxyConnector(args, localHost, updatePlaintext);
-			new HttpsProxyServer(args, args.serverHost, args.getHttpsProxyPortReadonly(), creadonly).start();
-			new HttpsProxyServer(args, args.serverHost, args.getHttpsProxyPortUpdate(), cupdate).start();
+			final ServerConnector readOnlyPlaintext=startProxyServer(server, dispatchHandler, localHost, 0, new ProxyRepoHandler(RepoCache.this).setHttps(true));	// READ_ONLY mode
+			final ServerConnector updatePlaintext=startProxyServer(server, dispatchHandler, localHost, 0, new ProxyRepoHandler(RepoCache.this).setHttps(true));// UPDATE mode
+			DynamicSSLProxyConnector creadonly=new DynamicSSLProxyConnector(args, localHost, new Function<Object, Integer>() {
+				
+				@Override
+				public Integer apply(Object t) {
+					return readOnlyPlaintext.getLocalPort();
+				}
+			});
+			DynamicSSLProxyConnector cupdate=new DynamicSSLProxyConnector(args, localHost,  new Function<Object, Integer>() {
+				
+				@Override
+				public Integer apply(Object t) {
+					return updatePlaintext.getLocalPort();
+				}
+			});
+			server.addBean(new HttpsProxyLifecycle(args, args.serverHost, args.getHttpsProxyPortReadonly(), creadonly));
+			server.addBean(new HttpsProxyLifecycle(args, args.serverHost, args.getHttpsProxyPortUpdate(), cupdate));
 		}
-		
-		Server server = new Server(configuration.getCommandLine().port);
-		server.setHandler(rh);
+		server.setHandler(dispatchHandler);
 		server.start();
 		log.info("RepoCache started....");
-		
-//		Server s2=new Server();
-//        ServerConnector connector=new ServerConnector(s2);
-//        connector.setHost(args.getServerHost());
-//        connector.setPort(9999);
-//        s2.addConnector(connector);
-//		s2.start();
-//		System.out.println(" s2 connectors: "+s2.getConnectors().length+" "+s2.getConnectors()[0]);
-
-		
-		server.join();
-		
+		server.join();		
 	}
 
 	/**
 	 * 
+	 * @param dispatchHandler 
+	 * @param server 
 	 * @param host
 	 * @param port
 	 * @param prh
 	 * @return the port on which the server has started.
 	 * @throws Exception
 	 */
-	private int startProxyServer(String host, int port, MyRequestHandler prh) throws Exception
+	private ServerConnector startProxyServer(Server server, DispatchByPortHandler dispatchHandler, String host, int port, MyRequestHandler prh) throws Exception
 	{
-		Server proxyServer = new Server(new InetSocketAddress(host, port));
-		proxyServer.setHandler(prh);
-		proxyServer.start();
-		ServerConnector sc=(ServerConnector)proxyServer.getConnectors()[0];
-		return sc.getLocalPort();
+		ServerConnector sc=new ServerConnector(server);
+		sc.setHost(host);
+		sc.setPort(port);
+		server.addConnector(sc);
+		dispatchHandler.addHandler(sc, prh);
+		return sc;
 	}
 	
 	public void assertStatusClean() throws IOException, NoWorkTreeException, GitAPIException {

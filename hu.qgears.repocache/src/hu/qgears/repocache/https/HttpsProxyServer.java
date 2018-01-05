@@ -10,6 +10,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.List;
 
 import hu.qgears.commons.UtilString;
+import hu.qgears.commons.signal.SignalFutureWrapper;
 import hu.qgears.repocache.CommandLineArgs;
 
 /**
@@ -22,29 +23,41 @@ public class HttpsProxyServer extends Thread{
 	private int port;
 	private IConnector connector;
 	
+	public final SignalFutureWrapper<HttpsProxyServer> started=new SignalFutureWrapper<>();
+	public final SignalFutureWrapper<HttpsProxyServer> stopped=new SignalFutureWrapper<>();
+	
 	public HttpsProxyServer(CommandLineArgs args, String host, int port, IConnector connector) {
 		super();
 		this.connector=connector;
 		this.host = host;
 		this.port = port;
 	}
-	private boolean exit=false;
+	private volatile boolean exit=false;
 	private static final int maxLength=4096;
+	private ServerSocket ss;
 	public void run()
 	{
 		try {
-			try(ServerSocket ss=new ServerSocket())
+			ss=new ServerSocket();
+			try
 			{
 				ss.bind(new InetSocketAddress(host, port));
+				started.ready(this, null);
 				while(!exit)
 				{
 					Socket s=ss.accept();
 					handle(s);
 				}
+			}finally
+			{
+				ss.close();
 			}
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
+		}finally
+		{
+			stopped.ready(this, null);
 		}
 	}
 	private void handle(final Socket s) {
@@ -104,7 +117,7 @@ public class HttpsProxyServer extends Thread{
 					try(IConnection c=connector.connect(targethost, targetport))
 					{
 						sendReply(os, 200, "Connection Established");
-						c.connectStreams(is, os);
+						c.connectStreams(s, is, os);
 					}
 				} catch (NoConnectException e1) {
 					sendReply(os, 404, "Not found can not connect target");
@@ -127,5 +140,12 @@ public class HttpsProxyServer extends Thread{
 		os.write("\n".getBytes(StandardCharsets.US_ASCII));
 		os.write("\n".getBytes(StandardCharsets.US_ASCII));
 		os.flush();
+	}
+	public void stopServer() {
+		exit=true;
+		try {
+			ss.close();
+		} catch (IOException e) {
+		}
 	}
 }
