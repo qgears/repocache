@@ -3,12 +3,11 @@ package hu.qgears.repocache.https;
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.net.Socket;
-import java.util.function.Function;
 
 import javax.net.ssl.SSLServerSocket;
 import javax.net.ssl.SSLServerSocketFactory;
 
-import hu.qgears.repocache.CommandLineArgs;
+import hu.qgears.repocache.ssh.SSLDynamicCert;
 
 /**
  * Man In The Middle implementation for https
@@ -16,19 +15,17 @@ import hu.qgears.repocache.CommandLineArgs;
  */
 public class DynamicSSLProxyConnector implements IConnector
 {
-	private String connectHost;
-	private Function<Object, Integer> connectPort;
-	private CommandLineArgs args;
-	public DynamicSSLProxyConnector(CommandLineArgs args, String connectHost, Function<Object, Integer> connectPort) {
-		this.args=args;
-		this.connectHost=connectHost;
-		this.connectPort=connectPort;
+	private SSLDynamicCert sslDc;
+	private IDecodedClientHandler decodedClientHandler;
+	public DynamicSSLProxyConnector(SSLDynamicCert sslDc, IDecodedClientHandler decodedClientHandler) {
+		this.decodedClientHandler=decodedClientHandler;
+		this.sslDc=sslDc;
 	}
 
 	@Override
 	public IConnection connect(final String targethost, final int targetport) throws NoConnectException {
 		try {
-			SSLServerSocketFactory fact=args.getDynamicCertSupplier().openServer(targethost);
+			SSLServerSocketFactory fact=sslDc.openServer(targethost);
 			final SSLServerSocket ss=(SSLServerSocket)fact.createServerSocket();
 			ss.bind(new InetSocketAddress("127.0.0.1", 0));
 			int port=ss.getLocalPort();
@@ -49,7 +46,7 @@ public class DynamicSSLProxyConnector implements IConnector
 								e.printStackTrace();
 							}
 						}
-						handleDecodedClient(client, targethost, targetport);
+						decodedClientHandler.handleDecodedClient(client, targethost, targetport);
 					} catch (IOException e) {
 						// TODO Auto-generated catch block
 						e.printStackTrace();
@@ -59,7 +56,7 @@ public class DynamicSSLProxyConnector implements IConnector
 			try
 			{
 				Socket s=new Socket("localhost", port);
-				return new Connection("SSL MITM "+targethost+":"+targetport, s, false);
+				return new Connection("SSL MITM "+targethost+":"+targetport, s, s.getOutputStream(), s.getInputStream(), false);
 			}catch(Exception e)
 			{
 				throw new NoConnectException("Problem");
@@ -70,24 +67,6 @@ public class DynamicSSLProxyConnector implements IConnector
 	}
 
 	protected void handleDecodedClient(Socket client, String targethost, int targetport) {
-		try {
-			Socket proxy=new Socket(connectHost, connectPort.apply(this));
-			System.err.println("Connected to: "+connectHost+":"+connectPort.apply(this));
-			try(Connection c=new Connection("SSL plaintext "+targethost+":"+targetport, proxy, false))
-			{
-				c.connectStreams(client, client.getInputStream(), client.getOutputStream());
-			}
-		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}finally {
-			try {
-				client.close();
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-		}
 	}
 
 }

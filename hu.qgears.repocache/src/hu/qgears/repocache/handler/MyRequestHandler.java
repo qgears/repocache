@@ -23,13 +23,12 @@ public abstract class MyRequestHandler extends AbstractHandler {
 	private static Log log=LogFactory.getLog(RepoHandler.class);
 	
 	protected RepoCache rc;
-	protected boolean updateProxyPort;
 	public MyRequestHandler(RepoCache rc) {
 		this.rc = rc;
 	}
 
-	protected void handleQlientQuery (ClientQuery q, Request baseRequest, HttpServletResponse response) throws IOException, ServletException {
-		try(QueryResponse cachedContent=getQueryResponse(q)) {
+	protected void handleQlientQuery (ClientQuery q, Request baseRequest, HttpServletResponse response, boolean rw) throws IOException, ServletException {
+		try(QueryResponse cachedContent=getQueryResponse(q, rw)) {
 			if(cachedContent!=null) {
 				if(!q.path.folder && cachedContent.folder) {
 					redirectToFolder(q);
@@ -63,7 +62,7 @@ public abstract class MyRequestHandler extends AbstractHandler {
 		}
 	}
 	
-	public QueryResponse getQueryResponse(ClientQuery q) throws IOException {
+	public QueryResponse getQueryResponse(ClientQuery q, boolean rw) throws IOException {
 		if(q.path.pieces.size()>1 && rc.getRepoModeHandler().isRepoTransparent(q.path.pieces.get(1)))
 		{
 			log.trace("Getting response from transparent repo : " + q.path.pieces.get(1));
@@ -71,7 +70,7 @@ public abstract class MyRequestHandler extends AbstractHandler {
 			return qr;
 		}
 		QueryResponse cachedContent=rc.getCache(q.path);
-		QueryResponse qr=getResponseFromPlugin(q, cachedContent, q.rc.updateRequired(q, cachedContent, updateProxyPort));
+		QueryResponse qr=getResponseFromPlugin(q, cachedContent, q.rc.updateRequired(q, cachedContent, rw));
 		if(qr!=null)
 		{
 			try

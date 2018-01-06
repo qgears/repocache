@@ -5,23 +5,27 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.Socket;
 
-class Connection implements IConnection, Runnable
+public class Connection implements IConnection, Runnable
 {
 	private Socket tg;
 	private String name;
 	private Socket c;
 	private boolean log;
-	public Connection(String name, Socket tg, boolean log) {
+	private InputStream tgIn;
+	private OutputStream tgOut;
+	public Connection(String name, Socket tg, OutputStream tgOut, InputStream tgIn, boolean log) {
 		super();
 		this.name=name;
 		this.tg = tg;
 		this.log=log;
+		this.tgIn=tgIn;
+		this.tgOut=tgOut;
 	}
 	@Override
 	public void connectStreams(Socket c, InputStream is, OutputStream os) throws Exception {
 		this.c=c;
-		HttpsConnectStreams t1=new HttpsConnectStreams(name+" send", is, tg.getOutputStream()).setAfterCallback(this).setOs2(createLogger()).start();
-		HttpsConnectStreams t2=new HttpsConnectStreams(name+" receive", tg.getInputStream(), os).setAfterCallback(this).setOs2(createLogger()).start();
+		HttpsConnectStreams t1=new HttpsConnectStreams(name+" send", is, tgOut).setAfterCallback(this).setOs2(createLogger()).start();
+		HttpsConnectStreams t2=new HttpsConnectStreams(name+" receive", tgIn, os).setAfterCallback(this).setOs2(createLogger()).start();
 		t1.join();
 		t2.join();
 		if(log)

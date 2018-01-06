@@ -5,7 +5,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.function.Function;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -32,6 +31,7 @@ import hu.qgears.repocache.handler.RepoHandler;
 import hu.qgears.repocache.httpget.StreamingHttpClient;
 import hu.qgears.repocache.httpplugin.RepoPluginHttp;
 import hu.qgears.repocache.httpplugin.RepoPluginProxy;
+import hu.qgears.repocache.https.DecodedClientHandlerToProxy;
 import hu.qgears.repocache.https.DynamicSSLProxyConnector;
 import hu.qgears.repocache.https.HttpsProxyLifecycle;
 import hu.qgears.repocache.mavenplugin.RepoPluginMaven;
@@ -135,24 +135,14 @@ public class RepoCache {
 
 		if (args.hasHttpsProxyPortDefined()) {
 			String localHost="127.0.0.1";
-			final ServerConnector readOnlyPlaintext=startProxyServer(server, dispatchHandler, localHost, 0, new ProxyRepoHandler(RepoCache.this).setHttps(true));	// READ_ONLY mode
-			final ServerConnector updatePlaintext=startProxyServer(server, dispatchHandler, localHost, 0, new ProxyRepoHandler(RepoCache.this).setHttps(true));// UPDATE mode
-			DynamicSSLProxyConnector creadonly=new DynamicSSLProxyConnector(args, localHost, new Function<Object, Integer>() {
-				
-				@Override
-				public Integer apply(Object t) {
-					return readOnlyPlaintext.getLocalPort();
-				}
-			});
-			DynamicSSLProxyConnector cupdate=new DynamicSSLProxyConnector(args, localHost,  new Function<Object, Integer>() {
-				
-				@Override
-				public Integer apply(Object t) {
-					return updatePlaintext.getLocalPort();
-				}
-			});
-			server.addBean(new HttpsProxyLifecycle(args, args.serverHost, args.getHttpsProxyPortReadonly(), creadonly));
-			server.addBean(new HttpsProxyLifecycle(args, args.serverHost, args.getHttpsProxyPortUpdate(), cupdate));
+//			final ServerConnector readOnlyPlaintext=startProxyServer(server, dispatchHandler, localHost, 0, new ProxyRepoHandler(RepoCache.this).setHttps(true));	// READ_ONLY mode
+//			final ServerConnector updatePlaintext=startProxyServer(server, dispatchHandler, localHost, 0, new ProxyRepoHandler(RepoCache.this).setHttps(true));// UPDATE mode
+			DynamicSSLProxyConnector creadonly=new DynamicSSLProxyConnector(args.getDynamicCertSupplier(),
+					new DecodedClientHandlerToProxy(localHost, args.getProxyPortReadonly(), "r"));
+			DynamicSSLProxyConnector cupdate=new DynamicSSLProxyConnector(args.getDynamicCertSupplier(), 
+					new DecodedClientHandlerToProxy(localHost, args.getProxyPortReadonly(), "rw"));
+			server.addBean(new HttpsProxyLifecycle(args.serverHost, args.getHttpsProxyPortReadonly(), creadonly));
+			server.addBean(new HttpsProxyLifecycle(args.serverHost, args.getHttpsProxyPortUpdate(), cupdate));
 		}
 		server.setHandler(dispatchHandler);
 		server.start();

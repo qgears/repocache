@@ -34,7 +34,7 @@ public class RepoHandler extends MyRequestHandler {
 		} else if(q.getParameter("crawl")!=null) {
 			new CrawlExecutor().handle(this, q);
 		} else {
-			super.handleQlientQuery(q, baseRequest, response);
+			super.handleQlientQuery(q, baseRequest, response, false);
 		}
 		log.debug("Handling request response status: " + response.getStatus() + ", type: " + response.getContentType());
 	}

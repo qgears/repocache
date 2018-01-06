@@ -38,7 +38,7 @@ public class CrawlExecutor {
 	{
 		w.write("Querying: "+q.path.toStringPath()+"\n");
 		w.flush();
-		QueryResponse resp=rh.getQueryResponse(q);
+		QueryResponse resp=rh.getQueryResponse(q, false);
 		if(resp!=null&&resp.folder)
 		{
 			try {

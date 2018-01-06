@@ -209,7 +209,7 @@ public class RepoPluginP2 extends AbstractRepoPlugin
 	private boolean updatePath (ClientQuery q, Path relpath) {
 		ClientQueryInternal subq=new ClientQueryInternal(rc, relpath, q);
 		try {
-			rh.getQueryResponse(subq);
+			rh.getQueryResponse(subq, false);
 		} catch (IOException e) {
 			log.error("Error updating path: " + relpath.toStringPath(), e);
 		}

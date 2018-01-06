@@ -11,7 +11,6 @@ import java.util.List;
 
 import hu.qgears.commons.UtilString;
 import hu.qgears.commons.signal.SignalFutureWrapper;
-import hu.qgears.repocache.CommandLineArgs;
 
 /**
  * Simple plain TCP server based HTTPS proxy implementation.
@@ -26,14 +25,14 @@ public class HttpsProxyServer extends Thread{
 	public final SignalFutureWrapper<HttpsProxyServer> started=new SignalFutureWrapper<>();
 	public final SignalFutureWrapper<HttpsProxyServer> stopped=new SignalFutureWrapper<>();
 	
-	public HttpsProxyServer(CommandLineArgs args, String host, int port, IConnector connector) {
+	public HttpsProxyServer(String host, int port, IConnector connector) {
 		super();
 		this.connector=connector;
 		this.host = host;
 		this.port = port;
 	}
 	private volatile boolean exit=false;
-	private static final int maxLength=4096;
+	public static final int headerMaxLength=8192;
 	private ServerSocket ss;
 	public void run()
 	{
@@ -78,7 +77,7 @@ public class HttpsProxyServer extends Thread{
 			InputStream is=s.getInputStream();
 			OutputStream os=s.getOutputStream();
 			try {
-				String query=ReadLine.readLine(is, maxLength);
+				String query=ReadLine.readLine(is, headerMaxLength);
 				List<String> pieces=UtilString.split(query, " ");
 				if(pieces.size()<1)
 				{
@@ -102,13 +101,13 @@ public class HttpsProxyServer extends Thread{
 					throw new HeaderException(400, "Bad Request error parsing host");
 				}
 				int nLine=0;
-				String line=ReadLine.readLine(is, maxLength);
+				String line=ReadLine.readLine(is, headerMaxLength);
 				while(line.length()>0)
 				{
 					//System.out.println("param: "+line);
-					line=ReadLine.readLine(is, maxLength);
+					line=ReadLine.readLine(is, headerMaxLength);
 					nLine++;
-					if(nLine>maxLength)
+					if(nLine>headerMaxLength)
 					{
 						throw new HeaderException(400, "Bad Request error too many lines");
 					}
