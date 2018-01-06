@@ -1,7 +1,6 @@
 package hu.qgears.repocache.handler;
 
 import java.io.IOException;
-import java.util.List;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -11,12 +10,12 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.eclipse.jetty.server.Request;
 
-import hu.qgears.commons.UtilString;
 import hu.qgears.repocache.ClientQuery;
 import hu.qgears.repocache.ClientQueryHttp;
 import hu.qgears.repocache.Path;
 import hu.qgears.repocache.RepoCache;
-import hu.qgears.repocache.https.RewriteOutputStreamFilter;
+import hu.qgears.repocache.https.HttpsProxyConnectionsManager;
+import hu.qgears.repocache.https.HttpsProxyConnectionsManager.RegistryEntry;
 
 public class ProxyRepoHandler extends MyRequestHandler {
 	private static Log log=LogFactory.getLog(ProxyRepoHandler.class);
@@ -28,29 +27,29 @@ public class ProxyRepoHandler extends MyRequestHandler {
 	@Override
 	public void handle(String target, Request baseRequest, HttpServletRequest request, HttpServletResponse response)
 			throws IOException, ServletException {
-		String httpsProxyHeader=baseRequest.getHeader(RewriteOutputStreamFilter.headerName);
+		String remoteHost=baseRequest.getRemoteHost();
+		int remotePort=baseRequest.getRemotePort();
+		RegistryEntry entry=null;
+		if("127.0.0.1".equals(remoteHost))
+		{
+			entry=HttpsProxyConnectionsManager.getInstance().get(remotePort);
+			if(entry.closed)
+			{
+				entry=null;
+			}
+		}
+		System.out.println("Channel: "+remoteHost+" "+remotePort);
 		String servername=baseRequest.getServerName();
 		String scheme="http";
 		int port;
 		boolean rwMode;
-		if(httpsProxyHeader!=null)
+		if(entry!=null)
 		{
-			List<String> pieces=UtilString.split(httpsProxyHeader, " ");
-			scheme=pieces.get(0);
+			scheme="https";
 			baseRequest.setScheme(scheme);
-			servername=pieces.get(1);
-			port=Integer.parseInt(pieces.get(2));
-			switch(pieces.get(3))
-			{
-			case "r":
-				rwMode=false;
-				break;
-			case "rw":
-				rwMode=true;
-				break;
-			default:
-				throw new IOException("Invalid rw mode: '"+pieces.get(3)+"'");
-			}
+			servername=entry.servername;
+			port=entry.port;
+			rwMode=entry.rwMode;
 		}else
 		{
 			port=baseRequest.getServerPort();
@@ -64,10 +63,9 @@ public class ProxyRepoHandler extends MyRequestHandler {
 			bld.append(Integer.toString(port));
 		}
 		String pathStr="proxy/"+scheme+"/"+servername+baseRequest.getRequestURI();
-		log.debug("Proxy request arrived : "+" target URL: "+pathStr+" "+(rwMode?"RW":"RO"));
 		Path path = new Path(pathStr);
 		ClientQuery q=new ClientQueryHttp(target, baseRequest, request, response, rc, path);
-		log.debug("Path for proxy request is: " + q.path + ", localPort: " + baseRequest.getLocalPort());
+		log.debug("Proxy request: " + q.path+" "+(rwMode?"RW":"RO")+" HTTPS PROXY: "+entry);
 		super.handleQlientQuery(q, baseRequest, response, rwMode);
 		log.debug("Proxy request response status: " + response.getStatus() + ", type: " + response.getContentType());
 	}

@@ -138,9 +138,9 @@ public class RepoCache {
 //			final ServerConnector readOnlyPlaintext=startProxyServer(server, dispatchHandler, localHost, 0, new ProxyRepoHandler(RepoCache.this).setHttps(true));	// READ_ONLY mode
 //			final ServerConnector updatePlaintext=startProxyServer(server, dispatchHandler, localHost, 0, new ProxyRepoHandler(RepoCache.this).setHttps(true));// UPDATE mode
 			DynamicSSLProxyConnector creadonly=new DynamicSSLProxyConnector(args.getDynamicCertSupplier(),
-					new DecodedClientHandlerToProxy(localHost, args.getProxyPortReadonly(), "r"));
+					new DecodedClientHandlerToProxy(localHost, args.getProxyPortReadonly(), false));
 			DynamicSSLProxyConnector cupdate=new DynamicSSLProxyConnector(args.getDynamicCertSupplier(), 
-					new DecodedClientHandlerToProxy(localHost, args.getProxyPortReadonly(), "rw"));
+					new DecodedClientHandlerToProxy(localHost, args.getProxyPortReadonly(), true));
 			server.addBean(new HttpsProxyLifecycle(args.serverHost, args.getHttpsProxyPortReadonly(), creadonly));
 			server.addBean(new HttpsProxyLifecycle(args.serverHost, args.getHttpsProxyPortUpdate(), cupdate));
 		}
@@ -354,9 +354,9 @@ public class RepoCache {
 		}
 		if (repoName != null) {
 			if (cachedContent!=null) {
-				updRequired = getRepoModeHandler().isRepoUpdatable(repoName);
+				updRequired = getRepoModeHandler().isRepoUpdatable(q);
 			} else {
-				updRequired = getRepoModeHandler().isRepoAddable(repoName);
+				updRequired = getRepoModeHandler().isRepoAddable(q);
 			}
 		}
 		
@@ -369,7 +369,6 @@ public class RepoCache {
 				updRequired = !client.isReadonly();
 			}
 		}
-		log.debug("Update required for path: " + q.path + "=" + updRequired);
 		return updRequired;
 	}
 	public ReadConfig getConfiguration() {

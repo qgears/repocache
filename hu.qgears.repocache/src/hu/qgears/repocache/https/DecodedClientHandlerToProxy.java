@@ -3,12 +3,14 @@ package hu.qgears.repocache.https;
 import java.io.IOException;
 import java.net.Socket;
 
+import hu.qgears.repocache.https.HttpsProxyConnectionsManager.RegistryEntry;
+
 public class DecodedClientHandlerToProxy implements IDecodedClientHandler {
 
 	private String connectHost;
 	private int connectPort;
-	private String rewriteInfo;
-	public DecodedClientHandlerToProxy(String connectHost, int connectPort, String rewriteInfo) {
+	private boolean rewriteInfo;
+	public DecodedClientHandlerToProxy(String connectHost, int connectPort, boolean rewriteInfo) {
 		super();
 		this.connectHost = connectHost;
 		this.connectPort = connectPort;
@@ -19,11 +21,16 @@ public class DecodedClientHandlerToProxy implements IDecodedClientHandler {
 			int targetport) {
 		try {
 			Socket proxy=new Socket(connectHost, connectPort);
-			RewriteOutputStreamFilter rewrite=new RewriteOutputStreamFilter(proxy.getOutputStream(), targethost, targetport, rewriteInfo);
-			try(Connection c=new Connection("SSL plaintext "+targethost+":"+targetport, proxy, rewrite, proxy.getInputStream(), false))
-			{
-				c.connectStreams(client, client.getInputStream(), client.getOutputStream());
-			}
+			proxy.getLocalPort();
+			System.out.println("Local port: "+proxy.getLocalPort());
+//			RewriteOutputStreamFilter rewrite=new RewriteOutputStreamFilter(proxy.getOutputStream(), targethost, targetport, rewriteInfo);
+				try(Connection c=new Connection("SSL plaintext "+targethost+":"+targetport, proxy, proxy.getOutputStream(), proxy.getInputStream(), false))
+				{
+					try(RegistryEntry entry=HttpsProxyConnectionsManager.getInstance().register(proxy.getLocalPort(), targethost, targetport, rewriteInfo))
+					{
+						c.connectStreams(client, client.getInputStream(), client.getOutputStream());
+					}
+				}
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

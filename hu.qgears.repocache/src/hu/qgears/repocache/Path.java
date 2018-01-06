@@ -50,7 +50,7 @@ public class Path {
 	}
 	@Override
 	public String toString() {
-		return "PATH: "+pieces+" "+folder;
+		return "PATH: "+pieces+" "+(folder?"folder":"file");
 	}
 	public String getFileName() {
 		if(pieces.size()==0)

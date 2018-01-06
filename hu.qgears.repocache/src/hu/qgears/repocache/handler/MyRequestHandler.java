@@ -63,14 +63,16 @@ public abstract class MyRequestHandler extends AbstractHandler {
 	}
 	
 	public QueryResponse getQueryResponse(ClientQuery q, boolean rw) throws IOException {
-		if(q.path.pieces.size()>1 && rc.getRepoModeHandler().isRepoTransparent(q.path.pieces.get(1)))
+		if(rc.getRepoModeHandler().isRepoTransparent(q))
 		{
 			log.trace("Getting response from transparent repo : " + q.path.pieces.get(1));
 			QueryResponse qr=getResponseFromPlugin(q, null, true);
 			return qr;
 		}
 		QueryResponse cachedContent=rc.getCache(q.path);
-		QueryResponse qr=getResponseFromPlugin(q, cachedContent, q.rc.updateRequired(q, cachedContent, rw));
+		boolean updateRequired=q.rc.updateRequired(q, cachedContent, rw);
+		QueryResponse qr=getResponseFromPlugin(q, cachedContent, updateRequired);
+		log.debug("HANDLE: '" + q.path.toStringPath() +"' "+ (updateRequired?"UPDATED":(cachedContent==null?"NO CACHE":("CACHE: "+cachedContent))));
 		if(qr!=null)
 		{
 			try

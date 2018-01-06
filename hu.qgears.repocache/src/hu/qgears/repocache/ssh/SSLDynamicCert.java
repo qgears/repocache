@@ -28,14 +28,14 @@ public class SSLDynamicCert
 			if(!pkfile.exists())
 			{
 				File script=new File(certsFolder, "dynamiccert.sh");
-				System.out.println("Site does not exist yet! '"+hostName+"' '"+ pkfile.getAbsolutePath()+"'");
+				// System.out.println("Site does not exist yet! '"+hostName+"' '"+ pkfile.getAbsolutePath()+"'");
 				ProcessBuilder pb=new ProcessBuilder(new String[]{script.getAbsolutePath(), hostName}).directory(certsFolder);
 				Process p=pb.start();
 				String s=UtilProcess.execute(p);
-				System.out.println("Process output: "+s);
+				// System.out.println("Process output: "+s);
 			}else
 			{
-				System.out.println("Site already exists! '"+hostName+"' '"+ pkfile.getAbsolutePath()+"'");
+				// System.out.println("Site already exists! '"+hostName+"' '"+ pkfile.getAbsolutePath()+"'");
 			}
 		}
 		SSLServerSocketFactory fact=SSLContextFactory.createContext(pkfile, "verysec", "site");
