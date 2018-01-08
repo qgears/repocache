@@ -32,9 +32,10 @@ public class RepoHandler extends MyRequestHandler {
 		{
 			log.debug("Handling request arrived, path info: " + baseRequest.getPathInfo());
 		}
-		if(q.path.eq(0, "config")) {
+		Path path=q.getPath();
+		if(path.eq(0, "config")) {
 			new ConfigHandler().handle(q);
-		}else if(q.path.eq(0, "config2.html")) {
+		}else if(path.eq(0, "config2.html")) {
 				new ConfigHandler2(q).handle();
 		} else if(q.getParameter("crawl")!=null) {
 			new CrawlExecutor().handle(this, q);

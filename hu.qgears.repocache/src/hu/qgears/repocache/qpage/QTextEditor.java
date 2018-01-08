@@ -2,16 +2,37 @@ package hu.qgears.repocache.qpage;
 
 import java.io.IOException;
 
-import hu.qgears.commons.UtilListenableProperty;
+import hu.qgears.commons.UtilEventListener;
 import hu.qgears.repocache.utils.InMemoryPost;
 
 public class QTextEditor extends QComponent
 {
-	public final UtilListenableProperty<String> text=new UtilListenableProperty<>();
+	public final QProperty<String> text=new QProperty<>();
 	public QTextEditor(QPage page, String identifier) {
 		super(page, identifier);
+		text.serverChangedEvent.addListener(new UtilEventListener<String>() {
+			@Override
+			public void eventHappened(String msg) {
+				serverTextChanged(msg);
+			}
+		});
 	}
 	
+	protected void serverTextChanged(final String msg) {
+		if(page.inited)
+		{
+			new ChangeTemplate(page.getCurrentTemplate()){
+				public void generate() {
+					write("page.components['");
+					writeJSValue(id);
+					write("'].initValue(\"");
+					writeJSValue(msg);
+					write("\");\n");
+				}
+			}.generate();
+		}
+	}
+
 	public static void generateHeader(HtmlTemplate parent)
 	{
 		new HtmlTemplate(parent){
@@ -36,7 +57,7 @@ public class QTextEditor extends QComponent
 	}
 
 	public void handle(HtmlTemplate parent, InMemoryPost post) throws IOException {
-		text.setProperty(post.getParameter("text"));
+		text.setPropertyFromClient(post.getParameter("text"));
 	}
 
 	@Override

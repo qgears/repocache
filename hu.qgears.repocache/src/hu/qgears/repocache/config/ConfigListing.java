@@ -48,8 +48,8 @@ public class ConfigListing extends AbstractHTMLPage {
 		{
 			page=new QPage(qpm);
 			QTextEditor editorConfigXml=new QTextEditor(page, "config.xml");
-			editorConfigXml.text.setProperty(new String(getHttpQuery().rc.getConfiguration().getConfigXml(), StandardCharsets.UTF_8));
-			editorConfigXml.text.getPropertyChangedEvent().addListener(new UtilEventListener<String>() {
+			editorConfigXml.text.setPropertyFromServer(new String(getHttpQuery().rc.getConfiguration().getConfigXml(), StandardCharsets.UTF_8));
+			editorConfigXml.text.clientChangedEvent.addListener(new UtilEventListener<String>() {
 				
 				@Override
 				public void eventHappened(String msg) {

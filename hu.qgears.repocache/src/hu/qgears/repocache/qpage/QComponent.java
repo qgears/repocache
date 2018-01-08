@@ -26,5 +26,8 @@ public abstract class QComponent {
 	final public String getId() {
 		return id;
 	}
+	public QPage getPage() {
+		return page;
+	}
 
 }

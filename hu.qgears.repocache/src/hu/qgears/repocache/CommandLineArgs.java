@@ -13,8 +13,8 @@ public class CommandLineArgs implements IArgs
 {
 	private byte[] configOverride;
 	private byte[] repoModeConfigOverride;
-	@JOHelp("Name of the Repo Cace. This name is shown in the admin web pages as title.")
-	public String name="Unconfigured Repo Cache";
+	@JOHelp("Configuration folder")
+	public File configFolder;
 	@JOHelp("Folder that contains the cached git repository. If not exists then it is created.")
 	public File repo;
 	@JOHelp("Configuration xml file.")
@@ -123,17 +123,11 @@ public class CommandLineArgs implements IArgs
 	public boolean hasHttpsProxyPortDefined() {
 		return httpsProxyPort>-1;
 	}
-	public Integer getProxyPortReadonly() {
-		return hasProxyPortDefined() ? proxyPort : null;
-	}
-	public Integer getProxyPortUpdate() {
+	public Integer getProxyPort() {
 		return hasProxyPortDefined() ? proxyPort+1 : null;
 	}
-	public Integer getHttpsProxyPortReadonly() {
+	public Integer getHttpsProxyPort() {
 		return hasHttpsProxyPortDefined()? httpsProxyPort: null;
-	}
-	public Integer getHttpsProxyPortUpdate() {
-		return hasHttpsProxyPortDefined()? httpsProxyPort+1: null;
 	}
 	private SSLDynamicCert dynamicCertSupplier;
 	synchronized public SSLDynamicCert getDynamicCertSupplier()

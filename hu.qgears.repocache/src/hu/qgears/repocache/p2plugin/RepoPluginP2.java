@@ -138,7 +138,7 @@ public class RepoPluginP2 extends AbstractRepoPlugin
 			{
 				try
 				{
-					QueryResponse response = q.rc.client.get(new HttpGet(q.rc.createTmpFile(q.path), httpPath));
+					QueryResponse response = q.rc.client.get(new HttpGet(q.rc.createTmpFile(q.getPath()), httpPath));
 					if(response!=null&&!(response.equals(cachedContent)))
 					{
 						if (cachedContent != null && !isUpdateModeNormal(localPath.pieces.get(0))) {
@@ -165,7 +165,7 @@ public class RepoPluginP2 extends AbstractRepoPlugin
 				}
 			}else
 			{
-				log.debug("File in cache is not updated, net not allowed: "+q.path);
+				log.debug("File in cache is not updated, net not allowed: "+q.getPath());
 			}
 		}
 		return null;
@@ -198,7 +198,7 @@ public class RepoPluginP2 extends AbstractRepoPlugin
 	private QueryResponse getResponseForHttpGet (ClientQuery q, String baseUrl, String fileName) {
 		String httpPath = baseUrl + fileName;
 		try {
-			QueryResponse response = q.rc.client.get(new HttpGet(q.rc.createTmpFile(q.path), httpPath));
+			QueryResponse response = q.rc.client.get(new HttpGet(q.rc.createTmpFile(q.getPath()), httpPath));
 			return response;
 		} catch (Exception e) {
 			log.debug("Http path get exception. httpPath: " + httpPath, e);

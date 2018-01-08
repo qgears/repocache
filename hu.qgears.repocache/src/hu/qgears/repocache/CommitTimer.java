@@ -8,6 +8,7 @@ import org.apache.commons.logging.LogFactory;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.api.errors.NoFilepatternException;
 
+import hu.qgears.commons.UtilEvent;
 import hu.qgears.commons.UtilTimer;
 
 public class CommitTimer implements Callable<Object>{
@@ -17,6 +18,7 @@ public class CommitTimer implements Callable<Object>{
 	private long lastUpdate;
 	private long timeoutMillis=5*60*1000;
 	private long millisToNanos=1000*1000;
+	public final UtilEvent<CommitTimer> commitStateChanged=new UtilEvent<>();
 	public CommitTimer(RepoCache rc) {
 		super();
 		this.rc = rc;
@@ -35,6 +37,7 @@ public class CommitTimer implements Callable<Object>{
 			lastUpdate=System.nanoTime();
 		}
 		UtilTimer.getInstance().executeTimeout(timeoutMillis+10, this);
+		commitStateChanged.eventHappened(this);
 	}
 	public void executeCommit() throws IOException, NoFilepatternException, GitAPIException
 	{
@@ -48,6 +51,7 @@ public class CommitTimer implements Callable<Object>{
 				commitMessage=new StringBuilder();
 			}
 		}
+		commitStateChanged.eventHappened(this);
 	}
 	public void executeRevert() throws IOException, NoFilepatternException, GitAPIException
 	{
@@ -62,6 +66,7 @@ public class CommitTimer implements Callable<Object>{
 				commitMessage=new StringBuilder();
 			}
 		}
+		commitStateChanged.eventHappened(this);
 	}
 	@Override
 	public Object call() throws Exception {

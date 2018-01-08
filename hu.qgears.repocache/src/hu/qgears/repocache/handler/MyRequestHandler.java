@@ -15,7 +15,6 @@ import hu.qgears.repocache.ClientQuery;
 import hu.qgears.repocache.Path;
 import hu.qgears.repocache.QueryResponse;
 import hu.qgears.repocache.RepoCache;
-import hu.qgears.repocache.StatusPage;
 import hu.qgears.repocache.config.ClientSetup;
 import hu.qgears.repocache.folderlisting.RealFolderListing;
 
@@ -28,9 +27,10 @@ public abstract class MyRequestHandler extends AbstractHandler {
 	}
 
 	protected void handleQlientQuery (ClientQuery q, Request baseRequest, HttpServletResponse response, boolean rw) throws IOException, ServletException {
+		q.setPath(q.rc.getAccessRules().rewriteClientPath(q.getPath()));
 		try(QueryResponse cachedContent=getQueryResponse(q, rw)) {
 			if(cachedContent!=null) {
-				if(!q.path.folder && cachedContent.folder) {
+				if(!q.getPath().folder && cachedContent.folder) {
 					redirectToFolder(q);
 				} else {
 					response.setContentType(q.getMimeType(cachedContent));
@@ -43,8 +43,8 @@ public abstract class MyRequestHandler extends AbstractHandler {
 					}
 				}
 			} else {
-				if (q.path.folder) {
-					QueryResponse qr = rc.loadDirFromCache(q.path);
+				if (q.getPath().folder) {
+					QueryResponse qr = rc.loadDirFromCache(q.getPath());
 					if (qr != null) {
 						response.setContentType(q.getMimeType(cachedContent));
 						response.setStatus(HttpServletResponse.SC_OK);
@@ -65,24 +65,24 @@ public abstract class MyRequestHandler extends AbstractHandler {
 	public QueryResponse getQueryResponse(ClientQuery q, boolean rw) throws IOException {
 		if(rc.getAccessRules().isRepoTransparent(q))
 		{
-			log.trace("Getting response from transparent repo : " + q.path.toStringPath());
+			log.trace("Getting response from transparent repo : " + q.getPathString());
 			QueryResponse qr=getResponseFromPlugin(q, null, true);
 			return qr;
 		}
-		QueryResponse cachedContent=rc.getCache(q.path);
+		QueryResponse cachedContent=rc.getCache(q.getPath());
 		boolean updateRequired=q.rc.updateRequired(q, cachedContent, rw);
 		QueryResponse qr=getResponseFromPlugin(q, cachedContent, updateRequired);
-		log.debug("HANDLE: '" + q.path.toStringPath() +"' "+ (updateRequired?"UPDATED":(cachedContent==null?"NO CACHE":("CACHE: "+cachedContent))));
+		log.debug("HANDLE: '" + q.getPathString() +"' "+ (updateRequired?"UPDATED":(cachedContent==null?"NO CACHE":("CACHE: "+cachedContent))));
 		if(qr!=null)
 		{
 			try
 			{
 				try {
-					rc.updateResponse(q.path, cachedContent, qr);
+					rc.updateResponse(q.getPath(), cachedContent, qr);
 				} catch (Exception e) {
 					throw new IOException(e);
 				}
-				cachedContent=rc.getCache(q.path);
+				cachedContent=rc.getCache(q.getPath());
 			}finally
 			{
 				qr.close();
@@ -100,14 +100,12 @@ public abstract class MyRequestHandler extends AbstractHandler {
 	}
 
 	private QueryResponse getResponseFromPlugin(ClientQuery q, QueryResponse cachedContent, boolean netAllowed) throws IOException {
-		Path path=rc.getConfiguration().doPathAlias(q.path);
+		Path path=rc.getAccessRules().rewriteInternetPath(q.getPath());
 		try {
-			for(AbstractRepoPlugin plugin: rc.getPlugins())
+			AbstractRepoPlugin plugin=rc.getPlugin(path);
+			if(plugin!=null)
 			{
-				if(path.eq(0, plugin.getPath()))
-				{
-					return plugin.getOnlineResponse(path, new Path(path).remove(0), q, cachedContent, netAllowed);
-				}
+				return plugin.getOnlineResponse(path, new Path(path).remove(0), q, cachedContent, netAllowed);
 			}
 			if(path.pieces.size()==0)
 			{
@@ -120,7 +118,7 @@ public abstract class MyRequestHandler extends AbstractHandler {
 	}
 
 	public static void redirectToFolder(ClientQuery q) throws IOException {
-		q.sendRedirect(q.path.pieces.get(q.path.pieces.size()-1)+"/");
+		q.sendRedirect(q.getPath().pieces.get(q.getPath().pieces.size()-1)+"/");
 	}
 
 }

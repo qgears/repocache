@@ -3,15 +3,14 @@ package hu.qgears.repocache.qpage;
 import java.io.IOException;
 
 import hu.qgears.commons.UtilEventListener;
-import hu.qgears.commons.UtilListenableProperty;
 import hu.qgears.repocache.utils.InMemoryPost;
 
 public class QLabel extends QComponent
 {
-	public final UtilListenableProperty<String> text=new UtilListenableProperty<>();
+	public final QProperty<String> innerhtml=new QProperty<>();
 	public QLabel(QPage page, String identifier) {
 		super(page, identifier);
-		text.getPropertyChangedEvent().addListener(new UtilEventListener<String>() {
+		innerhtml.serverChangedEvent.addListener(new UtilEventListener<String>() {
 			
 			@Override
 			public void eventHappened(String msg) {
@@ -44,7 +43,6 @@ public class QLabel extends QComponent
 	}
 
 	public void handle(HtmlTemplate parent, InMemoryPost post) throws IOException {
-		text.setProperty(post.getParameter("text"));
 	}
 
 	@Override
@@ -56,7 +54,7 @@ public class QLabel extends QComponent
 				write("\tnew QLabel(page, \"");
 				writeObject(id);
 				write("\").initValue(\"");
-				writeJSValue(text.getProperty());
+				writeJSValue(innerhtml.getProperty());
 				write("\");\n");
 			}
 			

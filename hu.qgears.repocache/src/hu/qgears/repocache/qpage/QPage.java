@@ -5,8 +5,11 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.TimerTask;
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
+import hu.qgears.commons.signal.SignalFutureWrapper;
 import hu.qgears.repocache.utils.InMemoryPost;
 
 /**
@@ -23,7 +26,11 @@ public class QPage implements Closeable {
 	private int serverstateindex = 0;
 	private HtmlTemplate currentTemplate;
 	public boolean inited;
-	private static long TIMEOUT_DISPOSE=30000;
+	private static long TIMEOUT_POLL=15000;
+	private static long TIMEOUT_DISPOSE=TIMEOUT_POLL*2;
+	private LinkedBlockingQueue<Runnable> tasks=new LinkedBlockingQueue<>();
+	public final SignalFutureWrapper<QPage> disposedEvent=new SignalFutureWrapper<>();
+	private volatile Thread thread;
 	
 	class MessageFramingTemplate extends HtmlTemplate {
 
@@ -48,6 +55,7 @@ public class QPage implements Closeable {
 		HtmlTemplate parent;
 		InMemoryPost post;
 		int index;
+		boolean outOfOrder=false;
 
 		public Message(HtmlTemplate parent, InMemoryPost post) throws NumberFormatException, IOException {
 			super();
@@ -55,29 +63,44 @@ public class QPage implements Closeable {
 			this.post = post;
 			index = Integer.parseInt(post.getParameter("messageindex"));
 		}
+		public Message(HtmlTemplate parent, boolean outOfOrder) throws NumberFormatException, IOException {
+			super();
+			this.parent = parent;
+			this.outOfOrder=outOfOrder;
+		}
+		protected void executeTask() throws IOException
+		{
+			String cid = post.getParameter("component");
+			QComponent ed = components.get(cid);
+			ed.handle(parent, post);
+		}
 
 		public void executeOnThread() throws Exception {
 			long t = System.currentTimeMillis();
 			synchronized (syncObject) {
 				// Proper ordering of messages!
-				while (index != currentMessageIndex) {
-					syncObject.wait(10000);
-					if (System.currentTimeMillis() > t + 10000) {
-						// TODO crash the client! User feedback of internal
-						// error!
-						throw new TimeoutException();
+				if(!outOfOrder)
+				{
+					while (index != currentMessageIndex) {
+						syncObject.wait(10000);
+						if (System.currentTimeMillis() > t + 10000) {
+							// TODO crash the client! User feedback of internal
+							// error!
+							throw new TimeoutException();
+						}
 					}
+					currentMessageIndex++;
 				}
 				MessageFramingTemplate msft = new MessageFramingTemplate(parent);
+				thread=Thread.currentThread();
 				currentTemplate=parent;
 				msft.openMessage();
-				String cid = post.getParameter("component");
-				QComponent ed = components.get(cid);
-				ed.handle(parent, post);
+				executeTask();
 				currentTemplate=null;
 				msft.closeMessage();
-				currentMessageIndex++;
 				syncObject.notifyAll();
+				reinitDisposeTimer();
+				thread=null;
 			}
 		}
 	}
@@ -119,8 +142,7 @@ public class QPage implements Closeable {
 				for (QComponent c : components.values()) {
 					c.init(parent);
 				}
-				// TODO periodic refresh is not started yet! page.start();
-				write("}, false);\n</script>\n");
+				write("\tpage.start();\n}, false);\n</script>\n");
 				inited=true;
 			}
 		}.generate();
@@ -144,28 +166,51 @@ public class QPage implements Closeable {
 		}
 		return true;
 	}
-
-	public void executeSynchronized(Runnable r) {
-		synchronized (syncObject) {
-			r.run();
+	public void submitToUI(Runnable r) {
+		if(!disposedEvent.isDone())
+		{
+			tasks.add(r);
 		}
 	}
 
 	private void handlePeriodicQuery(HtmlTemplate parent) {
 		try {
-			Thread.sleep(6000);
-		} catch (InterruptedException e) {
+			final Runnable task=tasks.poll(TIMEOUT_POLL, TimeUnit.MILLISECONDS);
+			new Message(parent, true)
+			{
+				protected void executeTask() throws IOException {
+					try{
+						if(task!=null)
+						{
+							task.run();
+						}
+						while(!tasks.isEmpty())
+						{
+							Runnable t=tasks.poll();
+							t.run();
+						}
+					}catch(Exception e)
+					{
+						// TODO
+						e.printStackTrace();
+					}
+					if (active) {
+						parent.write("page.query();\n");
+					}
+				};
+			}.executeOnThread();
+		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		new HtmlTemplate(parent) {
-			public void generate() {
-				write("console.info(\"Hello QPage reply! \"+page);\n");
-				if (active) {
-					write("page.query();\n");
-				}
-			}
-		}.generate();
+//		new HtmlTemplate(parent) {
+//			public void generate() {
+//				write("console.info(\"Hello QPage reply! \"+page);\n");
+//				if (active) {
+//					write("page.query();\n");
+//				}
+//			}
+//		}.generate();
 	}
 
 	@Override
@@ -185,6 +230,12 @@ public class QPage implements Closeable {
 	 * Dispose is called on the session dispose event from the Web Servers thread.
 	 */
 	public void dispose() {
+		active=false;
+		disposedEvent.ready(this, null);
+	}
+
+	public boolean isThread() {
+		return Thread.currentThread()==thread;
 	}
 
 }

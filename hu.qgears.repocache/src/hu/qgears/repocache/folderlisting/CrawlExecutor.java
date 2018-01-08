@@ -36,7 +36,7 @@ public class CrawlExecutor {
 	}
 	private void handleInternal(MyRequestHandler rh, ClientQuery q, Writer w) throws IOException
 	{
-		w.write("Querying: "+q.path.toStringPath()+"\n");
+		w.write("Querying: "+q.getPathString()+"\n");
 		w.flush();
 		QueryResponse resp=rh.getQueryResponse(q, false);
 		if(resp!=null&&resp.folder)
@@ -56,11 +56,11 @@ public class CrawlExecutor {
 					{
 						try
 						{
-							Path relpath=new Path(q.path, href);
-							if(relpath.pieces.size()>q.path.pieces.size())
+							Path relpath=new Path(q.getPath(), href);
+							if(relpath.pieces.size()>q.getPath().pieces.size())
 							{
 								relpath.validate();
-								w.write("Delegate child: "+q.path.toStringPath()+": "+relpath.toStringPath()+"\n");
+								w.write("Delegate child: "+q.getPathString()+": "+relpath.toStringPath()+"\n");
 								w.flush();
 								ClientQueryInternal subq=new ClientQueryInternal(q.rc, relpath, q);
 								handleInternal(rh, subq, w);

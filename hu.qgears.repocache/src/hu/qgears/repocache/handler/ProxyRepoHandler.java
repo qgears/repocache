@@ -38,7 +38,6 @@ public class ProxyRepoHandler extends MyRequestHandler {
 				entry=null;
 			}
 		}
-		System.out.println("Channel: "+remoteHost+" "+remotePort);
 		String servername=baseRequest.getServerName();
 		String scheme="http";
 		int port;
@@ -65,7 +64,7 @@ public class ProxyRepoHandler extends MyRequestHandler {
 		String pathStr="proxy/"+scheme+"/"+bld+baseRequest.getRequestURI();
 		Path path = new Path(pathStr);
 		ClientQuery q=new ClientQueryHttp(target, baseRequest, request, response, rc, path);
-		log.debug("Proxy request: " + q.path+" "+(rwMode?"RW":"RO")+" HTTPS PROXY: "+entry);
+		log.debug("Proxy request: " + q.getPathString()+" "+(rwMode?"RW":"RO")+" HTTPS PROXY: "+entry);
 		super.handleQlientQuery(q, baseRequest, response, rwMode);
 		log.debug("Proxy request response status: " + response.getStatus() + ", type: " + response.getContentType());
 	}

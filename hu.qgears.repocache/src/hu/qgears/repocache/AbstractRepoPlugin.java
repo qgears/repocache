@@ -4,8 +4,6 @@ import java.io.IOException;
 
 abstract public class AbstractRepoPlugin {
 
-	abstract public String getPath();
-
 	/**
 	 * 
 	 * @param fullPath Full path in the storage repsitory

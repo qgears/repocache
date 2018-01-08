@@ -14,11 +14,13 @@ abstract public class ClientQuery
 {
 	private static Log log=LogFactory.getLog(ClientQuery.class);
 	public final RepoCache rc;
-	public final Path path;
+	private final Path originalPath;
+	private Path path;
 	
 	public ClientQuery(RepoCache rc, Path path) {
 		super();
 		this.rc = rc;
+		this.originalPath=path;
 		this.path=path;
 	}
 
@@ -39,16 +41,28 @@ abstract public class ClientQuery
 		{
 			return resp.contentType;
 		}
-		if(path.folder)
+		if(getPath().folder)
 		{
 			return "text/html;charset=utf-8";
 		}
 		String mimeType = "";
 		try {
-			mimeType = Files.probeContentType(new File(path.getFileName()).toPath());
+			mimeType = Files.probeContentType(new File(getPath().getFileName()).toPath());
 		} catch (IOException e) {
-			log.error("Error getting file mime type. path: " + path, e);
+			log.error("Error getting file mime type. path: " + getPath(), e);
 		}
 		return StringUtils.isEmptyOrNull(mimeType) ? "application/data" : mimeType;
+	}
+
+	public Path getPath() {
+		return path;
+	}
+
+	public String getPathString() {
+		return "/"+getPath().toStringPath();
+	}
+
+	public void setPath(Path rewriteClientPath) {
+		this.path=rewriteClientPath;
 	}
 }

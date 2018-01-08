@@ -16,20 +16,20 @@ public class ConfigHandler {
 	
 	public void handle(ClientQueryHttp q) throws IOException {
 		QueryResponse ret=null;
-		if(q.path.pieces.size()==1 && !q.path.folder)
+		if(q.getPath().pieces.size()==1 && !q.getPath().folder)
 		{
 			RepoHandler.redirectToFolder(q);
 			return;
 		}
-		String localPath=new Path(q.path).remove(0).toStringPath();
+		String localPath=new Path(q.getPath()).remove(0).toStringPath();
 		switch (localPath) {
 		case "config.xml":
 			ret=new QueryResponseByteArray("config.xml", q.rc.getConfiguration().getConfigXml());
 			break;
 		default:
-			if(q.path.eq(1, "repoModeConfig"))
+			if(q.getPath().eq(1, "repoModeConfig"))
 			{
-				if (q.path.pieces.size()==3&&q.path.eq(2, "setRepoMode")) {
+				if (q.getPath().pieces.size()==3&&q.getPath().eq(2, "setRepoMode")) {
 					String repoName=q.getParameter("repoName");
 					String mode=q.getParameter("mode");
 					log.info("Setting repoMode on repo name: " + repoName + ", to mode: " + mode);
@@ -39,11 +39,11 @@ public class ConfigHandler {
 				}
 				ret=new RepoModeListing(q).generate();
 			}
-			if(q.path.pieces.size()==1)
+			if(q.getPath().pieces.size()==1)
 			{
 				ret=new ConfigListing(q).generate();
 			}
-			if(q.path.pieces.size()==2&&q.path.eq(1, "setClientMode"))
+			if(q.getPath().pieces.size()==2&&q.getPath().eq(1, "setClientMode"))
 			{
 				String client=q.getParameter("client");
 				String mode=q.getParameter("mode");
@@ -65,7 +65,7 @@ public class ConfigHandler {
 				q.sendRedirect("./");
 				return;
 			}
-			if(q.path.pieces.size()==2&&q.path.eq(1, "commit"))
+			if(q.getPath().pieces.size()==2&&q.getPath().eq(1, "commit"))
 			{
 				try {
 					q.rc.getCommitTimer().executeCommit();
@@ -75,7 +75,7 @@ public class ConfigHandler {
 				q.sendRedirect("./");
 				return;
 			}
-			if(q.path.pieces.size()==2&&q.path.eq(1, "revert"))
+			if(q.getPath().pieces.size()==2&&q.getPath().eq(1, "revert"))
 			{
 				try {
 					q.rc.getCommitTimer().executeRevert();

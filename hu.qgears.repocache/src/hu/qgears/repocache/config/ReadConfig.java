@@ -21,7 +21,6 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 import hu.qgears.repocache.CommandLineArgs;
-import hu.qgears.repocache.Path;
 import hu.qgears.repocache.p2plugin.P2RepoConfig;
 import hu.qgears.repocache.p2plugin.P2RepoMode;
 
@@ -178,19 +177,4 @@ public class ReadConfig {
 		}
 		return ret;
 	}
-
-	public Path doPathAlias(Path path) {
-		String s=path.toStringPath();
-		for(String alias:aliases.keySet())
-		{
-			if(s.startsWith(alias))
-			{
-				String replaced=aliases.get(alias)+s.substring(alias.length());
-				log.info("Path alias applied: '"+s+"' -> '"+replaced+"' ("+alias+"->"+aliases.get(alias)+")");
-				return new Path(replaced);
-			}
-		}
-		return path;
-	}
-
 }

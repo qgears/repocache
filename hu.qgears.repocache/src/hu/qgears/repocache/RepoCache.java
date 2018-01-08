@@ -2,8 +2,6 @@ package hu.qgears.repocache;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import org.apache.commons.logging.Log;
@@ -27,20 +25,18 @@ import org.eclipse.jgit.lib.Repository;
 
 import hu.qgears.commons.UtilFile;
 import hu.qgears.repocache.config.AccessRules;
+import hu.qgears.repocache.config.AccessRules.PluginDef;
 import hu.qgears.repocache.config.ReadConfig;
 import hu.qgears.repocache.config.RepoModeHandler;
 import hu.qgears.repocache.handler.MyRequestHandler;
 import hu.qgears.repocache.handler.ProxyRepoHandler;
 import hu.qgears.repocache.handler.RepoHandler;
 import hu.qgears.repocache.httpget.StreamingHttpClient;
-import hu.qgears.repocache.httpplugin.RepoPluginHttp;
 import hu.qgears.repocache.httpplugin.RepoPluginProxy;
 import hu.qgears.repocache.https.DecodedClientHandlerToProxy;
 import hu.qgears.repocache.https.DynamicSSLProxyConnector;
 import hu.qgears.repocache.https.HttpsProxyLifecycle;
-import hu.qgears.repocache.mavenplugin.RepoPluginMaven;
 import hu.qgears.repocache.p2plugin.P2VersionFolderUtil;
-import hu.qgears.repocache.p2plugin.RepoPluginP2;
 import joptsimple.annot.AnnotatedClass;
 
 public class RepoCache {
@@ -49,14 +45,14 @@ public class RepoCache {
 	public StreamingHttpClient client = new StreamingHttpClient();
 	public static final String maintenancefilesprefix = "XXXRepoCache.";
 	private static Log log = LogFactory.getLog(RepoCache.class);
-	private List<AbstractRepoPlugin> plugins = new ArrayList<>();
+	public RepoPluginProxy plugin;
 	private ReadConfig configuration;
 	private RepoModeHandler repoModeHandler;
 	private CommitTimer commitTimer;
 	private File worktree;
 	public final String repoVersion = "Repo Cache 1.0.0 by Q-Gears Kft.\n";
 	private String versionFilePath = "version.txt";
-	private AccessRules accessRules=new AccessRules();
+	private AccessRules accessRules;
 
 	public static void main(String[] args) throws Exception {
 		CommandLineArgs clargs = new CommandLineArgs();
@@ -98,6 +94,7 @@ public class RepoCache {
 
 	public void start() throws Exception {
 		CommandLineArgs args = getConfiguration().getCommandLine();
+		accessRules=new AccessRules(args.configFolder);
 		// register Message as shutdown hook
 		Runtime.getRuntime().addShutdownHook(new RepoShutdown());
 
@@ -121,9 +118,9 @@ public class RepoCache {
 		assertStatusClean();
 		DispatchByPortHandler dispatchHandler = new DispatchByPortHandler();
 		RepoHandler rh = new RepoHandler(this);
-		plugins.add(new RepoPluginP2(this, rh));
-		plugins.add(new RepoPluginHttp(this));
-		plugins.add(new RepoPluginMaven(this));
+		//plugins.add(new RepoPluginP2(this, rh));
+		//plugins.add(new RepoPluginHttp(this));
+		//plugins.add(new RepoPluginMaven(this));
 
 		Server server = new Server();
 		
@@ -148,29 +145,16 @@ public class RepoCache {
 		server.addConnector(sc);
 
 		if (args.hasProxyPortDefined()) {
-			startProxyServer(server, dispatchHandler, args.serverHost, args.getProxyPortReadonly(),
+			startProxyServer(server, dispatchHandler, args.serverHost, args.getProxyPort(),
 					new ProxyRepoHandler(RepoCache.this)); // READ_ONLY mode
-			startProxyServer(server, dispatchHandler, args.serverHost, args.getProxyPortUpdate(),
-					new ProxyRepoHandler(RepoCache.this).setUpdateProxyPort(true));// UPDATE
-																					// mode
-			plugins.add(new RepoPluginProxy(this));
+			plugin=new RepoPluginProxy(this);
 		}
 
 		if (args.hasHttpsProxyPortDefined()) {
 			String localHost = "127.0.0.1";
-			// final ServerConnector readOnlyPlaintext=startProxyServer(server,
-			// dispatchHandler, localHost, 0, new
-			// ProxyRepoHandler(RepoCache.this).setHttps(true)); // READ_ONLY
-			// mode
-			// final ServerConnector updatePlaintext=startProxyServer(server,
-			// dispatchHandler, localHost, 0, new
-			// ProxyRepoHandler(RepoCache.this).setHttps(true));// UPDATE mode
 			DynamicSSLProxyConnector creadonly = new DynamicSSLProxyConnector(args.getDynamicCertSupplier(),
-					new DecodedClientHandlerToProxy(localHost, args.getProxyPortReadonly(), false));
-			DynamicSSLProxyConnector cupdate = new DynamicSSLProxyConnector(args.getDynamicCertSupplier(),
-					new DecodedClientHandlerToProxy(localHost, args.getProxyPortReadonly(), true));
-			server.addBean(new HttpsProxyLifecycle(args.serverHost, args.getHttpsProxyPortReadonly(), creadonly));
-			server.addBean(new HttpsProxyLifecycle(args.serverHost, args.getHttpsProxyPortUpdate(), cupdate));
+					new DecodedClientHandlerToProxy(localHost, args.getProxyPort(), false));
+			server.addBean(new HttpsProxyLifecycle(args.serverHost, args.getHttpsProxyPort(), creadonly));
 		}
         sessions.setHandler(dispatchHandler);
 		server.start();
@@ -203,7 +187,7 @@ public class RepoCache {
 			Status status = git.status().call();
 			log.debug("Git status clean: " + status.isClean());
 			if (!status.isClean()) {
-				throw new IOException("git repo is not clean");
+				// throw new IOException("git repo is not clean");
 			}
 			String storedVersion = UtilFile.loadAsString(new File(worktree, versionFilePath));
 			if (!storedVersion.equals(repoVersion)) {
@@ -326,10 +310,6 @@ public class RepoCache {
 		return new Path(localPath).add(maintenancefilesprefix + "listing");
 	}
 
-	public List<AbstractRepoPlugin> getPlugins() {
-		return plugins;
-	}
-
 	/**
 	 * Update the stored cached content.
 	 * 
@@ -424,5 +404,18 @@ public class RepoCache {
 	}
 	public AccessRules getAccessRules() {
 		return accessRules;
+	}
+
+	public AbstractRepoPlugin getPlugin(Path path) {
+		PluginDef pd=getAccessRules().getPluginDef(path);
+		if(pd!=null)
+		{
+			return pd.plugin;
+		}
+		if(path.eq(0, plugin.getPath()))
+		{
+			return plugin;
+		}
+		return null;
 	}
 }

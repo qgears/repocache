@@ -19,7 +19,7 @@ public abstract class AbstractHTMLPage extends AbstractPage {
 	 * Writes Javascript code that generates the HTMLM title tag.
 	 */
 	protected void writeHTMLTitle() {
-		write("<script language=\"javascript\" type=\"text/javascript\">\n\tdocument.write(\"<title>[RepoCache] ");
+		write("<script language=\"javascript\" type=\"text/javascript\">\n\tdocument.write(\"<title>");
 		writeObject(getTitleFragment());
 		write(" @ \" + window.location.host + \"</title>\");\n</script>\n");
 	}
