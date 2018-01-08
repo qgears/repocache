@@ -11,7 +11,7 @@ abstract public class AbstractRepoPlugin {
 	 * @param q
 	 * @param cachedContent
 	 * @param netAllowed
-	 * @return
+	 * @return Valid response or null or throw exception if target does not exist
 	 * @throws IOException
 	 */
 	abstract public QueryResponse getOnlineResponse(Path fullPath, Path pluginLocalPath, ClientQuery q, QueryResponse cachedContent, boolean netAllowed) throws IOException;

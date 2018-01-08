@@ -22,7 +22,7 @@ abstract public class AbstractPage extends HtmlTemplate
 	public QueryResponse generate() throws IOException {
 		doGenerate();
 		return new QueryResponseByteArray("", out.toString().getBytes(
-				StandardCharsets.UTF_8), folder);
+				StandardCharsets.UTF_8), folder).setContentType("text/html; charset=utf-8");
 	}
 	
 	/**

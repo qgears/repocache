@@ -1,9 +1,7 @@
 package hu.qgears.repocache;
 
 import java.io.File;
-import java.io.IOException;
 
-import hu.qgears.commons.UtilFile;
 import hu.qgears.repocache.ssh.SSLDynamicCert;
 import hu.qgears.tools.AbstractTool.IArgs;
 import joptsimple.annot.JOHelp;
@@ -11,16 +9,10 @@ import joptsimple.annot.JOSimpleBoolean;
 
 public class CommandLineArgs implements IArgs
 {
-	private byte[] configOverride;
-	private byte[] repoModeConfigOverride;
 	@JOHelp("Configuration folder")
 	public File configFolder;
 	@JOHelp("Folder that contains the cached git repository. If not exists then it is created.")
 	public File repo;
-	@JOHelp("Configuration xml file.")
-	public File config;
-	@JOHelp("Repo mode configuration xml file.")
-	public File repoModeConfig;
 	@JOHelp("Http server port that is opened by the server")
 	public int port=8080;
 	@JOHelp("Http proxy server port that is opened by the server")
@@ -44,24 +36,6 @@ public class CommandLineArgs implements IArgs
 	 */
 	public void validate()
 	{
-		if(configOverride==null)
-		{
-			if(config==null)
-			{
-				throw new IllegalArgumentException("config file must be set as a command line parameter.");
-			}
-			if((!config.exists()) || !config.isFile())
-			{
-				throw new IllegalArgumentException("config file does not exist.");
-			}
-		}
-		if(repoModeConfigOverride==null)
-		{
-			if(repoModeConfig==null)
-			{
-				throw new IllegalArgumentException("repo mode config file must be set as a command line parameter.");
-			}
-		}
 		if(repo==null)
 		{
 			throw new IllegalArgumentException("'repo' Repository folder must be set as a command line parameter.");
@@ -82,40 +56,6 @@ public class CommandLineArgs implements IArgs
 		{
 			throw new IllegalArgumentException("'downloadsFolder' must be a directory.");
 		}
-	}
-	public CommandLineArgs setConfigOverride(byte[] bs)
-	{
-		this.configOverride=bs;
-		return this;
-	}
-	public CommandLineArgs setRepoModeConfigOverride(byte[] bs, String filePath)
-	{
-		this.repoModeConfigOverride=bs;
-		this.repoModeConfig=new File(filePath);
-		return this;
-	}
-	public byte[] openConfigXml() throws IOException {
-		if(configOverride!=null)
-		{
-			return configOverride;
-		}
-		return UtilFile.loadFile(config);
-	}
-	public byte[] openRepoModeConfigXml() {
-		if(repoModeConfigOverride!=null)
-		{
-			return repoModeConfigOverride;
-		}
-		byte[] ret = null;
-		try {
-			ret = UtilFile.loadFile(repoModeConfig);
-		} catch (IOException e) {
-			System.out.println("Repomode config file missing.");
-		}
-		return ret;
-	}
-	public void setProxyPort(Integer proxyPort) {
-		this.proxyPort = proxyPort;
 	}
 	public boolean hasProxyPortDefined() {
 		return proxyPort>-1;

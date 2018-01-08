@@ -15,6 +15,7 @@ import hu.qgears.repocache.Path;
 import hu.qgears.repocache.RepoCache;
 import hu.qgears.repocache.config.ConfigHandler2;
 import hu.qgears.repocache.folderlisting.CrawlExecutor;
+import hu.qgears.repocache.log.AccessLogPage;
 
 public class RepoHandler extends MyRequestHandler {
 	private static Log log=LogFactory.getLog(RepoHandler.class);
@@ -32,9 +33,16 @@ public class RepoHandler extends MyRequestHandler {
 			log.debug("Handling request arrived, path info: " + baseRequest.getPathInfo());
 		}
 		Path path=q.getPath();
-		if(path.eq(0, "config2.html")) {
-				new ConfigHandler2(q).handle();
-		} else if(q.getParameter("crawl")!=null) {
+		switch(path.toStringPath())
+		{
+		case "config.html":
+			new ConfigHandler2(q).handle();
+			return;
+		case "access-log.html":
+			new AccessLogPage(q).handle();
+			return;
+		}
+		if(q.getParameter("crawl")!=null) {
 			new CrawlExecutor().handle(this, q);
 		} else {
 			super.handleQlientQuery(q, baseRequest, response, false);

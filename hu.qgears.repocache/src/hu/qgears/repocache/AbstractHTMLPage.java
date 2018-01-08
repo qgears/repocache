@@ -32,6 +32,7 @@ public abstract class AbstractHTMLPage extends AbstractPage {
 	protected void doGenerate() throws IOException {
 		write("<!DOCTYPE html>\n<html>\n<head>\n");
 		writeHTMLTitle();
+		write("<meta http-equiv=\"Content-Type\" content=\"text/html; charset=utf-8\">\n");
 		writeHtmlHeaders();
 		write("</head>\n<body>\n");
 		writeHTMLBody();

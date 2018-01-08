@@ -34,6 +34,7 @@ import hu.qgears.repocache.httpplugin.RepoPluginProxy;
 import hu.qgears.repocache.https.DecodedClientHandlerToProxy;
 import hu.qgears.repocache.https.DynamicSSLProxyConnector;
 import hu.qgears.repocache.https.HttpsProxyLifecycle;
+import hu.qgears.repocache.log.AccessLog;
 import hu.qgears.repocache.p2plugin.P2VersionFolderUtil;
 import joptsimple.annot.AnnotatedClass;
 
@@ -50,7 +51,11 @@ public class RepoCache {
 	private String versionFilePath = "version.txt";
 	private RepoConfiguration configuration;
 	private CommandLineArgs args;
+	public final AccessLog accessLog=new AccessLog();
 
+	public CommandLineArgs getArgs() {
+		return args;
+	}
 	public static void main(String[] args) throws Exception {
 		CommandLineArgs clargs = new CommandLineArgs();
 		AnnotatedClass cl = new AnnotatedClass();
@@ -321,7 +326,9 @@ public class RepoCache {
 		synchronized (this) {
 			if (qr != null && !(qr.equals(cachedContent))) {
 				updateFile(path, qr);
+				accessLog.pathUpdated(path);
 			} else {
+				accessLog.pathDidNotChange(path);
 				log.debug("Path did not change: " + path.toStringPath());
 			}
 		}
@@ -337,6 +344,7 @@ public class RepoCache {
 	 */
 	public boolean updateRequired(ClientQuery q, QueryResponse cachedContent, boolean updaterProxyPort) {
 		if (args.localOnly) {
+			q.rc.accessLog.localOnly(q);
 			return false;
 		}
 

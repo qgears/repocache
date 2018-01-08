@@ -62,4 +62,8 @@ public class QueryResponseByteArray extends QueryResponse
 	public int getLength() {
 		return responseBody.length;
 	}
+	public QueryResponse setContentType(String string) {
+		contentType=string;
+		return this;
+	}
 }

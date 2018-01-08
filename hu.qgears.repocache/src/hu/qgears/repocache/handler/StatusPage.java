@@ -15,7 +15,7 @@ public class StatusPage extends AbstractHTMLPage {
 		folder=true;
 		write("<h1>");
 		writeHtml(getQuery().rc.getConfiguration().getName());
-		write("</h1>\n\n<a href=\"config2.html\">New configuration</a><br/>\n<a href=\"config\">Configuration</a><br/>\nContent:\n<br/>\n<ul>\n");
+		write("</h1>\n\n<a href=\"config.html\">Configuration</a><br/>\n<a href=\"access-log.html\">Access log</a><br/>\nContent:\n<br/>\n<ul>\n");
 		RepoPluginProxy plugin=getQuery().rc.plugin;
 		write("\t<li><a href=\"");
 		writeValue(plugin.getPath());

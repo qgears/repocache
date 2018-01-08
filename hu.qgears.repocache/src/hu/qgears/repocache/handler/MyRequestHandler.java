@@ -71,6 +71,16 @@ public abstract class MyRequestHandler extends AbstractHandler {
 		QueryResponse cachedContent=rc.getCache(q.getPath());
 		boolean updateRequired=q.rc.updateRequired(q, cachedContent, rw);
 		QueryResponse qr=getResponseFromPlugin(q, cachedContent, updateRequired);
+		if(!updateRequired)
+		{
+			if(cachedContent!=null)
+			{
+				q.rc.accessLog.fromCache(q);
+			}else
+			{
+				q.rc.accessLog.missingCache(q);
+			}
+		}
 		log.debug("HANDLE: '" + q.getPathString() +"' "+ (updateRequired?"UPDATED":(cachedContent==null?"NO CACHE":("CACHE: "+cachedContent))));
 		if(qr!=null)
 		{
@@ -109,6 +119,7 @@ public abstract class MyRequestHandler extends AbstractHandler {
 			}
 		} catch (Exception e) {
 			log.debug("Error fetching file: "+path + ", message: " + e.getMessage());
+			q.rc.accessLog.errorDownloading(q);
 		}
 		return cachedContent;
 	}
