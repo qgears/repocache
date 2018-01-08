@@ -21,6 +21,7 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 import hu.qgears.repocache.CommandLineArgs;
+import hu.qgears.repocache.Path;
 import hu.qgears.repocache.p2plugin.P2RepoConfig;
 import hu.qgears.repocache.p2plugin.P2RepoMode;
 
@@ -34,6 +35,7 @@ public class ReadConfig {
 	private Map<String, String> httprepos = new HashMap<>();
 	private Map<String, P2RepoConfig> p2repos = new HashMap<>();
 	private Map<String, String> proxyrepos = new HashMap<>();
+	private Map<String, String> aliases = new HashMap<>();
 	private Map<String, ClientSetup> clients=Collections.synchronizedMap(new TreeMap<String, ClientSetup>());
 	private CommandLineArgs args;
 	private byte[] configXml;
@@ -57,9 +59,21 @@ public class ReadConfig {
 				parseHttpRepos(doc);
 				parseP2Repos(doc);
 				parseProxyRepos(doc);
+				parsePathRewriteAliases(doc);
 			}
 		} catch (Exception e) {
 			throw new IOException("Error reading configuration: "+args.config, e);
+		}
+	}
+
+	private void parsePathRewriteAliases(Document doc) {
+		NodeList pathRewrites = doc.getElementsByTagName("path-rewrite");
+		for (int temp = 0; temp < pathRewrites.getLength(); temp++) {
+			Node pathRewrite = pathRewrites.item(temp);
+			String path = DomParserUtil.getNodeAttr("path", pathRewrite);
+			String alias = DomParserUtil.getNodeAttr("alias", pathRewrite);
+			aliases.put(path, alias);
+			log.debug("Path rewrite alias: '" + path + "' -> '" + alias +"'");
 		}
 	}
 
@@ -163,6 +177,20 @@ public class ReadConfig {
 			clients.put(ret.getId(), ret);
 		}
 		return ret;
+	}
+
+	public Path doPathAlias(Path path) {
+		String s=path.toStringPath();
+		for(String alias:aliases.keySet())
+		{
+			if(s.startsWith(alias))
+			{
+				String replaced=aliases.get(alias)+s.substring(alias.length());
+				log.info("Path alias applied: '"+s+"' -> '"+replaced+"' ("+alias+"->"+aliases.get(alias)+")");
+				return new Path(replaced);
+			}
+		}
+		return path;
 	}
 
 }

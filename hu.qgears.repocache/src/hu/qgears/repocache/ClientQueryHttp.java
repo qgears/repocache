@@ -11,10 +11,13 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.eclipse.jetty.server.Request;
 
+import hu.qgears.repocache.utils.InMemoryPost;
+
 public class ClientQueryHttp extends ClientQuery
 {
 	public Request baseRequest;
 	public final HttpServletResponse response;
+	private InMemoryPost inMemoryPost;
 
 	public ClientQueryHttp(String target, Request baseRequest, HttpServletRequest request, HttpServletResponse response,
 			RepoCache rc, Path path) {
@@ -37,7 +40,7 @@ public class ClientQueryHttp extends ClientQuery
 	@Override
 	public void reply(QueryResponse r) throws IOException
 	{
-		response.setContentType(getMimeType());
+		response.setContentType(getMimeType(r));
 		response.setStatus(HttpServletResponse.SC_OK);
 		baseRequest.setHandled(true);
 		r.streamTo(response.getOutputStream());
@@ -67,5 +70,20 @@ public class ClientQueryHttp extends ClientQuery
 		response.setStatus(HttpServletResponse.SC_OK);
 		baseRequest.setHandled(true);
 		return response.getOutputStream();
+	}
+	public boolean isPost() {
+		return "POST".equals(baseRequest.getMethod());
+	}
+	public InMemoryPost getInMemoryPost() throws IOException
+	{
+		if(inMemoryPost==null)
+		{
+			try {
+				inMemoryPost=new InMemoryPost(baseRequest);
+			} catch (Exception e) {
+				throw new IOException("Parsing multipart data", e);
+			}			
+		}
+		return inMemoryPost;
 	}
 }

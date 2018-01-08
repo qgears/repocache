@@ -1,3 +1,5 @@
+Content type should be handled in storage so the original content type is replied.
+
 Stop crawling: Ongoing crawlings must be registered. config page should list them with a link, which when called cancels the crawling (after the current file is finished.)
 (Currently setting the client to read only mode fixes this problem.)
 

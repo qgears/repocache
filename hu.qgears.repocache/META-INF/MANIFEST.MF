@@ -22,6 +22,7 @@ Require-Bundle: org.eclipse.jgit;bundle-version="4.1.0",
  org.jsoup;bundle-version="1.7.2",
  org.apache.commons.io;bundle-version="2.2.0",
  org.apache.log4j,
- hu.qgears.tools;bundle-version="1.0.0"
+ hu.qgears.tools;bundle-version="1.0.0",
+ org.apache.commons.lang;bundle-version="2.6.0"
 Import-Package: javax.net,
  javax.net.ssl

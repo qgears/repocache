@@ -30,7 +30,7 @@ public class RepoPluginHttp extends AbstractRepoPlugin
 		return new TreeMap<>(rc.getConfiguration().getHttprepos());
 	}
 	@Override
-	public QueryResponse getOnlineResponse(Path localPath, ClientQuery q, QueryResponse cachedContent, boolean netAllowed) throws IOException {
+	public QueryResponse getOnlineResponse(Path fullPath, Path localPath, ClientQuery q, QueryResponse cachedContent, boolean netAllowed) throws IOException {
 		if(localPath.pieces.size()==0)
 		{
 			return new HttpListing(q, this).generate();

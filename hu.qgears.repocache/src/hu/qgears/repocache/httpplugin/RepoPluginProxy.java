@@ -9,7 +9,6 @@ import org.apache.commons.logging.LogFactory;
 
 import hu.qgears.repocache.AbstractRepoPlugin;
 import hu.qgears.repocache.ClientQuery;
-import hu.qgears.repocache.ClientQueryHttp;
 import hu.qgears.repocache.Path;
 import hu.qgears.repocache.QueryResponse;
 import hu.qgears.repocache.RepoCache;
@@ -30,18 +29,20 @@ public class RepoPluginProxy extends AbstractRepoPlugin {
 		return new TreeMap<>(rc.getConfiguration().getHttprepos());
 	}
 	@Override
-	public QueryResponse getOnlineResponse(Path localPath, ClientQuery q, QueryResponse cachedContent, boolean netAllowed) throws IOException {
+	public QueryResponse getOnlineResponse(Path fullPath, Path localPath, ClientQuery q, QueryResponse cachedContent, boolean netAllowed) throws IOException {
 		if(localPath.pieces.size()<2)
 		{
 			return null;
 		}
-		String httpPath = replaceMirrorUrl(((ClientQueryHttp)q).baseRequest.getRequestURL().toString());
+		String protocol=localPath.pieces.get(0);
+		Path noProtocol=new Path(localPath).remove(0);
+		String httpPath = replaceMirrorUrl(protocol+"://"+noProtocol.toStringPath());
 		if(!netAllowed)
 		{
-			log.debug("Path not updated from remote server: "+ httpPath +" local path: "+localPath);
+			log.debug("Path offline: "+localPath.toStringPath());
 			return null;
 		}
-		log.debug("Update from remote server: "+ httpPath +" local path: "+localPath);
+		log.debug("Path update: "+ localPath.toStringPath() +" remote url: "+httpPath);
 		QueryResponse response = q.rc.client.get(new HttpGet(q.rc.createTmpFile(q.path), httpPath));
 		return response;
 	}
@@ -55,6 +56,7 @@ public class RepoPluginProxy extends AbstractRepoPlugin {
 			if (baseUrl.startsWith(url) && url.length()>usedLength) {
 				usedLength = url.length();
 				replacedUrl = urls.get(url) + baseUrl.substring(url.length());
+				log.info("Mirror URL replacement done: "+baseUrl+" -> "+replacedUrl);
 			}
 		}
 		return replacedUrl;

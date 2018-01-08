@@ -50,7 +50,11 @@ abstract public class ClientQuery implements ICodeGeneratorContext
 
 	abstract public Set<String> getParameterNames();
 
-	public String getMimeType() {
+	public String getMimeType(QueryResponse resp) {
+		if(resp!=null&&resp.contentType!=null)
+		{
+			return resp.contentType;
+		}
 		if(path.folder)
 		{
 			return "text/html;charset=utf-8";

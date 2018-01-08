@@ -26,7 +26,7 @@ abstract public class AbstractPage extends RAbstractTemplatePart
 	/**
 	 * Emits the textual reply body, such as a HTML or XML document.  
 	 */
-	abstract protected void doGenerate();
+	abstract protected void doGenerate() throws IOException;
 	
 	protected void writeHtml(String value) {
 		writeObject(value);

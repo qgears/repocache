@@ -1,5 +1,7 @@
 package hu.qgears.repocache;
 
+import java.io.IOException;
+
 public abstract class AbstractHTMLPage extends AbstractPage {
 
 	public AbstractHTMLPage(ClientQuery query) {
@@ -27,11 +29,17 @@ public abstract class AbstractHTMLPage extends AbstractPage {
 	}
 	
 	@Override
-	protected void doGenerate() {
+	protected void doGenerate() throws IOException {
 		write("<!DOCTYPE html>\n<html>\n<head>\n");
 		writeHTMLTitle();
+		writeHtmlHeaders();
 		write("</head>\n<body>\n");
 		writeHTMLBody();
 		write("</body>\n</html>\n");
+	}
+
+	protected void writeHtmlHeaders() {
+		// TODO Auto-generated method stub
+		
 	}
 }

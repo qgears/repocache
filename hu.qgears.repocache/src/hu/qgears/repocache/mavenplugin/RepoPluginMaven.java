@@ -29,7 +29,7 @@ public class RepoPluginMaven extends AbstractRepoPlugin
 		return new TreeMap<>(rc.getConfiguration().getMvnrepos());
 	}
 	@Override
-	public QueryResponse getOnlineResponse(Path localPath, ClientQuery q, QueryResponse cachedContent, boolean netAllowed) throws IOException {
+	public QueryResponse getOnlineResponse(Path fullPath, Path localPath, ClientQuery q, QueryResponse cachedContent, boolean netAllowed) throws IOException {
 		if(localPath.pieces.size()==0)
 		{
 			return new MavenListing(q, this).generate();

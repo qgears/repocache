@@ -33,7 +33,7 @@ public class ProxyRepoHandler extends MyRequestHandler {
 		if("127.0.0.1".equals(remoteHost))
 		{
 			entry=HttpsProxyConnectionsManager.getInstance().get(remotePort);
-			if(entry.closed)
+			if(entry!=null&&entry.closed)
 			{
 				entry=null;
 			}
@@ -62,7 +62,7 @@ public class ProxyRepoHandler extends MyRequestHandler {
 			bld.append(":");
 			bld.append(Integer.toString(port));
 		}
-		String pathStr="proxy/"+scheme+"/"+servername+baseRequest.getRequestURI();
+		String pathStr="proxy/"+scheme+"/"+bld+baseRequest.getRequestURI();
 		Path path = new Path(pathStr);
 		ClientQuery q=new ClientQueryHttp(target, baseRequest, request, response, rc, path);
 		log.debug("Proxy request: " + q.path+" "+(rwMode?"RW":"RO")+" HTTPS PROXY: "+entry);

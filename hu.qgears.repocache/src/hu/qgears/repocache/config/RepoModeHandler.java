@@ -27,7 +27,6 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
-import hu.qgears.repocache.ClientQuery;
 import hu.qgears.repocache.CommandLineArgs;
 
 public class RepoModeHandler {
@@ -86,34 +85,20 @@ public class RepoModeHandler {
 		saveRepoModeToXml();
 	}
 	
-	public boolean isRepoUpdatable(ClientQuery q) {
-//		return true;
-		return false;
-	}
-
-	public boolean isRepoAddable(ClientQuery q) {
-		return true;
-//		return false;
-	}
-
-	public boolean isRepoUpdatable(String repoName) {
-		RepoMode mode = getRepoMode(repoName);
-		return RepoMode.UPDATE.equals(mode);
-	}
+//	public boolean isRepoUpdatable(String repoName) {
+//		RepoMode mode = getRepoMode(repoName);
+//		return RepoMode.UPDATE.equals(mode);
+//	}
+//	
+//	public boolean isRepoAddable(String repoName) {
+//		RepoMode mode = getRepoMode(repoName);
+//		return RepoMode.UPDATE.equals(mode) || RepoMode.ADD_ONLY.equals(mode);
+//	}
 	
-	public boolean isRepoAddable(String repoName) {
-		RepoMode mode = getRepoMode(repoName);
-		return RepoMode.UPDATE.equals(mode) || RepoMode.ADD_ONLY.equals(mode);
-	}
-	
-	public boolean isRepoTransparent(ClientQuery q)
-	{
-		return false;
-	}
-	public boolean isRepoTransparent(String repoName) {
-		RepoMode mode = getRepoMode(repoName);
-		return RepoMode.NO_CACHE_TRANSPARENT.equals(mode);
-	}
+//	public boolean isRepoTransparent(String repoName) {
+//		RepoMode mode = getRepoMode(repoName);
+//		return RepoMode.NO_CACHE_TRANSPARENT.equals(mode);
+//	}
 	
 	public HashMap<String, RepoMode> getRepoModes() {
 		return repoModes;

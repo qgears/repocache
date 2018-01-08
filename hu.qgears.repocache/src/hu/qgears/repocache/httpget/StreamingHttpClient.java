@@ -80,6 +80,11 @@ public class StreamingHttpClient {
 			{
 				UrlFixer.fixUrls(ret);
 			}
+			h=method.getResponseHeader("Content-Type");
+			if(h!=null)
+			{
+				ret.contentType=h.getValue();
+			}
 			return ret;
 		} finally {
 			get.close();

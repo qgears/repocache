@@ -6,6 +6,16 @@ abstract public class AbstractRepoPlugin {
 
 	abstract public String getPath();
 
-	abstract public QueryResponse getOnlineResponse(Path remove, ClientQuery q, QueryResponse cachedContent, boolean netAllowed) throws IOException;
+	/**
+	 * 
+	 * @param fullPath Full path in the storage repsitory
+	 * @param pluginLocalPath Local path within the plugin
+	 * @param q
+	 * @param cachedContent
+	 * @param netAllowed
+	 * @return
+	 * @throws IOException
+	 */
+	abstract public QueryResponse getOnlineResponse(Path fullPath, Path pluginLocalPath, ClientQuery q, QueryResponse cachedContent, boolean netAllowed) throws IOException;
 
 }

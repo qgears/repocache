@@ -58,4 +58,8 @@ public class QueryResponseByteArray extends QueryResponse
 	public void streamTo(OutputStream outputStream) throws IOException {
 		outputStream.write(responseBody);
 	}
+	@Override
+	public int getLength() {
+		return responseBody.length;
+	}
 }

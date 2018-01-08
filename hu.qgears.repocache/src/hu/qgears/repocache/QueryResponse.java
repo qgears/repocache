@@ -16,6 +16,8 @@ abstract public class QueryResponse implements AutoCloseable
 	public String url;
 	public boolean folder;
 	public File fileSystemFolder;
+	public String contentType;
+//	public String encoding;
 
 	public QueryResponse(String url) throws IOException {
 		this.url=url;
@@ -73,4 +75,9 @@ abstract public class QueryResponse implements AutoCloseable
 	abstract public void streamTo(OutputStream outputStream) throws FileNotFoundException, IOException;
 	@Override
 	abstract public void close();
+	/**
+	 * Get length in bytes.
+	 * @return
+	 */
+	abstract public int getLength();
 }

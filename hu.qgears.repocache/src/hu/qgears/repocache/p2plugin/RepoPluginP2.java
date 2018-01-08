@@ -69,7 +69,7 @@ public class RepoPluginP2 extends AbstractRepoPlugin
 	}
 	
 	@Override
-	public QueryResponse getOnlineResponse(Path localPath, ClientQuery q, QueryResponse cachedContent, boolean netAllowed) throws IOException {
+	public QueryResponse getOnlineResponse(Path fullPath, Path localPath, ClientQuery q, QueryResponse cachedContent, boolean netAllowed) throws IOException {
 		log.debug("Getting online response for path: " + localPath.toStringPath());
 		if(localPath.pieces.size()==0)
 		{

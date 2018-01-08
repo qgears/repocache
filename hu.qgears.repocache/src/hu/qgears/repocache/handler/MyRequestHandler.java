@@ -33,9 +33,9 @@ public abstract class MyRequestHandler extends AbstractHandler {
 				if(!q.path.folder && cachedContent.folder) {
 					redirectToFolder(q);
 				} else {
-					response.setContentType(q.getMimeType());
+					response.setContentType(q.getMimeType(cachedContent));
 					response.setStatus(HttpServletResponse.SC_OK);
-					response.setContentLength(cachedContent.getResponseAsBytes().length);
+					response.setContentLength(cachedContent.getLength());
 					baseRequest.setHandled(true);
 					cachedContent.streamTo(response.getOutputStream());
 					if(cachedContent.fileSystemFolder!=null) {
@@ -46,12 +46,12 @@ public abstract class MyRequestHandler extends AbstractHandler {
 				if (q.path.folder) {
 					QueryResponse qr = rc.loadDirFromCache(q.path);
 					if (qr != null) {
-						response.setContentType(q.getMimeType());
+						response.setContentType(q.getMimeType(cachedContent));
 						response.setStatus(HttpServletResponse.SC_OK);
 						baseRequest.setHandled(true);
 						QueryResponse r2=new RealFolderListing(q, qr).generate();
 						r2.streamTo(response.getOutputStream());
-						response.setContentLength(r2.getResponseAsBytes().length);
+						response.setContentLength(r2.getLength());
 					} else {
 						response.setStatus(HttpServletResponse.SC_NOT_FOUND);
 					}
@@ -63,9 +63,9 @@ public abstract class MyRequestHandler extends AbstractHandler {
 	}
 	
 	public QueryResponse getQueryResponse(ClientQuery q, boolean rw) throws IOException {
-		if(rc.getRepoModeHandler().isRepoTransparent(q))
+		if(rc.getAccessRules().isRepoTransparent(q))
 		{
-			log.trace("Getting response from transparent repo : " + q.path.pieces.get(1));
+			log.trace("Getting response from transparent repo : " + q.path.toStringPath());
 			QueryResponse qr=getResponseFromPlugin(q, null, true);
 			return qr;
 		}
@@ -100,20 +100,21 @@ public abstract class MyRequestHandler extends AbstractHandler {
 	}
 
 	private QueryResponse getResponseFromPlugin(ClientQuery q, QueryResponse cachedContent, boolean netAllowed) throws IOException {
+		Path path=rc.getConfiguration().doPathAlias(q.path);
 		try {
 			for(AbstractRepoPlugin plugin: rc.getPlugins())
 			{
-				if(q.path.eq(0, plugin.getPath()))
+				if(path.eq(0, plugin.getPath()))
 				{
-					return plugin.getOnlineResponse(new Path(q.path).remove(0), q, cachedContent, netAllowed);
+					return plugin.getOnlineResponse(path, new Path(path).remove(0), q, cachedContent, netAllowed);
 				}
 			}
-			if(q.path.pieces.size()==0)
+			if(path.pieces.size()==0)
 			{
 				return new StatusPage(q).generate();
 			}
 		} catch (Exception e) {
-			log.debug("Error fetching file: "+q.path + ", message: " + e.getMessage());
+			log.debug("Error fetching file: "+path + ", message: " + e.getMessage());
 		}
 		return cachedContent;
 	}

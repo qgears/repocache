@@ -41,7 +41,8 @@ public class HttpGet {
 
 	public QueryResponse ready(GetMethod method) throws URIException, IOException {
 		this.ready=true;
-		return new QueryResponseFile(method.getURI().toString(), tmpFile).setDeleteFileOnClose(true);
+		QueryResponseFile ret=new QueryResponseFile(method.getURI().toString(), tmpFile).setDeleteFileOnClose(true);
+		return ret;
 	}
 	public File getFile()
 	{

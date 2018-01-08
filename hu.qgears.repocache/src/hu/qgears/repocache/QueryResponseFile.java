@@ -66,4 +66,8 @@ public class QueryResponseFile extends QueryResponse{
 		this.deleteFileOnClose = deleteFileOnClose;
 		return this;
 	}
+	@Override
+	public int getLength() {
+		return (int)file.length();
+	}
 }
