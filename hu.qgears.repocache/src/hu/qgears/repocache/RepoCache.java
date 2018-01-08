@@ -115,9 +115,6 @@ public class RepoCache {
 		assertStatusClean();
 		DispatchByPortHandler dispatchHandler = new DispatchByPortHandler();
 		RepoHandler rh = new RepoHandler(this);
-		//plugins.add(new RepoPluginP2(this, rh));
-		//plugins.add(new RepoPluginHttp(this));
-		//plugins.add(new RepoPluginMaven(this));
 
 		Server server = new Server();
 		
