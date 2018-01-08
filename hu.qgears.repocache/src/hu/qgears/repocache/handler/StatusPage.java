@@ -14,7 +14,7 @@ public class StatusPage extends AbstractHTMLPage {
 	protected void writeHTMLBody() {
 		folder=true;
 		write("<h1>");
-		writeHtml(getQuery().rc.getAccessRules().getName());
+		writeHtml(getQuery().rc.getConfiguration().getName());
 		write("</h1>\n\n<a href=\"config2.html\">New configuration</a><br/>\n<a href=\"config\">Configuration</a><br/>\nContent:\n<br/>\n<ul>\n");
 		RepoPluginProxy plugin=getQuery().rc.plugin;
 		write("\t<li><a href=\"");
@@ -26,6 +26,6 @@ public class StatusPage extends AbstractHTMLPage {
 
 	@Override
 	protected String getTitleFragment() {
-		return getQuery().rc.getAccessRules().getName()+"";
+		return getQuery().rc.getConfiguration().getName()+"";
 	}
 }

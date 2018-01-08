@@ -18,8 +18,8 @@ import hu.qgears.repocache.ClientQuery;
 import hu.qgears.repocache.Path;
 import hu.qgears.repocache.p2plugin.ReplaceP2Plugin;
 
-public class AccessRules {
-	private static Log log=LogFactory.getLog(AccessRules.class);
+public class RepoConfiguration {
+	private static Log log=LogFactory.getLog(RepoConfiguration.class);
 	private File configFolder;
 	private String accessRules="#Empty access rules config";
 	private String clientAliasConfig="#Empty client alias config";
@@ -34,7 +34,7 @@ public class AccessRules {
 	private final String pathPluginsConfig="plugins.config";
 	private final String pathNameConfig="name.config";
 	private String name="Unconfigured repocache name";
-	public final UtilEvent<AccessRules> configChanged=new UtilEvent<>();
+	public final UtilEvent<RepoConfiguration> configChanged=new UtilEvent<>();
 	public class PluginDef
 	{
 		public String pluginId;
@@ -64,7 +64,7 @@ public class AccessRules {
 			return accessRules;
 		}
 	}
-	public AccessRules(File configFolder)
+	public RepoConfiguration(File configFolder)
 	{
 		this.configFolder=configFolder;
 		try {

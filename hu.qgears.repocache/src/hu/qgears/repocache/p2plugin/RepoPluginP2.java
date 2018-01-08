@@ -37,12 +37,13 @@ public class RepoPluginP2 extends AbstractRepoPlugin
 		return P2VersionFolderUtil.P2_PATH;
 	}
 	public Map<String, P2RepoConfig> getP2Repos() {
-		return new TreeMap<>(rc.getConfiguration().getP2repos());
+		return new TreeMap<>(//  TODO Ps repos feature is removed rc.getConfiguration().getP2repos()
+				);
 	}
 	
 	private P2RepoConfig getRepoConfig(String repoName) {
 		if (repoName == null) return null;
-		for (Map.Entry<String, P2RepoConfig> entry : rc.getConfiguration().getP2repos().entrySet()) {
+		for (Map.Entry<String, P2RepoConfig> entry : getP2Repos().entrySet()) {
 			if (repoName.equals(entry.getKey())) {
 				return entry.getValue();
 			}

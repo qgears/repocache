@@ -15,7 +15,6 @@ import hu.qgears.repocache.ClientQuery;
 import hu.qgears.repocache.Path;
 import hu.qgears.repocache.QueryResponse;
 import hu.qgears.repocache.RepoCache;
-import hu.qgears.repocache.config.ClientSetup;
 import hu.qgears.repocache.folderlisting.RealFolderListing;
 
 public abstract class MyRequestHandler extends AbstractHandler {
@@ -27,7 +26,7 @@ public abstract class MyRequestHandler extends AbstractHandler {
 	}
 
 	protected void handleQlientQuery (ClientQuery q, Request baseRequest, HttpServletResponse response, boolean rw) throws IOException, ServletException {
-		q.setPath(q.rc.getAccessRules().rewriteClientPath(q.getPath()));
+		q.setPath(q.rc.getConfiguration().rewriteClientPath(q.getPath()));
 		try(QueryResponse cachedContent=getQueryResponse(q, rw)) {
 			if(cachedContent!=null) {
 				if(!q.getPath().folder && cachedContent.folder) {
@@ -38,9 +37,9 @@ public abstract class MyRequestHandler extends AbstractHandler {
 					response.setContentLength(cachedContent.getLength());
 					baseRequest.setHandled(true);
 					cachedContent.streamTo(response.getOutputStream());
-					if(cachedContent.fileSystemFolder!=null) {
-						appendRealFolderListing(q, response, cachedContent);
-					}
+//					if(cachedContent.fileSystemFolder!=null) {
+//						appendRealFolderListing(q, response, cachedContent);
+//					}
 				}
 			} else {
 				if (q.getPath().folder) {
@@ -63,7 +62,7 @@ public abstract class MyRequestHandler extends AbstractHandler {
 	}
 	
 	public QueryResponse getQueryResponse(ClientQuery q, boolean rw) throws IOException {
-		if(rc.getAccessRules().isRepoTransparent(q))
+		if(rc.getConfiguration().isRepoTransparent(q))
 		{
 			log.trace("Getting response from transparent repo : " + q.getPathString());
 			QueryResponse qr=getResponseFromPlugin(q, null, true);
@@ -92,15 +91,12 @@ public abstract class MyRequestHandler extends AbstractHandler {
 	}
 
 	private void appendRealFolderListing(ClientQuery q, HttpServletResponse response, QueryResponse cachedContent) throws IOException {
-		ClientSetup client=rc.getConfiguration().getClientSetup(q.getClientIdentifier());
-		if (client.isShawRealFolderListing()) {
-			QueryResponse r2=new RealFolderListing(q, cachedContent).generate();
-			response.getOutputStream().write(r2.getResponseAsBytes());
-		}
+		QueryResponse r2=new RealFolderListing(q, cachedContent).generate();
+		response.getOutputStream().write(r2.getResponseAsBytes());
 	}
 
 	private QueryResponse getResponseFromPlugin(ClientQuery q, QueryResponse cachedContent, boolean netAllowed) throws IOException {
-		Path path=rc.getAccessRules().rewriteInternetPath(q.getPath());
+		Path path=rc.getConfiguration().rewriteInternetPath(q.getPath());
 		try {
 			AbstractRepoPlugin plugin=rc.getPlugin(path);
 			if(plugin!=null)

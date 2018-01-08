@@ -6,7 +6,7 @@ import hu.qgears.repocache.AbstractRepoPluginSubTree;
 import hu.qgears.repocache.ClientQuery;
 import hu.qgears.repocache.Path;
 import hu.qgears.repocache.QueryResponse;
-import hu.qgears.repocache.config.AccessRules.PluginDef;
+import hu.qgears.repocache.config.RepoConfiguration.PluginDef;
 
 public class ReplaceP2Plugin extends AbstractRepoPluginSubTree
 {

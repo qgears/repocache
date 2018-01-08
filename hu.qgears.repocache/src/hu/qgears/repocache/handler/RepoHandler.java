@@ -13,7 +13,6 @@ import org.eclipse.jetty.server.Request;
 import hu.qgears.repocache.ClientQueryHttp;
 import hu.qgears.repocache.Path;
 import hu.qgears.repocache.RepoCache;
-import hu.qgears.repocache.config.ConfigHandler;
 import hu.qgears.repocache.config.ConfigHandler2;
 import hu.qgears.repocache.folderlisting.CrawlExecutor;
 
@@ -33,9 +32,7 @@ public class RepoHandler extends MyRequestHandler {
 			log.debug("Handling request arrived, path info: " + baseRequest.getPathInfo());
 		}
 		Path path=q.getPath();
-		if(path.eq(0, "config")) {
-			new ConfigHandler().handle(q);
-		}else if(path.eq(0, "config2.html")) {
+		if(path.eq(0, "config2.html")) {
 				new ConfigHandler2(q).handle();
 		} else if(q.getParameter("crawl")!=null) {
 			new CrawlExecutor().handle(this, q);

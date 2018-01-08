@@ -1,6 +1,6 @@
 package hu.qgears.repocache;
 
-import hu.qgears.repocache.config.AccessRules.PluginDef;
+import hu.qgears.repocache.config.RepoConfiguration.PluginDef;
 
 /**
  * A plugin that can be applied on a subtree.

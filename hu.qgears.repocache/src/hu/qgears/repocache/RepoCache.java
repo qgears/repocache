@@ -24,10 +24,8 @@ import org.eclipse.jgit.errors.NoWorkTreeException;
 import org.eclipse.jgit.lib.Repository;
 
 import hu.qgears.commons.UtilFile;
-import hu.qgears.repocache.config.AccessRules;
-import hu.qgears.repocache.config.AccessRules.PluginDef;
-import hu.qgears.repocache.config.ReadConfig;
-import hu.qgears.repocache.config.RepoModeHandler;
+import hu.qgears.repocache.config.RepoConfiguration;
+import hu.qgears.repocache.config.RepoConfiguration.PluginDef;
 import hu.qgears.repocache.handler.MyRequestHandler;
 import hu.qgears.repocache.handler.ProxyRepoHandler;
 import hu.qgears.repocache.handler.RepoHandler;
@@ -46,13 +44,12 @@ public class RepoCache {
 	public static final String maintenancefilesprefix = "XXXRepoCache.";
 	private static Log log = LogFactory.getLog(RepoCache.class);
 	public RepoPluginProxy plugin;
-	private ReadConfig configuration;
-	private RepoModeHandler repoModeHandler;
 	private CommitTimer commitTimer;
 	private File worktree;
 	public final String repoVersion = "Repo Cache 1.0.0 by Q-Gears Kft.\n";
 	private String versionFilePath = "version.txt";
-	private AccessRules accessRules;
+	private RepoConfiguration configuration;
+	private CommandLineArgs args;
 
 	public static void main(String[] args) throws Exception {
 		CommandLineArgs clargs = new CommandLineArgs();
@@ -80,26 +77,21 @@ public class RepoCache {
 		// String parsedOptions=cl.optionsToString();
 		// log.info("Options:\n" + parsedOptions);
 		clargs.validate();
-		ReadConfig config = new ReadConfig(clargs);
-		RepoModeHandler repoModeH = new RepoModeHandler(clargs);
-		RepoCache rc = new RepoCache(config, repoModeH);
+		RepoCache rc = new RepoCache(clargs);
 		rc.start();
 		return 0;
 	}
 
-	public RepoCache(ReadConfig configuration, RepoModeHandler repoModeHandler) {
-		this.configuration = configuration;
-		this.repoModeHandler = repoModeHandler;
+	public RepoCache(CommandLineArgs args) {
+		this.args=args;
 	}
-
 	public void start() throws Exception {
-		CommandLineArgs args = getConfiguration().getCommandLine();
-		accessRules=new AccessRules(args.configFolder);
+		configuration=new RepoConfiguration(args.configFolder);
 		// register Message as shutdown hook
 		Runtime.getRuntime().addShutdownHook(new RepoShutdown());
 
 		commitTimer = new CommitTimer(this);
-		File wc = configuration.getLocalGitRepo();
+		File wc = args.repo;
 		new P2VersionFolderUtil(wc.getAbsolutePath());
 		if (!wc.exists()) {
 			wc.mkdirs();
@@ -344,15 +336,15 @@ public class RepoCache {
 	 *         update.
 	 */
 	public boolean updateRequired(ClientQuery q, QueryResponse cachedContent, boolean updaterProxyPort) {
-		if (configuration.getCommandLine().localOnly) {
+		if (args.localOnly) {
 			return false;
 		}
 
 		boolean updRequired = true;
 		if (cachedContent != null) {
-			updRequired = getAccessRules().isRepoUpdatable(q);
+			updRequired = getConfiguration().isRepoUpdatable(q);
 		} else {
-			updRequired = getAccessRules().isRepoAddable(q);
+			updRequired = getConfiguration().isRepoAddable(q);
 		}
 
 		// Update req enabled by client
@@ -367,14 +359,6 @@ public class RepoCache {
 		return updRequired;
 	}
 
-	public ReadConfig getConfiguration() {
-		return configuration;
-	}
-
-	public RepoModeHandler getRepoModeHandler() {
-		return repoModeHandler;
-	}
-
 	public CommitTimer getCommitTimer() {
 		return commitTimer;
 	}
@@ -382,7 +366,7 @@ public class RepoCache {
 	private AtomicInteger ctr = new AtomicInteger(0);
 
 	public File createTmpFile(Path path) {
-		return new File(configuration.getCommandLine().downloadsFolder, "" + ctr.incrementAndGet());
+		return new File(args.downloadsFolder, "" + ctr.incrementAndGet());
 	}
 
 	/**
@@ -402,12 +386,12 @@ public class RepoCache {
 			}
 		}
 	}
-	public AccessRules getAccessRules() {
-		return accessRules;
+	public RepoConfiguration getConfiguration() {
+		return configuration;
 	}
 
 	public AbstractRepoPlugin getPlugin(Path path) {
-		PluginDef pd=getAccessRules().getPluginDef(path);
+		PluginDef pd=getConfiguration().getPluginDef(path);
 		if(pd!=null)
 		{
 			return pd.plugin;

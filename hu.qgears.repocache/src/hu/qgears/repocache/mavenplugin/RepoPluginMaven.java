@@ -14,6 +14,9 @@ import hu.qgears.repocache.QueryResponse;
 import hu.qgears.repocache.RepoCache;
 import hu.qgears.repocache.httpget.HttpGet;
 
+/**
+ * TODO maven repos are removed as a feature.
+ */
 public class RepoPluginMaven extends AbstractRepoPlugin
 {
 	private Log log=LogFactory.getLog(getClass());
@@ -26,7 +29,8 @@ public class RepoPluginMaven extends AbstractRepoPlugin
 		return "maven";
 	}
 	public Map<String, String> getMavenRepos() {
-		return new TreeMap<>(rc.getConfiguration().getMvnrepos());
+		return new TreeMap<>(// TODO rc.getConfiguration().getMvnrepos()
+				);
 	}
 	@Override
 	public QueryResponse getOnlineResponse(Path fullPath, Path localPath, ClientQuery q, QueryResponse cachedContent, boolean netAllowed) throws IOException {
@@ -34,7 +38,7 @@ public class RepoPluginMaven extends AbstractRepoPlugin
 		{
 			return new MavenListing(q, this).generate();
 		}
-		for (Map.Entry<String, String> entry : rc.getConfiguration().getMvnrepos().entrySet()) {
+		for (Map.Entry<String, String> entry : getMavenRepos().entrySet()) {
 			if (localPath.pieces.get(0).equals(entry.getKey())) {
 				Path ref = new Path(localPath).remove(0);
 				String httpPath = entry.getValue() + ref.toStringPath();
