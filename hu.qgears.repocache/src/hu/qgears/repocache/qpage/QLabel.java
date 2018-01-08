@@ -5,7 +5,6 @@ import java.io.IOException;
 import hu.qgears.commons.UtilEventListener;
 import hu.qgears.commons.UtilListenableProperty;
 import hu.qgears.repocache.utils.InMemoryPost;
-import hu.qgears.rtemplate.runtime.RAbstractTemplatePart;
 
 public class QLabel extends QComponent
 {
@@ -21,7 +20,7 @@ public class QLabel extends QComponent
 		});
 	}
 
-	public static void generateHeader(RAbstractTemplatePart parent)
+	public static void generateHeader(HtmlTemplate parent)
 	{
 		new HtmlTemplate(parent){
 
@@ -32,7 +31,7 @@ public class QLabel extends QComponent
 		}.generate();
 	}
 
-	public void generateExampleHtmlObject(RAbstractTemplatePart parent) {
+	public void generateExampleHtmlObject(HtmlTemplate parent) {
 		new HtmlTemplate(parent){
 
 			public void generate() {
@@ -44,12 +43,12 @@ public class QLabel extends QComponent
 		}.generate();		
 	}
 
-	public void handle(RAbstractTemplatePart parent, InMemoryPost post) throws IOException {
+	public void handle(HtmlTemplate parent, InMemoryPost post) throws IOException {
 		text.setProperty(post.getParameter("text"));
 	}
 
 	@Override
-	public void init(RAbstractTemplatePart parent) {
+	public void init(HtmlTemplate parent) {
 		new HtmlTemplate(parent)
 		{
 

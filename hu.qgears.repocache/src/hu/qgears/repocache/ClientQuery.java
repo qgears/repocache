@@ -10,10 +10,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.eclipse.jgit.util.StringUtils;
 
-import hu.qgears.rtemplate.runtime.ICodeGeneratorContext;
-import hu.qgears.rtemplate.runtime.TemplateTracker;
-
-abstract public class ClientQuery implements ICodeGeneratorContext
+abstract public class ClientQuery
 {
 	private static Log log=LogFactory.getLog(ClientQuery.class);
 	public final RepoCache rc;
@@ -23,19 +20,6 @@ abstract public class ClientQuery implements ICodeGeneratorContext
 		super();
 		this.rc = rc;
 		this.path=path;
-	}
-
-	@Override
-	public boolean needReport() {
-		return false;
-	}
-
-	@Override
-	public void createFile(String path, String o) {
-	}
-
-	@Override
-	public void createReport(String path, String o, TemplateTracker tt) {
 	}
 
 	abstract public String getClientIdentifier();

@@ -3,7 +3,6 @@ package hu.qgears.repocache.qpage;
 import java.io.IOException;
 
 import hu.qgears.repocache.utils.InMemoryPost;
-import hu.qgears.rtemplate.runtime.RAbstractTemplatePart;
 
 public abstract class QComponent {
 
@@ -18,11 +17,11 @@ public abstract class QComponent {
 		page.add(this);
 	}
 
-	abstract public void generateExampleHtmlObject(RAbstractTemplatePart parent);
+	abstract public void generateExampleHtmlObject(HtmlTemplate parent);
 
-	abstract public void init(RAbstractTemplatePart parent);
+	abstract public void init(HtmlTemplate parent);
 
-	abstract public void handle(RAbstractTemplatePart parent, InMemoryPost post) throws IOException;
+	abstract public void handle(HtmlTemplate parent, InMemoryPost post) throws IOException;
 
 	final public String getId() {
 		return id;

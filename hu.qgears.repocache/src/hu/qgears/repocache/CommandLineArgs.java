@@ -13,6 +13,8 @@ public class CommandLineArgs implements IArgs
 {
 	private byte[] configOverride;
 	private byte[] repoModeConfigOverride;
+	@JOHelp("Name of the Repo Cace. This name is shown in the admin web pages as title.")
+	public String name="Unconfigured Repo Cache";
 	@JOHelp("Folder that contains the cached git repository. If not exists then it is created.")
 	public File repo;
 	@JOHelp("Configuration xml file.")

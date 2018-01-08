@@ -1,6 +1,7 @@
 package hu.qgears.repocache.qpage.example;
 
 import java.io.IOException;
+import java.io.StringWriter;
 import java.nio.charset.StandardCharsets;
 
 import javax.servlet.ServletException;
@@ -17,8 +18,6 @@ import org.eclipse.jetty.server.session.HashSessionManager;
 import org.eclipse.jetty.server.session.SessionHandler;
 
 import hu.qgears.commons.UtilEventListener;
-import hu.qgears.commons.UtilListenableProperty;
-import hu.qgears.repocache.ClientQueryHttp;
 import hu.qgears.repocache.qpage.HtmlTemplate;
 import hu.qgears.repocache.qpage.QButton;
 import hu.qgears.repocache.qpage.QLabel;
@@ -26,11 +25,8 @@ import hu.qgears.repocache.qpage.QPage;
 import hu.qgears.repocache.qpage.QPageManager;
 import hu.qgears.repocache.qpage.QTextEditor;
 import hu.qgears.repocache.utils.InMemoryPost;
-import hu.qgears.rtemplate.runtime.ICodeGeneratorContext;
-import hu.qgears.rtemplate.runtime.RAbstractTemplatePart;
-import hu.qgears.rtemplate.runtime.TemplateTracker;
 
-public class QExample extends AbstractHandler implements ICodeGeneratorContext
+public class QExample extends AbstractHandler
 {
 	public static void main(String[] args) throws Exception {
 		Server server = new Server(8080);
@@ -61,7 +57,7 @@ public class QExample extends AbstractHandler implements ICodeGeneratorContext
 		final QPageManager qpm=QPageManager.getManager(sess);
 		final QPage page0=qpm.getPage(baseRequest);
 		try {
-			new HtmlTemplate(this){
+			new HtmlTemplate(new StringWriter()){
 				QPage page;
 				public void dogenerate() throws Exception {
 					if(page0!=null)
@@ -101,10 +97,9 @@ public class QExample extends AbstractHandler implements ICodeGeneratorContext
 
 				public void generate() throws Exception {
 					dogenerate();
-					getTemplateState().flush();
 					baseRequest.setHandled(true);
 					response.setContentType("text/html; charset=utf-8"); 
-					response.getOutputStream().write(getTemplateState().getOut().toString().getBytes(StandardCharsets.UTF_8));
+					response.getOutputStream().write(out.toString().getBytes(StandardCharsets.UTF_8));
 				}
 
 				private void generateHtmlContent() {
@@ -118,18 +113,5 @@ public class QExample extends AbstractHandler implements ICodeGeneratorContext
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-	}
-
-	@Override
-	public boolean needReport() {
-		return false;
-	}
-
-	@Override
-	public void createFile(String path, String o) {
-	}
-
-	@Override
-	public void createReport(String path, String o, TemplateTracker tt) {
 	}
 }

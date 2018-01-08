@@ -1,25 +1,27 @@
 package hu.qgears.repocache;
 
 import java.io.IOException;
+import java.io.StringWriter;
 import java.nio.charset.StandardCharsets;
 
-import hu.qgears.rtemplate.runtime.RAbstractTemplatePart;
+import hu.qgears.repocache.qpage.HtmlTemplate;
 
-abstract public class AbstractPage extends RAbstractTemplatePart
+abstract public class AbstractPage extends HtmlTemplate
 {
 	protected boolean folder;
+	private ClientQuery query;
 	public AbstractPage(ClientQuery query)
 	{
-		super(query);
+		super(new StringWriter());
+		this.query=query;
 	}
 	public ClientQuery getQuery()
 	{
-		return (ClientQuery) getCodeGeneratorContext();
+		return query;
 	}
 	public QueryResponse generate() throws IOException {
 		doGenerate();
-		finishDeferredParts();
-		return new QueryResponseByteArray("", getTemplateState().getOut().toString().getBytes(
+		return new QueryResponseByteArray("", out.toString().getBytes(
 				StandardCharsets.UTF_8), folder);
 	}
 	
@@ -28,14 +30,6 @@ abstract public class AbstractPage extends RAbstractTemplatePart
 	 */
 	abstract protected void doGenerate() throws IOException;
 	
-	protected void writeHtml(String value) {
-		writeObject(value);
-	}
-
-	protected void writeValue(String key) {
-		writeObject(key);
-		
-	}
 	protected void printParameters() {
 		for(String s: getQuery().getParameterNames())
 		{

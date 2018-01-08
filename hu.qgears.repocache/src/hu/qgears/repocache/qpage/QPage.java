@@ -8,7 +8,6 @@ import java.util.TimerTask;
 import java.util.concurrent.TimeoutException;
 
 import hu.qgears.repocache.utils.InMemoryPost;
-import hu.qgears.rtemplate.runtime.RAbstractTemplatePart;
 
 /**
  * @author rizsi
@@ -22,13 +21,13 @@ public class QPage implements Closeable {
 	private Object syncObject = new Object();
 	private int currentMessageIndex = 0;
 	private int serverstateindex = 0;
-	private RAbstractTemplatePart currentTemplate;
+	private HtmlTemplate currentTemplate;
 	public boolean inited;
 	private static long TIMEOUT_DISPOSE=30000;
 	
 	class MessageFramingTemplate extends HtmlTemplate {
 
-		public MessageFramingTemplate(RAbstractTemplatePart parent) {
+		public MessageFramingTemplate(HtmlTemplate parent) {
 			super(parent);
 		}
 
@@ -46,11 +45,11 @@ public class QPage implements Closeable {
 	}
 
 	class Message {
-		RAbstractTemplatePart parent;
+		HtmlTemplate parent;
 		InMemoryPost post;
 		int index;
 
-		public Message(RAbstractTemplatePart parent, InMemoryPost post) throws NumberFormatException, IOException {
+		public Message(HtmlTemplate parent, InMemoryPost post) throws NumberFormatException, IOException {
 			super();
 			this.parent = parent;
 			this.post = post;
@@ -105,7 +104,7 @@ public class QPage implements Closeable {
 		QPageManager.disposeTimer.schedule(disposeTimer, TIMEOUT_DISPOSE);
 	}
 
-	public void writeHeaders(final RAbstractTemplatePart parent) {
+	public void writeHeaders(final HtmlTemplate parent) {
 		new HtmlTemplate(parent) {
 			public void generate() {
 				write("<script language=\"javascript\" type=\"text/javascript\">\n\nclass QPage\n{\n\tconstructor()\n\t{\n\t\tthis.messageindex=0;\n\t\tthis.serverstateindex=0;\n\t\tthis.waitingMessages={};\n\t\tthis.components={};\n\t}\n\tprocessServerMessage(serverstate, message)\n\t{\n\t\tif(serverstate==this.serverstateindex)\n\t\t{\n\t\t\tmessage(this);\n\t\t\tthis.serverstateindex++;\n\t\t\twhile(this.waitingMessages[this.serverstateindex])\n\t\t\t{\n\t\t\t\tthis.waitingMessages[this.serverstateindex](this);\n\t\t\t\tdelete this.waitingMessages[this.serverstateindex];\n\t\t\t\tthis.serverstateindex++;\n\t\t\t}\n\t\t}else\n\t\t{\n\t\t\tthis.waitingMessages[serverstate, message];\n\t\t}\n\t}\n\tstart()\n\t{\n\t\tthis.query();\n\t}\n\tquery()\n\t{\n\t\tvar xhr = new XMLHttpRequest();\n\t\txhr.qpage=this;\n\t\txhr.responseType = \"text\";\n\t\txhr.onreadystatechange = function() {\n\t\t\tif (this.readyState == 4 && this.status == 200) {\n\t\t\t\tvar page=this.qpage;\n\t\t\t\teval(this.responseText);\n\t\t\t}\n\t\t}.bind(xhr);\n\t\tvar FD = new FormData();\n\t\tFD.append(\"QPage\", \"");
@@ -130,7 +129,7 @@ public class QPage implements Closeable {
 		QLabel.generateHeader(parent);
 	}
 
-	public boolean handle(RAbstractTemplatePart parent, InMemoryPost post) throws IOException {
+	public boolean handle(HtmlTemplate parent, InMemoryPost post) throws IOException {
 		if (identifier.equals(post.getParameter("QPage"))) {
 			if ("true".equals(post.getParameter("periodic"))) {
 				handlePeriodicQuery(parent);
@@ -152,14 +151,14 @@ public class QPage implements Closeable {
 		}
 	}
 
-	private void handlePeriodicQuery(RAbstractTemplatePart parent) {
+	private void handlePeriodicQuery(HtmlTemplate parent) {
 		try {
 			Thread.sleep(6000);
 		} catch (InterruptedException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		new RAbstractTemplatePart(parent) {
+		new HtmlTemplate(parent) {
 			public void generate() {
 				write("console.info(\"Hello QPage reply! \"+page);\n");
 				if (active) {
@@ -178,7 +177,7 @@ public class QPage implements Closeable {
 		components.put(qTextEditor.getId(), qTextEditor);
 	}
 
-	public RAbstractTemplatePart getCurrentTemplate() {
+	public HtmlTemplate getCurrentTemplate() {
 		return currentTemplate;
 	}
 
