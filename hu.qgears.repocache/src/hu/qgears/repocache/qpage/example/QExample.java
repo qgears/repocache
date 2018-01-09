@@ -74,7 +74,7 @@ public class QExample extends AbstractHandler
 					{
 						page=new QPage(qpm);
 						final QTextEditor accessRules=new QTextEditor(page, "texted");
-						accessRules.text.setPropertyFromServer("access rules current value");
+						accessRules.text.setPropertyFromServer("Example text to edit");
 						QButton buttonAccess=new QButton(page, "submit");
 						buttonAccess.clicked.addListener(new UtilEventListener<QButton>() {
 							@Override
@@ -90,7 +90,7 @@ public class QExample extends AbstractHandler
 						});
 						
 						final QLabel counter=new QLabel(page, "counter");
-						new Thread()
+						new Thread("QExample Counter")
 						{
 							public void run() {
 								while(!page.disposedEvent.isDone())
