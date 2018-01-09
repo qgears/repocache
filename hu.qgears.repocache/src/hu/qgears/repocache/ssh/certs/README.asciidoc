@@ -1,0 +1,18 @@
+= Dynamic certification creation scripts for https MITM
+
+This folder contains the scripts that generate certificates dynamically.
+
+The server copies these scripts into the certs folder and calls them to generate certificates.
+
+== Creating root certificate and private key
+
+----
+$ ./rootcerts.sh
+----
+
+== Creating certificate for a server name
+
+----
+$ ./dynamiccert.sh example.com
+----
+
