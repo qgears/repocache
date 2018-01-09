@@ -318,14 +318,14 @@ public class RepoCache {
 	 * @throws IOException
 	 * @throws GitAPIException
 	 */
-	public void updateResponse(Path path, QueryResponse cachedContent, QueryResponse qr)
+	public void updateResponse(ClientQuery q, Path path, QueryResponse cachedContent, QueryResponse qr)
 			throws NoFilepatternException, IOException, GitAPIException {
 		synchronized (this) {
 			if (qr != null && !(qr.equals(cachedContent))) {
 				updateFile(path, qr);
-				accessLog.pathUpdated(path);
+				accessLog.pathUpdated(q);
 			} else {
-				accessLog.pathDidNotChange(path);
+				accessLog.pathDidNotChange(q);
 				log.debug("Path did not change: " + path.toStringPath());
 			}
 		}

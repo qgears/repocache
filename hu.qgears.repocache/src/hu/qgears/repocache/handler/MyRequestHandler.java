@@ -87,7 +87,7 @@ public abstract class MyRequestHandler extends AbstractHandler {
 			try
 			{
 				try {
-					rc.updateResponse(q.getPath(), cachedContent, qr);
+					rc.updateResponse(q, q.getPath(), cachedContent, qr);
 				} catch (Exception e) {
 					throw new IOException(e);
 				}

@@ -1,7 +1,6 @@
 package hu.qgears.repocache.log;
 
 import hu.qgears.repocache.ClientQuery;
-import hu.qgears.repocache.Path;
 
 public class AccessLog {
 	public final LogEventList didNotChange=new LogEventList();
@@ -12,29 +11,40 @@ public class AccessLog {
 	public final LogEventList missingCache=new LogEventList();
 	
 	
-	public void pathDidNotChange(Path path) {
-		add(didNotChange, path.toStringPath());
+	public void pathDidNotChange(ClientQuery q) {
+		add(didNotChange, path(q));
 	}
 
 
-	public void pathUpdated(Path path) {
-		add(updated, path.toStringPath());
+	public void pathUpdated(ClientQuery q) {
+		add(updated, path(q));
 	}
 
 	public void localOnly(ClientQuery q) {
-		add(localOnly, q.getPath().toStringPath());
+		add(localOnly, path(q));
 	}
 
+	private String path(ClientQuery q) {
+		String s=q.getPathString();
+		String orig=q.getOriginalPath().toStringPath();
+		if(!orig.equals(s))
+		{
+			return s+" (rewrite from: "+orig+")";
+		}
+		return s;
+	}
+
+
 	public void errorDownloading(ClientQuery q) {
-		add(errorDownload, q.getPathString());
+		add(errorDownload, path(q));
 	}
 
 	public void fromCache(ClientQuery q) {
-		add(fromCache, q.getPathString());
+		add(fromCache, path(q));
 	}
 
 	public void missingCache(ClientQuery q) {
-		add(missingCache, q.getPathString());
+		add(missingCache, path(q));
 	}
 
 

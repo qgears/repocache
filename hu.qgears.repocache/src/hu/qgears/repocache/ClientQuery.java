@@ -65,4 +65,7 @@ abstract public class ClientQuery
 	public void setPath(Path rewriteClientPath) {
 		this.path=rewriteClientPath;
 	}
+	public Path getOriginalPath() {
+		return originalPath;
+	}
 }
