@@ -56,7 +56,28 @@ Crawling can be started using the crawl link on the bottom part of the listing.
 
 === Modes of operation by server and resource path
 
-Possible to set up the server to refresh some resources while keeping others read-only. It is useful when only a set of repositories are to be refreshed.
+Possible to set up the server to refresh some resources while keeping others read-only. It is useful when only a set of repositories 
+are to be refreshed.
 
+=== Configuration folder layout
 
- 
+----
+path/to/config/
+               certs/ - cert creation scripts
+               certs/public/ - certificates
+               certs/keys/ - private keys and additional data for certificates
+               access.config - access mode configuration
+               client-alias.config - client side aliasing
+               plugins.config - plugins configuration
+----
+
+=== HTTPS proxy
+
+* Use the configuration page of the repo cache management web page to generate root certificate
+* download the certificate from the configuration page
+* install the certificate into the https clients
+* set up the client to use the https proxy
+
+==== Dynamic certificate creation scripts
+
+https://github.com/qgears/repocache/tree/master/hu.qgears.repocache/src/hu/qgears/repocache/ssh/certs
