@@ -284,6 +284,7 @@ public class RepoConfiguration {
 					String newP=alias.getB()+p.substring(alias.getA().length());
 					log.info(name+" alias rewrite: "+p+"->"+newP);
 					p=newP;
+					changed=true;
 				}
 			}
 		}
