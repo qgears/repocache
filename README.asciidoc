@@ -2,7 +2,9 @@
 
 [red] *This project is not ready yet! Please don't use for real!*
 
-http, p2 and Maven repository cache implementation.
+Http and https cache proxy implementation with a goal to make work with online refreshed tools reproducible.
+
+Can be used to proxy installers, maven and p2 repositories. Amd maybe many others.
 
 == Goal
 
@@ -10,13 +12,15 @@ To create a local repository cache of various repositories that are used when in
 
  * Speed up download time and reduce bandwith - using the cache which is on the same computer or in the same office.
  * Make it possible to work offline with tools that are designed online only.
- * Make past builds reproducible even if the Internet has forgot some of the old packaged. For projects where binary reproducibility is a requirement.
+ * Make past builds reproducible even if the Internet has forgot some of the old packages. For projects where binary reproducibility is a requirement.
 
 == Implementation details
 
-=== Not transparent cache
+=== Semi transparent http and https proxy
 
-All programs have to be directed to use this cache instead of its original repository URLs. Examples: eclipse installer, Maven, etc.
+All programs have to be set up to use the proxy server when accessing http and https. The repocache server returns the resources from the cache (which are updated if configured so).
+
+In order to use the https proxy feature the fake root CA certificate of the repo cache has to be installed onto the client because the proxy itself is a MITM.
 
 === GIT backend
 
@@ -27,7 +31,7 @@ All files accessed through the cache are first stored in a git repository then s
 
 === Files are just plain files within the git repo
 
-The resulted git repo can be used as a repository backend even using a simple HTTP server or using "file:" protocol. After downloading all the dependencies the repocache server is not required to be used (but it is possible).
+The resulted git repo is just the accessed content from the web in folders representing the servers and paths.
 
 === Merge feature
 
@@ -50,30 +54,9 @@ Automatic crawling of subtree (and thus caching all in the subtree) is implement
 
 Crawling can be started using the crawl link on the bottom part of the listing.
 
-=== Modes of operation by client IP
+=== Modes of operation by server and resource path
 
-Possible to set on /config page and simple HTTP GET commands:
+Possible to set up the server to refresh some resources while keeping others read-only. It is useful when only a set of repositories are to be refreshed.
 
- * READ_ONLY mode: read from cache only, do not use any remote servers
- * UPDATER mode: all queries initiate a remote server query and setting for the given repo is applied
-
-
- * timed mode: use the selected mode until the timeout then go back to default mode.
-
- * Shawing real folder listing can be enabled/disabled.
-
-=== Repo modes
- 
-Possible to set using repo modes, such as the followings:
- 
- * READ_ONLY mode: read from cache only, do not use any remote servers
- * UPDATE mode: all queries initiate a remote server query and cache is updated if remote source has changed
- * ADD_ONLY mode: non-exisiting files are queried from remote and added to cache on demand.
- * NO_CACHE_TRANSPARENT proxy mode: turn on this mode and you can download all packages available, even ones that are not available in the repo. (Use it to dry-run installing new features. After validating the install it is possible to turn on "update" or "add" mode which installs all files into cache.)
- * missingFilesTransparentDownload mode: use cache when available but download when not available. Downloaded file is not saved to cache.
-
- === Repocache as proxy server
- 
- Repocache can act as a proxy server if command line arg proxyPort is defined. In case of proxy mode two other ports are opened, the given default proxyPort is READONLY and a second UPDATE mode port (READONLY port + 1) - same as modes of operation by client IP. All response for incoming requests to the proxy server are cached to the same git repository.
 
  
