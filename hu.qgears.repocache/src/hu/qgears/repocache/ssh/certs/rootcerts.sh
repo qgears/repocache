@@ -4,6 +4,7 @@ PUBLICFOLDER=public
 FNAME=repocache.qgears.com
 FILE=$FOLDER/$FNAME
 mkdir -p $FOLDER
+mkdir -p $PUBLICFOLDER
 
 # Generate private key
 echo genrsa

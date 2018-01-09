@@ -10,7 +10,6 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.eclipse.jetty.server.Request;
-import org.eclipse.jetty.server.handler.ContextHandler;
 import org.eclipse.jetty.server.handler.ResourceHandler;
 import org.eclipse.jetty.util.resource.Resource;
 
@@ -30,7 +29,7 @@ public class RepoHandler extends MyRequestHandler {
 
 		certsHandler = new ResourceHandler();
 		certsHandler.setResourceBase("/certs/");
-		certsHandler.setBaseResource(Resource.newResource(new File(rc.getArgs().certsFolder, "public")));
+		certsHandler.setBaseResource(Resource.newResource(new File(rc.getArgs().getCertsFolder(), "public")));
 		certsHandler.setDirectoriesListed(true);
 
 	}

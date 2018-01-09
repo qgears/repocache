@@ -24,8 +24,6 @@ public class CommandLineArgs implements IArgs
 	public boolean localOnly;
 	@JOHelp("Downloads folder. Should be on the same physical device as the repo so files can be moved into repo by cheap move command.")
 	public File downloadsFolder;
-	@JOHelp("Fake Certificates folder used to Man In The Middle https queries.")
-	public File certsFolder;
 	@JOHelp("Configure log4j to log to console.")
 	@JOSimpleBoolean
 	public boolean log4jToConsole;
@@ -74,12 +72,11 @@ public class CommandLineArgs implements IArgs
 	{
 		if(dynamicCertSupplier==null)
 		{
-			if(certsFolder==null)
-			{
-				throw new RuntimeException("certsFolder is not specified");
-			}
-			dynamicCertSupplier=new SSLDynamicCert(certsFolder);
+			dynamicCertSupplier=new SSLDynamicCert(getCertsFolder());
 		}
 		return dynamicCertSupplier;
+	}
+	public File getCertsFolder() {
+		return new File(configFolder, "certs");
 	}
 }
