@@ -1,17 +1,19 @@
 package hu.qgears.repocache.qpage;
 
 import java.io.IOException;
+import java.io.Writer;
 
 import hu.qgears.repocache.utils.InMemoryPost;
 
-public abstract class QComponent {
+public abstract class QComponent extends HtmlTemplate
+{
 
 	protected QPage page;
 	protected String id;
 	
 
 	public QComponent(QPage page, String id) {
-		super();
+		super((Writer) null);
 		this.page = page;
 		this.id = id;
 		page.add(this);

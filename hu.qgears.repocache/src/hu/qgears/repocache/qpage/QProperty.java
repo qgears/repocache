@@ -6,6 +6,13 @@ public class QProperty<T>
 {
 	protected T property;
 
+	public QProperty() {
+		super();
+	}
+	public QProperty(T property) {
+		super();
+		this.property = property;
+	}
 	public T getProperty() {
 		return property;
 	}

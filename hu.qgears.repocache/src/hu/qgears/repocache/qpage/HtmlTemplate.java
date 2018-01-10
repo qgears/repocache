@@ -44,5 +44,11 @@ public class HtmlTemplate {
 			throw new RuntimeException(e);
 		}
 	}
+	public Writer getWriter() {
+		return out;
+	}
+	public void setWriter(Writer out) {
+		this.out = out;
+	}
 
 }
