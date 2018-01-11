@@ -4,7 +4,7 @@ import java.io.IOException;
 import java.io.StringWriter;
 import java.nio.charset.StandardCharsets;
 
-import hu.qgears.repocache.qpage.HtmlTemplate;
+import hu.qgears.quickjs.qpage.HtmlTemplate;
 
 abstract public class AbstractPage extends HtmlTemplate
 {

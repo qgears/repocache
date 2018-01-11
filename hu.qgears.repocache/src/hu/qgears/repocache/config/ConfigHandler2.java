@@ -7,14 +7,14 @@ import hu.qgears.commons.EscapeString;
 import hu.qgears.commons.UtilEventListener;
 import hu.qgears.commons.signal.SignalFuture;
 import hu.qgears.commons.signal.Slot;
+import hu.qgears.quickjs.qpage.QButton;
+import hu.qgears.quickjs.qpage.QLabel;
+import hu.qgears.quickjs.qpage.QPage;
+import hu.qgears.quickjs.qpage.QTextEditor;
 import hu.qgears.repocache.AbstractQPage;
 import hu.qgears.repocache.ClientQuery;
 import hu.qgears.repocache.CommandLineArgs;
 import hu.qgears.repocache.CommitTimer;
-import hu.qgears.repocache.qpage.QButton;
-import hu.qgears.repocache.qpage.QLabel;
-import hu.qgears.repocache.qpage.QPage;
-import hu.qgears.repocache.qpage.QTextEditor;
 import hu.qgears.repocache.ssh.InitCertsFolder;
 
 public class ConfigHandler2 extends AbstractQPage

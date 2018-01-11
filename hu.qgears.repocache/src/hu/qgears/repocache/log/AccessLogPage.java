@@ -3,10 +3,10 @@ package hu.qgears.repocache.log;
 import hu.qgears.commons.UtilEventListener;
 import hu.qgears.commons.signal.SignalFuture;
 import hu.qgears.commons.signal.Slot;
+import hu.qgears.quickjs.qpage.QLabel;
+import hu.qgears.quickjs.qpage.QPage;
 import hu.qgears.repocache.AbstractQPage;
 import hu.qgears.repocache.ClientQuery;
-import hu.qgears.repocache.qpage.QLabel;
-import hu.qgears.repocache.qpage.QPage;
 
 public class AccessLogPage extends AbstractQPage
 {

@@ -11,7 +11,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.eclipse.jetty.server.Request;
 
-import hu.qgears.repocache.utils.InMemoryPost;
+import hu.qgears.quickjs.utils.InMemoryPost;
 
 public class ClientQueryHttp extends ClientQuery
 {

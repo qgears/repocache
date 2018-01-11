@@ -4,8 +4,9 @@ import java.io.IOException;
 
 import javax.servlet.http.HttpSession;
 
-import hu.qgears.repocache.qpage.QPage;
-import hu.qgears.repocache.qpage.QPageManager;
+import hu.qgears.quickjs.qpage.QPage;
+import hu.qgears.quickjs.qpage.QPageManager;
+import hu.qgears.quickjs.utils.HttpSessionQPageManager;
 
 abstract public class AbstractQPage extends AbstractHTMLPage
 {
@@ -25,8 +26,8 @@ abstract public class AbstractQPage extends AbstractHTMLPage
 	@Override
 	protected void doGenerate() throws IOException {
  		HttpSession sess=getHttpQuery().baseRequest.getSession();
-		QPageManager qpm=QPageManager.getManager(sess);
-		page=qpm.getPage(getHttpQuery().baseRequest);
+		QPageManager qpm=HttpSessionQPageManager.getManager(sess);
+		page=qpm.getPage(getHttpQuery().baseRequest.getParameter(QPage.class.getSimpleName()));
 		if(page!=null)
 		{
 			page.handle(this, getHttpQuery().getInMemoryPost());
