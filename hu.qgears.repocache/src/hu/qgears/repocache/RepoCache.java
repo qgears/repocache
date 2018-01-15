@@ -37,7 +37,6 @@ import hu.qgears.repocache.https.DecodedClientHandlerToProxy;
 import hu.qgears.repocache.https.DynamicSSLProxyConnector;
 import hu.qgears.repocache.https.HttpsProxyLifecycle;
 import hu.qgears.repocache.log.AccessLog;
-import hu.qgears.repocache.p2plugin.P2VersionFolderUtil;
 import joptsimple.annot.AnnotatedClass;
 
 public class RepoCache {
@@ -101,7 +100,6 @@ public class RepoCache {
 
 		commitTimer = new CommitTimer(this);
 		File wc = args.repo;
-		new P2VersionFolderUtil(wc.getAbsolutePath());
 		if (!wc.exists()) {
 			wc.mkdirs();
 			try (Git git = Git.init().setDirectory(wc).call()) {
