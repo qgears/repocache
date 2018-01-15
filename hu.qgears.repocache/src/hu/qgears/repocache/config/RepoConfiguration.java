@@ -91,7 +91,7 @@ public class RepoConfiguration {
 	public void saveClientAlias(String config) throws IOException
 	{
 		synchronized (syncObject) {
-			UtilFile.saveAsFile(new File(configFolder, pathClientAlias), config);
+			saveWithMkDirParent(new File(configFolder, pathClientAlias), config);
 			setClientAlias(config);
 		}
 	}
@@ -122,7 +122,7 @@ public class RepoConfiguration {
 	public void saveAccessRules(String config) throws IOException
 	{
 		synchronized (syncObject) {
-			UtilFile.saveAsFile(new File(configFolder, pathAccess), config);
+			saveWithMkDirParent(new File(configFolder, pathAccess), config);
 			setAccessRules(config);
 		}
 	}
@@ -216,7 +216,7 @@ public class RepoConfiguration {
 	{
 		synchronized(syncObject)
 		{
-			UtilFile.saveAsFile(new File(configFolder, pathPluginsConfig), pluginsconfig);
+			saveWithMkDirParent(new File(configFolder, pathPluginsConfig), pluginsconfig);
 			setPluginsConfig(pluginsconfig);
 		}
 	}
@@ -305,7 +305,7 @@ public class RepoConfiguration {
 	}
 	public void saveName(String name) throws IOException {
 		synchronized (syncObject) {
-			UtilFile.saveAsFile(new File(configFolder, pathNameConfig), name);
+			saveWithMkDirParent(new File(configFolder, pathNameConfig), name);
 			setName(name);
 		}
 	}
@@ -320,7 +320,7 @@ public class RepoConfiguration {
 		synchronized (syncObject) {
 			for(PluginDef pd: plugins)
 			{
-				if(pd.path.startsWith(p))
+				if(p.startsWith(pd.path))
 				{
 					return pd;
 				}
@@ -329,4 +329,13 @@ public class RepoConfiguration {
 		return null;
 	}
 
+	private void saveWithMkDirParent(File targetFile, String content) throws IOException{
+		if (!targetFile.getParentFile().exists()){
+			if (!targetFile.getParentFile().mkdirs()){
+				throw new IOException("Cannot create directory: "+targetFile.getParent());
+			}
+		}
+		UtilFile.saveAsFile(targetFile, content);
+		
+	}
 }

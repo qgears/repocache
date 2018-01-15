@@ -76,27 +76,27 @@ public class RepoPluginP2 extends AbstractRepoPlugin
 		{
 			return new P2Listing(q, this).generate();
 		}
-		if(!localPath.folder&&localPath.pieces.size()==1 &&localPath.pieces.get(0).equals(P2CompositeArtifacts.file))
-		{
-			long timestamp=parseTimeStamp(cachedContent);
-			QueryResponse ret=new P2CompositeArtifacts(q, this, timestamp).generate();
-			if(!ret.equals(cachedContent))
-			{
-				// In case the listing has changed also update the timestamp
-				ret=new P2CompositeArtifacts(q, this, System.currentTimeMillis()).generate();
-			}
-			return ret;
-		}else if(!localPath.folder&&localPath.pieces.size()==1 &&localPath.pieces.get(0).equals(P2CompositeContent.file))
-		{
-			long timestamp=parseTimeStamp(cachedContent);
-			QueryResponse ret=new P2CompositeContent(q, this, timestamp).generate();
-			if(!ret.equals(cachedContent))
-			{
-				// In case the listing has changed also update the timestamp
-				ret=new P2CompositeContent(q, this, System.currentTimeMillis()).generate();
-			}
-			return ret;
-		}
+//		if(!localPath.folder&&localPath.pieces.size()==1 &&localPath.pieces.get(0).equals(P2CompositeArtifacts.file))
+//		{
+//			long timestamp=parseTimeStamp(cachedContent);
+//			QueryResponse ret=new P2CompositeArtifacts(q, this, timestamp).generate();
+//			if(!ret.equals(cachedContent))
+//			{
+//				// In case the listing has changed also update the timestamp
+//				ret=new P2CompositeArtifacts(q, this, System.currentTimeMillis()).generate();
+//			}
+//			return ret;
+//		}else if(!localPath.folder&&localPath.pieces.size()==1 &&localPath.pieces.get(0).equals(P2CompositeContent.file))
+//		{
+//			long timestamp=parseTimeStamp(cachedContent);
+//			QueryResponse ret=new P2CompositeContent(q, this, timestamp).generate();
+//			if(!ret.equals(cachedContent))
+//			{
+//				// In case the listing has changed also update the timestamp
+//				ret=new P2CompositeContent(q, this, System.currentTimeMillis()).generate();
+//			}
+//			return ret;
+//		}
 		P2RepoConfig config = getRepoConfig(localPath.pieces.get(0));
 		if (config != null) {
 			if (localPath.pieces.size()==1) {

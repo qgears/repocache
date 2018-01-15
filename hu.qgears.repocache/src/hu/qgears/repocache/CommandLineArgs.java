@@ -62,7 +62,7 @@ public class CommandLineArgs implements IArgs
 		return httpsProxyPort>-1;
 	}
 	public Integer getProxyPort() {
-		return hasProxyPortDefined() ? proxyPort+1 : null;
+		return hasProxyPortDefined() ? proxyPort : null;
 	}
 	public Integer getHttpsProxyPort() {
 		return hasHttpsProxyPortDefined()? httpsProxyPort: null;

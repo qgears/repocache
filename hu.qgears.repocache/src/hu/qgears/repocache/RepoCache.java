@@ -2,6 +2,8 @@ package hu.qgears.repocache;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import org.apache.commons.logging.Log;
@@ -63,6 +65,8 @@ public class RepoCache {
 		System.out.println("Repository cache program. Usage:\n");
 		cl.printHelpOn(System.out);
 		cl.parseArgs(args);
+		System.out.println("Current arguments:\n");
+		cl.print();
 		exec(clargs);
 	}
 
@@ -269,6 +273,9 @@ public class RepoCache {
 			commitTimer.addCommit(commitMsg + path.toStringPath());
 		}
 	}
+	public void createDir(Path path, String commitMsg) throws IOException {
+		createFile(new Path(path,".gitCreatesFolder"), "#git creates folder".getBytes("UTF-8"), commitMsg);
+	}
 
 	private void deleteIfExists(Path path) {
 		if (path == null) {
@@ -406,5 +413,24 @@ public class RepoCache {
 			return plugin;
 		}
 		return null;
+	}
+	
+	public boolean exists (Path path){
+		return getWorkingCopyFile(path).exists();
+	}
+	
+	public List<Path> getExistingItemsInFolder(Path folder){
+		List<Path> ret = new ArrayList<>();
+		try {
+			File dir = getDir(folder);
+			if (dir != null){
+				for (File s : dir.listFiles()){
+					Path p = new Path(folder,s.getName());
+					p.setFolder(s.isDirectory());
+					ret.add(p);
+				}
+			}
+		} catch (Exception e){}
+		return ret;
 	}
 }
