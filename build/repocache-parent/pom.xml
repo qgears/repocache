@@ -15,6 +15,11 @@
 	<version>1.0.0-SNAPSHOT</version>
 	<packaging>pom</packaging>
 
+	<properties>
+		<java-src-version>1.8</java-src-version>
+		<java-trg-version>1.8</java-trg-version>
+	</properties>
+
 	<repositories>
 		<repository>
 			<id>mars-repo</id>

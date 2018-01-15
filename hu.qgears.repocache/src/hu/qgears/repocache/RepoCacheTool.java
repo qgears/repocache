@@ -1,6 +1,6 @@
 package hu.qgears.repocache;
 
-import hu.qgears.tools.AbstractTool;
+import joptsimple.tool.AbstractTool;
 
 public class RepoCacheTool extends AbstractTool {
 

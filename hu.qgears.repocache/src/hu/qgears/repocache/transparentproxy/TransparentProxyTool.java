@@ -8,8 +8,8 @@ import org.eclipse.jetty.server.Server;
 import hu.qgears.repocache.https.DynamicSSLProxyConnector;
 import hu.qgears.repocache.https.HttpsProxyLifecycle;
 import hu.qgears.repocache.ssh.SSLDynamicCert;
-import hu.qgears.tools.AbstractTool;
 import joptsimple.annot.JOHelp;
+import joptsimple.tool.AbstractTool;
 
 public class TransparentProxyTool extends AbstractTool
 {

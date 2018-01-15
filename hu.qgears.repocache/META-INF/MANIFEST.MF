@@ -3,7 +3,7 @@ Bundle-ManifestVersion: 2
 Bundle-Name: Repocache
 Bundle-SymbolicName: hu.qgears.repocache
 Bundle-Version: 1.0.0.qualifier
-Bundle-RequiredExecutionEnvironment: JavaSE-1.7
+Bundle-RequiredExecutionEnvironment: JavaSE-1.8
 Require-Bundle: org.eclipse.jgit;bundle-version="4.1.0",
  org.slf4j.api;bundle-version="1.7.2",
  org.eclipse.jetty.http;bundle-version="9.2.13",
@@ -21,9 +21,8 @@ Require-Bundle: org.eclipse.jgit;bundle-version="4.1.0",
  org.jsoup;bundle-version="1.7.2",
  org.apache.commons.io;bundle-version="2.2.0",
  org.apache.log4j,
- hu.qgears.tools;bundle-version="1.0.0",
  org.apache.commons.lang;bundle-version="2.6.0",
- quickjs;bundle-version="1.0.0",
- quickjs-example;bundle-version="1.0.0"
+ hu.qgears.quickjs;bundle-version="1.0.0",
+ hu.qgears.quickjs.example;bundle-version="1.0.0"
 Import-Package: javax.net,
  javax.net.ssl

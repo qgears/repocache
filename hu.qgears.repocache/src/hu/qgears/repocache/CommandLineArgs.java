@@ -3,9 +3,9 @@ package hu.qgears.repocache;
 import java.io.File;
 
 import hu.qgears.repocache.ssh.SSLDynamicCert;
-import hu.qgears.tools.AbstractTool.IArgs;
 import joptsimple.annot.JOHelp;
 import joptsimple.annot.JOSimpleBoolean;
+import joptsimple.tool.AbstractTool.IArgs;
 
 public class CommandLineArgs implements IArgs
 {
