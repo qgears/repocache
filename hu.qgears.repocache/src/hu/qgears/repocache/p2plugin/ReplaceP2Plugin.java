@@ -89,7 +89,7 @@ public class ReplaceP2Plugin extends AbstractRepoPluginSubTree {
 							String request = relativeToRepoRoot.pieces.get(0);
 							if (subrepo.equals(request)) {
 								return repoCache.client.get(new HttpGet(repoCache.createTmpFile(pluginLocalPath),
-										getRealHttpPath(fullPath)));
+										getRealHttpPath(fullPath,subrepo)));
 							} else {
 								LOG.info("Attempting to acces uncached old version of " + fullPath.toStringPath());
 								LOG.info(request
@@ -146,13 +146,14 @@ public class ReplaceP2Plugin extends AbstractRepoPluginSubTree {
 	}
 
 	private boolean checkContentChanged(int currentVersion) {
-		Path vRoot = new Path(pd.path + "/" + getVersionSubfolder(currentVersion));
+		String versionSubfolder = getVersionSubfolder(currentVersion);
+		Path vRoot = new Path(pd.path + "/" + versionSubfolder);
 		boolean changed = false;
 		for (Path p : repoCache.getExistingItemsInFolder(vRoot)) {
 			if (!p.folder && !p.getFileName().startsWith(".")) {
 				// ignoring features / plugin subdirectory, only compare
 				// descriptor files
-				changed = compareWithWeb(p);
+				changed = compareWithWeb(p,versionSubfolder);
 				if (changed) {
 					break;
 				}
@@ -164,9 +165,9 @@ public class ReplaceP2Plugin extends AbstractRepoPluginSubTree {
 		return changed;
 	}
 
-	private boolean compareWithWeb(Path cachePath) {
+	private boolean compareWithWeb(Path cachePath,String version) {
 		try {
-			String wp = getRealHttpPath(cachePath);
+			String wp = getRealHttpPath(cachePath,version);
 			File tmp = repoCache.createTmpFile(cachePath);
 			LOG.debug("Comparing " + cachePath + " with web " + wp);
 			QueryResponse response = repoCache.client.get(new HttpGet(tmp, wp));
@@ -184,9 +185,9 @@ public class ReplaceP2Plugin extends AbstractRepoPluginSubTree {
 		return false;
 	}
 
-	private String getRealHttpPath(Path cachePath) {
+	private String getRealHttpPath(Path cachePath,String version) {
 		Path webPath = new Path(cachePath);
-		webPath.remove(webPath.pieces.size() - 2).remove(0);
+		webPath.remove(webPath.pieces.lastIndexOf(version)).remove(0);
 		String wp = webPath.pieces.get(0) + "://"; // protocol
 		webPath.remove(0);
 		wp += webPath.toStringPath();
