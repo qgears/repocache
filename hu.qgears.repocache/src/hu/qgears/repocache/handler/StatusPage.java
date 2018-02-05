@@ -12,6 +12,7 @@ public class StatusPage extends AbstractHTMLPage {
 
 	@Override
 	protected void writeHTMLBody() {
+		VersionMetadata vm = VersionMetadata.get();
 		folder=true;
 		write("<h1>");
 		writeHtml(getQuery().rc.getConfiguration().getName());
@@ -21,11 +22,16 @@ public class StatusPage extends AbstractHTMLPage {
 		writeValue(plugin.getPath());
 		write("/\">");
 		writeHtml(plugin.getPath());
-		write("</a></li>\n</ul>\n\nPowered by: <a href=\"https://github.com/qgears/repocache\">Repo Cache by Q-Gears Kft. version 2.0.0.</a>\n");
+		write("</a></li>\n</ul>\n\nPowered by: <a href=\"");
+		writeObject(vm.getGitHubUrl());
+		write("\">Repo Cache by Q-Gears Kft. version ");
+		writeObject(vm.getVersion());
+		write("</a>\n");
 	}
 
 	@Override
 	protected String getTitleFragment() {
 		return getQuery().rc.getConfiguration().getName()+"";
 	}
+
 }

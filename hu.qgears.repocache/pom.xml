@@ -19,6 +19,36 @@
 	
 	<build>
 		<plugins>
+			<!-- Generating current build qualifiers into version.txt and copy beside the main class of CLI.
+			Version informations printed by CLI app will be read from here.
+			 -->
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-resources-plugin</artifactId>
+				<version>2.6</version>
+				<executions>
+					<execution>
+						<id>Prepare version.txt</id>
+						<phase>generate-sources</phase>
+						<configuration>
+							<outputDirectory>${project.basedir}/src/hu/qgears/repocache/handler/</outputDirectory>
+							<overwrite>true</overwrite>
+							<resources>
+								<resource>
+									<directory>${project.basedir}</directory>
+									<includes>
+										<include>version.txt</include>
+									</includes>
+									<filtering>true</filtering>
+								</resource>
+							</resources>
+						</configuration>
+						<goals>
+							<goal>copy-resources</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
 			<!-- Generates the Java command line tool as a single runnable jar. -->
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
@@ -51,7 +81,7 @@
 							<mainClass>hu.qgears.repocache.RepoCache</mainClass>
 						</manifest>
 					</archive>
-					<finalName>${binary-name}-${forceContextQualifier}</finalName>
+					<finalName>${binary-name}-${qualifiedVersion}</finalName>
 					<appendAssemblyId>false</appendAssemblyId>
 				</configuration>
 				<executions>

@@ -1,0 +1,4 @@
+unqualifiedVersion=${unqualifiedVersion}
+buildQualifier=${buildQualifier}
+qualifiedVersion=${qualifiedVersion}
+tagged_version=${env.CREATE_TAG}

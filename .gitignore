@@ -23,3 +23,8 @@ hs_err_pid*
 #shared objects
 *.so
 
+#generated version.txt
+hu.qgears.repocache/src/hu/qgears/repocache/handler/version.txt
+
+#empty folder generated during release builds
+workspace
