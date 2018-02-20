@@ -182,9 +182,6 @@ public class RepoCache {
 		synchronized (this) {
 			Status status = git.status().call();
 			log.debug("Git status clean: " + status.isClean());
-			if (!status.isClean()) {
-				// throw new IOException("git repo is not clean");
-			}
 			String storedVersion = UtilFile.loadAsString(new File(worktree, versionFilePath));
 			if (!storedVersion.equals(repoVersion)) {
 				throw new IOException("Invalid repocache version: " + storedVersion);
