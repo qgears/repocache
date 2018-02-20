@@ -13,6 +13,7 @@ import org.eclipse.jetty.server.Request;
 import org.eclipse.jetty.server.handler.ResourceHandler;
 import org.eclipse.jetty.util.resource.Resource;
 
+import hu.qgears.quickjs.qpage.example.QPageHandler;
 import hu.qgears.repocache.ClientQueryHttp;
 import hu.qgears.repocache.Path;
 import hu.qgears.repocache.RepoCache;
@@ -31,9 +32,11 @@ public class RepoHandler extends MyRequestHandler {
 		certsHandler.setResourceBase("/certs/");
 		certsHandler.setBaseResource(Resource.newResource(new File(rc.getArgs().getCertsFolder(), "public")));
 		certsHandler.setDirectoriesListed(true);
-
+		config=new QPageHandler(q->new ConfigHandler2((ClientQueryHttp)q));
+		accessLog=new QPageHandler(q->new AccessLogPage((ClientQueryHttp)q));
 	}
-
+	QPageHandler config;
+	QPageHandler accessLog;
 	@Override
 	public void handle(String target, Request baseRequest, HttpServletRequest request, HttpServletResponse response)
 			throws IOException, ServletException {
@@ -46,10 +49,10 @@ public class RepoHandler extends MyRequestHandler {
 		Path path = q.getPath();
 		switch (path.toStringPath()) {
 		case "config.html":
-			new ConfigHandler2(q).handle();
+			config.handle(q.baseRequest.getPathInfo(), q.baseRequest, request, q.response, q);
 			return;
 		case "access-log.html":
-			new AccessLogPage(q).handle();
+			accessLog.handle(q.baseRequest.getPathInfo(), q.baseRequest, request, q.response, q);
 			return;
 		}
 		if(pathString.startsWith("/certs/"))

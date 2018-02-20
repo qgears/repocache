@@ -11,29 +11,34 @@ import hu.qgears.quickjs.qpage.QButton;
 import hu.qgears.quickjs.qpage.QLabel;
 import hu.qgears.quickjs.qpage.QPage;
 import hu.qgears.quickjs.qpage.QTextEditor;
-import hu.qgears.repocache.AbstractQPage;
-import hu.qgears.repocache.ClientQuery;
+import hu.qgears.repocache.ClientQueryHttp;
 import hu.qgears.repocache.CommandLineArgs;
 import hu.qgears.repocache.CommitTimer;
 import hu.qgears.repocache.ssh.InitCertsFolder;
 
-public class ConfigHandler2 extends AbstractQPage
+public class ConfigHandler2 extends hu.qgears.quickjs.utils.AbstractQPage
 {
-	public ConfigHandler2(ClientQuery query) {
-		super(query);
+	ClientQueryHttp query;
+	public ConfigHandler2(ClientQueryHttp query) {
+		super();
+		this.query=query;
 	}
-	
-	@Override
-	protected void writeHtmlHeaders() {
-		super.writeHtmlHeaders();
-		write("<script language=\"javascript\" type=\"text/javascript\">\nfunction toggleVisible(id)\n{\n\tvar x = document.getElementById(id);\n    if (x.style.display === \"none\") {\n        x.style.display = \"block\";\n    } else {\n        x.style.display = \"none\";\n    }\n}\n</script>\n");
+
+	private ClientQueryHttp getHttpQuery() {
+		return query;
 	}
 
 	@Override
-	protected void initPage() {
+	protected void writeHeaders() {
+		write("<script language=\"javascript\" type=\"text/javascript\">\nfunction toggleVisible(id)\n{\n\tvar x = document.getElementById(id);\n    if (x.style.display === \"none\") {\n        x.style.display = \"block\";\n    } else {\n        x.style.display = \"none\";\n    }\n}\n</script>\n<title>");
+		writeHtml(getTitle());
+		write("</title>\n");
+	}
+	@Override
+	protected void initQPage(QPage page) {
 		{
 			final QTextEditor editor=new QTextEditor(page, "name");
-			editor.text.setPropertyFromServer(getHttpQuery().rc.getConfiguration().getName());
+			editor.text.setPropertyFromServer(query.rc.getConfiguration().getName());
 			QButton submit=new QButton(page, "submit-name");
 			submit.clicked.addListener(new UtilEventListener<QButton>() {
 				@Override
@@ -49,7 +54,7 @@ public class ConfigHandler2 extends AbstractQPage
 		}
 		{
 			final QTextEditor accessRules=new QTextEditor(page, "access");
-			accessRules.text.setPropertyFromServer(getHttpQuery().rc.getConfiguration().getAccessRules());
+			accessRules.text.setPropertyFromServer(query.rc.getConfiguration().getAccessRules());
 			QButton buttonAccess=new QButton(page, "submit-access");
 			buttonAccess.clicked.addListener(new UtilEventListener<QButton>() {
 				@Override
@@ -119,7 +124,7 @@ public class ConfigHandler2 extends AbstractQPage
 			final QLabel staging=new QLabel(page, "staging");
 			QButton commit=new QButton(page, "commit");
 			QButton revert=new QButton(page, "revert");
-			final CommitTimer ct=getQuery().rc.getCommitTimer();
+			final CommitTimer ct=getHttpQuery().rc.getCommitTimer();
 			updateStagingOnUIThread(staging, ct);
 			final UtilEventListener<CommitTimer> l=new UtilEventListener<CommitTimer>() {
 				@Override
@@ -172,7 +177,7 @@ public class ConfigHandler2 extends AbstractQPage
 		{
 			final QLabel configUpdated=new QLabel(page, "config-updated");
 			configUpdated.innerhtml.setPropertyFromServer("");
-			final RepoConfiguration ar=getQuery().rc.getConfiguration();
+			final RepoConfiguration ar=getHttpQuery().rc.getConfiguration();
 			final UtilEventListener<RepoConfiguration> changed=new UtilEventListener<RepoConfiguration>() {
 				@Override
 				public void eventHappened(RepoConfiguration msg) {
@@ -222,7 +227,7 @@ public class ConfigHandler2 extends AbstractQPage
 	{
 		StringWriter sw=new StringWriter();
 		sw.write("<pre>");
-		sw.write(getQuery().rc.getCommitTimer().getCurrentStagingMessage());
+		sw.write(getHttpQuery().rc.getCommitTimer().getCurrentStagingMessage());
 		sw.write("</pre>");
 		staging.innerhtml.setPropertyFromServer(sw.toString());
 	}
@@ -236,10 +241,10 @@ public class ConfigHandler2 extends AbstractQPage
 		});
 	}
 	@Override
-	protected void writeHTMLBody() {
-		CommandLineArgs args=getQuery().rc.getArgs();
+	protected void writeBody() {
+		CommandLineArgs args=query.rc.getArgs();
 		write("<h1>");
-		writeHtml(getQuery().rc.getConfiguration().getName());
+		writeHtml(query.rc.getConfiguration().getName());
 		write(" configuration</h1>\n<a href=\"../\">Repo cache root folder (../)</a><br/>\n<ul>\n<li>Configuration port: ");
 		writeObject(args.port);
 		write("</li>\n<li>Http proxy port: ");
@@ -250,9 +255,8 @@ public class ConfigHandler2 extends AbstractQPage
 	}
 
 
-	@Override
-	protected String getTitleFragment() {
-		return getQuery().rc.getConfiguration().getName()+" Configuration";
+	protected String getTitle() {
+		return query.rc.getConfiguration().getName()+" Configuration";
 	}
 	
 }
