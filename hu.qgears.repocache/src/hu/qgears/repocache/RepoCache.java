@@ -123,7 +123,7 @@ public class RepoCache {
 		DispatchByPortHandler dispatchHandler = new DispatchByPortHandler();
 		RepoHandler rh = new RepoHandler(this);
 
-		Server server = new Server();
+		server = new Server();
 		
         // Specify the Session ID Manager
         HashSessionIdManager idmanager = new HashSessionIdManager();
@@ -377,6 +377,7 @@ public class RepoCache {
 	}
 
 	private AtomicInteger ctr = new AtomicInteger(0);
+	private Server server;
 
 	public File createTmpFile(Path path) {
 		return new File(args.downloadsFolder, "" + ctr.incrementAndGet());
@@ -393,6 +394,7 @@ public class RepoCache {
 		public void run() {
 			log.info("ShutdownHook Bye!");
 			try {
+				configuration.saveToFile();
 				commitTimer.executeCommit();
 			} catch (Exception e) {
 				log.error("Error commiting in shutdown hook!", e);
@@ -435,7 +437,15 @@ public class RepoCache {
 		return ret;
 	}
 	
+	/**
+	 * @return the port assigned to the server
+	 */
+	public int getPort() {
+		return ((ServerConnector)server.getConnectors()[0]).getLocalPort();
+	}
+
 	public void waitForStartup() throws InterruptedException {
 		startupSync.await();
 	}
+	
 }
