@@ -11,11 +11,13 @@ import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.HttpException;
 import org.apache.commons.httpclient.HttpStatus;
 import org.apache.commons.httpclient.methods.GetMethod;
+import org.apache.commons.httpclient.params.HttpConnectionManagerParams;
 import org.apache.commons.httpclient.params.HttpMethodParams;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import hu.qgears.repocache.QueryResponse;
+import hu.qgears.repocache.config.RepoConfiguration;
 
 public class StreamingHttpClient {
 	public static final int bufferSize=1024*1024;
@@ -28,22 +30,31 @@ public class StreamingHttpClient {
 	 * @throws IOException
 	 */
 	public QueryResponse get(HttpGet get) throws HttpException, IOException {
-		// Create an instance of HttpClient.
+		// Create an instance of HttpClient
 		HttpClient client = new HttpClient();
+		
+		final HttpConnectionManagerParams httpConnParams = 
+				client.getHttpConnectionManager().getParams();
+		final RepoConfiguration repocacheConfig = get.getRepoConfiguration();
+		
+		httpConnParams.setConnectionTimeout(repocacheConfig.getHttpConnectionTimeoutMs());
+		
+		httpConnParams.setSoTimeout(repocacheConfig.getHttpSoTimeoutMs());
+		
 		// Create a method instance.
 		GetMethod method = new GetMethod(get.url);
-//		GetMethod method = new GetMethod("http://releases.ubuntu.com/16.04.1/ubuntu-16.04.1-desktop-amd64.iso");
 		
-
 		// Provide custom retry handler is necessary
-		method.getParams().setParameter(HttpMethodParams.RETRY_HANDLER, new DefaultHttpMethodRetryHandler(3, false));
+		method.getParams().setParameter(HttpMethodParams.RETRY_HANDLER, 
+				new DefaultHttpMethodRetryHandler(3, false));
 
 		try(DownloadLogAndTimeout log=new DownloadLogAndTimeout(method)) {
 			// Execute the method.
 			int statusCode = client.executeMethod(method);
 
 			if (statusCode != HttpStatus.SC_OK) {
-				throw new FileNotFoundException("Method failed: " + method.getStatusLine()+" "+get.url);
+				throw new FileNotFoundException("Method failed: " 
+			+ method.getStatusLine()+" "+get.url);
 			}
 			long l=-1;
 			Header h=method.getResponseHeader("Content-Length");
@@ -52,7 +63,8 @@ public class StreamingHttpClient {
 				try {
 					l=Long.parseLong(h.getValue());
 				} catch (Exception e) {
-					logger.error("Error parsing response header length, value: " + h.getValue(), e);
+					logger.error("Error parsing response header length, value: " 
+				+ h.getValue(), e);
 				}
 			}
 			long sum=0;

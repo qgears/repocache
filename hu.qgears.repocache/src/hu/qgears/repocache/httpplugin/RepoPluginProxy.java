@@ -36,7 +36,8 @@ public class RepoPluginProxy extends AbstractRepoPlugin {
 			return null;
 		}
 		log.debug("Path update: "+ localPath.toStringPath() +" remote url: "+httpPath);
-		QueryResponse response = q.rc.client.get(new HttpGet(q.rc.createTmpFile(q.getPath()), httpPath));
+		QueryResponse response = q.rc.client.get(new HttpGet(q.rc.createTmpFile(q.getPath()), 
+				httpPath, q.rc.getConfiguration()));
 		return response;
 	}
 }

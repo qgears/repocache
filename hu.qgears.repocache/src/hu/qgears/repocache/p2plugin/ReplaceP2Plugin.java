@@ -88,8 +88,10 @@ public class ReplaceP2Plugin extends AbstractRepoPluginSubTree {
 							String subrepo = getVersionSubfolder(v.intValue());
 							String request = relativeToRepoRoot.pieces.get(0);
 							if (subrepo.equals(request)) {
-								return repoCache.client.get(new HttpGet(repoCache.createTmpFile(pluginLocalPath),
-										getRealHttpPath(fullPath,subrepo)));
+								return repoCache.client.get(new HttpGet(
+										repoCache.createTmpFile(pluginLocalPath),
+										getRealHttpPath(fullPath,subrepo),
+										repoCache.getConfiguration()));
 							} else {
 								LOG.info("Attempting to acces uncached old version of " + fullPath.toStringPath());
 								LOG.info(request
@@ -170,7 +172,8 @@ public class ReplaceP2Plugin extends AbstractRepoPluginSubTree {
 			String wp = getRealHttpPath(cachePath,version);
 			File tmp = repoCache.createTmpFile(cachePath);
 			LOG.debug("Comparing " + cachePath + " with web " + wp);
-			QueryResponse response = repoCache.client.get(new HttpGet(tmp, wp));
+			QueryResponse response = repoCache.client.get(new HttpGet(tmp, wp,
+					repoCache.getConfiguration()));
 			QueryResponse cached = repoCache.getCache(cachePath);
 			if (!cached.equals(response)) {
 				LOG.debug("Change detected, new version will be created.");
@@ -180,7 +183,8 @@ public class ReplaceP2Plugin extends AbstractRepoPluginSubTree {
 				return false;
 			}
 		} catch (Exception e) {
-			LOG.error("Cannot compare resource with web. Assuming resource is smae as defined in cache " + cachePath);
+			LOG.error("Cannot compare resource with web. Assuming resource is "
+					+ "same as defined in cache " + cachePath);
 		}
 		return false;
 	}

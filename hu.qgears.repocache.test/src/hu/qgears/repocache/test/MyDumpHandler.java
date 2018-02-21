@@ -16,7 +16,7 @@ public class MyDumpHandler extends AbstractHandler
     {
         PrintWriter out = response.getWriter();
         response.setContentType("text/plain");
-
+	
         try
         {
             HttpSession session = request.getSession();
