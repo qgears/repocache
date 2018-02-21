@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import org.apache.commons.logging.Log;
@@ -53,6 +54,10 @@ public class RepoCache {
 	private RepoConfiguration configuration;
 	private CommandLineArgs args;
 	public final AccessLog accessLog=new AccessLog();
+	/**
+	 * Startup synchronization primitive, used primarily for testing.
+	 */
+	public final CountDownLatch startupSync = new CountDownLatch(1);
 
 	public CommandLineArgs getArgs() {
 		return args;
@@ -155,6 +160,7 @@ public class RepoCache {
         sessions.setHandler(dispatchHandler);
 		server.start();
 		log.info("RepoCache started....");
+		startupSync.countDown();
 		server.join();
 	}
 
@@ -427,5 +433,9 @@ public class RepoCache {
 			}
 		} catch (Exception e){}
 		return ret;
+	}
+	
+	public void waitForStartup() throws InterruptedException {
+		startupSync.await();
 	}
 }
