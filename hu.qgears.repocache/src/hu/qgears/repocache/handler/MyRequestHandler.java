@@ -25,7 +25,9 @@ public abstract class MyRequestHandler extends AbstractHandler {
 		this.rc = rc;
 	}
 
-	protected void handleQlientQuery (ClientQuery q, Request baseRequest, HttpServletResponse response, boolean rw) throws IOException, ServletException {
+	protected void handleQlientQuery (ClientQuery q, Request baseRequest, 
+			HttpServletResponse response, boolean rw) 
+					throws IOException, ServletException {
 		q.setPath(q.rc.getConfiguration().rewriteClientPath(q.getPath()));
 		try(QueryResponse cachedContent=getQueryResponse(q, rw)) {
 			if(cachedContent!=null) {
@@ -98,11 +100,6 @@ public abstract class MyRequestHandler extends AbstractHandler {
 			}
 		}
 		return cachedContent;
-	}
-
-	private void appendRealFolderListing(ClientQuery q, HttpServletResponse response, QueryResponse cachedContent) throws IOException {
-		QueryResponse r2=new RealFolderListing(q, cachedContent).generate();
-		response.getOutputStream().write(r2.getResponseAsBytes());
 	}
 
 	private QueryResponse getResponseFromPlugin(ClientQuery q, QueryResponse cachedContent, boolean netAllowed) throws IOException {
