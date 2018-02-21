@@ -12,7 +12,7 @@ Require-Bundle: org.eclipse.jgit;bundle-version="4.1.0",
  org.eclipse.jetty.servlet;bundle-version="9.2.13",
  org.eclipse.jetty.util;bundle-version="9.2.13",
  javax.servlet;bundle-version="3.1.0",
- org.apache.commons.httpclient,
+ org.apache.commons.httpclient;bundle-version="3.1.0",
  org.apache.commons.logging,
  org.apache.commons.codec,
  hu.qgears.commons;bundle-version="6.6.0",
@@ -26,3 +26,6 @@ Require-Bundle: org.eclipse.jgit;bundle-version="4.1.0",
  hu.qgears.quickjs.example;bundle-version="1.0.0"
 Import-Package: javax.net,
  javax.net.ssl
+Export-Package: hu.qgears.repocache,
+ hu.qgears.repocache.config,
+ hu.qgears.repocache.httpget
