@@ -1,12 +1,17 @@
 package hu.qgears.repocache.config;
 
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Properties;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.eclipse.jetty.server.HttpConfiguration;
 
 import hu.qgears.commons.Pair;
 import hu.qgears.commons.UtilEvent;
@@ -25,16 +30,51 @@ public class RepoConfiguration {
 	private String clientAliasConfig="#Empty client alias config";
 	private String pluginsConfig="#Empty plugins config";
 	private Object syncObject=new Object();
+	
 	private List<AccessRule> rules=new ArrayList<>();
 	private List<PluginDef> plugins=new ArrayList<>();
+	
 	private List<Pair<String, String>> clientAlias=new ArrayList<>();
 	private List<Pair<String, String>> internetAlias=new ArrayList<>();
+	
+	/**
+	 * @see HttpConfiguration#se
+	 */
+	protected int httpSoTimeoutMs = 0;
+	protected int httpConnectionTimeoutMs = 0;
+	
 	private final String pathAccess="access.config";
 	private final String pathClientAlias="client-alias.config";
 	private final String pathPluginsConfig="plugins.config";
-	private final String pathNameConfig="name.config";
-	private String name="Unconfigured repocache name";
+	/**
+	 * Textual configuration file containing the following options:
+	 * <ul>
+	 * <li>{@value #PROP_NAME_BROWSER_TITLE}
+	 * <li>{@value #PROP_NAME_HTTP_CONN_TIMEOUT}
+	 * <li>{@value #PROP_NAME_HTTP_SO_TIMEOUT}
+	 * </ul>
+	 */
+	private final String pathNameConfig="repocache.config";
+	
+	/**
+	 * Option name for title of administration page in a web user interface.
+	 */
+	private static final String PROP_NAME_BROWSER_TITLE = "browser.title";
+	/**
+	 * Option name for HTTP socket timeout for downloading artifacts.
+	 */
+	private static final String PROP_NAME_HTTP_SO_TIMEOUT = "http.sotimeout";
+	/**
+	 * Option name for HTTP connection timeout for downloading artifacts.
+	 */
+	private static final String PROP_NAME_HTTP_CONN_TIMEOUT = "http.conntimeout";
+	/**
+	 * Title of administration page in a web user interface.
+	 */
+	private String name = "Unconfigured repocache name";
+	
 	public final UtilEvent<RepoConfiguration> configChanged=new UtilEvent<>();
+	
 	public class PluginDef
 	{
 		public String pluginId;
@@ -64,6 +104,14 @@ public class RepoConfiguration {
 			return accessRules;
 		}
 	}
+	
+	/**
+	 * Creates an instance of repocache configuration, loading options from
+	 * configuration files.
+	 * @param configFolder the directory containing the configuration files
+	 * @throws IOException if any IO-related exception occurs during loading the
+	 * configuration files 
+	 */
 	public RepoConfiguration(File configFolder)
 	{
 		this.configFolder=configFolder;
@@ -82,12 +130,69 @@ public class RepoConfiguration {
 		} catch (Exception e) {
 			log.error("Loading initial version of client alias file");
 		}
+		
 		try {
-			setName(UtilFile.loadAsString(new File(configFolder, pathNameConfig)));
+			loadFromFile();
 		} catch (Exception e) {
-			log.error("Loading initial version of name file");
+			log.error("Could not load properties file; starting with defaults.");
 		}
 	}
+	
+	/**
+	 * Loads part of configuration from the default properties file. 
+	 * @throws IOException 
+	 * @throws FileNotFoundException 
+	 */
+	private Properties loadFromFile() throws IOException {
+		synchronized (syncObject) {
+			try (final FileReader cfgStream = new FileReader(
+					new File(configFolder, pathNameConfig))) {
+				final Properties repoCacheProps = new Properties();
+				
+				repoCacheProps.load(cfgStream);
+				
+				this.name = repoCacheProps.getProperty(PROP_NAME_BROWSER_TITLE, name);
+				this.httpConnectionTimeoutMs = Integer.parseInt(repoCacheProps.getProperty(
+						PROP_NAME_HTTP_CONN_TIMEOUT, "0"));
+				this.httpSoTimeoutMs = Integer.parseInt(repoCacheProps.getProperty(
+						PROP_NAME_HTTP_SO_TIMEOUT, "0"));
+				
+				return repoCacheProps;
+			}
+		}
+	}
+	
+	/**
+	 * Overwrites the configuration file with current data, preserving comments.
+	 * @see #pathNameConfig
+	 */
+	public void saveToFile() throws IOException {
+		synchronized (syncObject) {
+			final Properties repoCacheProps = new Properties();
+			final File configFile = new File(configFolder, pathNameConfig);
+			
+			/* 
+			 * Options will be loaded first, not to lose content from the 
+			 * configuration file.
+			 */
+			if (configFile.exists() && configFile.isFile()) {
+				try (final FileReader cfgReader = new FileReader(configFile)) {
+					repoCacheProps.load(cfgReader);
+				}
+			}
+			
+			repoCacheProps.setProperty(PROP_NAME_HTTP_CONN_TIMEOUT, 
+					Integer.toString(httpConnectionTimeoutMs));
+			repoCacheProps.setProperty(PROP_NAME_HTTP_SO_TIMEOUT, 
+					Integer.toString(httpSoTimeoutMs));
+			repoCacheProps.setProperty(PROP_NAME_BROWSER_TITLE, name);
+			
+			try (final FileWriter cfgWriter = new FileWriter(configFile)) {
+				repoCacheProps.store(cfgWriter, null);
+			}
+		}
+	}
+	
 	public void saveClientAlias(String config) throws IOException
 	{
 		synchronized (syncObject) {
@@ -150,9 +255,6 @@ public class RepoConfiguration {
 						rules.add(new AccessRule(rm, path));
 						log.info("Access rule: "+rm+" '"+path+"'");
 					}
-				}else
-				{
-					// Log omit
 				}
 			}
 		}
@@ -303,10 +405,15 @@ public class RepoConfiguration {
 			return name;
 		}
 	}
+	
+	public void saveOption(final String optionName, final String value) {
+		
+	}
+	
 	public void saveName(String name) throws IOException {
 		synchronized (syncObject) {
-			saveWithMkDirParent(new File(configFolder, pathNameConfig), name);
 			setName(name);
+			saveToFile();
 		}
 	}
 	private void setName(String name) {
@@ -327,6 +434,22 @@ public class RepoConfiguration {
 			}
 		}
 		return null;
+	}
+	
+	public int getHttpConnectionTimeoutMs() {
+		return httpConnectionTimeoutMs;
+	}
+	
+	public void setHttpConnectionTimeoutMs(final int httpConnectionTimeoutMs) {
+		this.httpConnectionTimeoutMs = httpConnectionTimeoutMs;
+	}
+	
+	public int getHttpSoTimeoutMs() {
+		return httpSoTimeoutMs;
+	}
+	
+	public void setHttpSoTimeoutMs(final int httpSoTimeoutMs) {
+		this.httpSoTimeoutMs = httpSoTimeoutMs;
 	}
 
 	private void saveWithMkDirParent(File targetFile, String content) throws IOException{
