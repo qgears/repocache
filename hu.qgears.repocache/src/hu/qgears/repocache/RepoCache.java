@@ -353,7 +353,8 @@ public class RepoCache {
 			return false;
 		}
 
-		boolean updRequired = true;
+		final boolean updRequired;
+		
 		if (cachedContent != null) {
 			updRequired = getConfiguration().isRepoUpdatable(q);
 		} else {
@@ -438,14 +439,30 @@ public class RepoCache {
 	}
 	
 	/**
-	 * @return the port assigned to the server
+	 * @return the HTTP port assigned to the administrative WEB ui of the 
+	 * repocache server
 	 */
 	public int getPort() {
 		return ((ServerConnector)server.getConnectors()[0]).getLocalPort();
 	}
 
+	/**
+	 * @return the HTTP proxy port assigned to the repocache server
+	 */
+	public int getProxyPort() {
+		return ((ServerConnector)server.getConnectors()[1]).getLocalPort();
+	}
+
 	public void waitForStartup() throws InterruptedException {
 		startupSync.await();
+	}
+	
+	/**
+	 * Stops the HTTP server.
+	 * @throws Exception thrown up from {@link Server#stop()}
+	 */
+	public void stop() throws Exception {
+		server.stop();
 	}
 	
 }
