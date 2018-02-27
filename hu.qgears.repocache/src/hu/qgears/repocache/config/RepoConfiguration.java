@@ -24,6 +24,26 @@ import hu.qgears.repocache.Path;
 import hu.qgears.repocache.p2plugin.ReplaceP2Plugin;
 
 public class RepoConfiguration {
+	/** 
+	 * Abbreviation for 'read only' mode to be used in access rule descriptions.
+	 * @see RepoMode#READ_ONLY 
+	 */
+	private static final String REPOMODE_ABBR_RO = "ro";
+	/**
+	 * Abbreviation for 'add only' mode to be used in access rule descriptions.
+	 * @see RepoMode#ADD_ONLY 
+	 */
+	private static final String REPOMODE_ABBR_ADD_ONLY = "add";
+	/**
+	 * Abbreviation for 'update' mode to be used in access rule descriptions.
+	 * @see RepoMode#UPDATE
+	 */
+	private static final String REPOMODE_ABBR_UPDATE = "update";
+	/**
+	 * Abbreviation for 'transparent' mode to be used in access rule descriptions.
+	 * @see RepoMode#NO_CACHE_TRANSPARENT
+	 */
+	private static final String REPOMODE_ABBR_TRANSPARENT = "transparent";
 	private static Log log=LogFactory.getLog(RepoConfiguration.class);
 	private File configFolder;
 	private String accessRules="#Empty access rules config";
@@ -43,7 +63,7 @@ public class RepoConfiguration {
 	protected int httpSoTimeoutMs = 0;
 	protected int httpConnectionTimeoutMs = 0;
 	
-	private final String pathAccess="access.config";
+	public static final String ACCESS_RULE_CONFIG_FILE = "access.config";
 	private final String pathClientAlias="client-alias.config";
 	private final String pathPluginsConfig="plugins.config";
 	/**
@@ -116,7 +136,7 @@ public class RepoConfiguration {
 	{
 		this.configFolder=configFolder;
 		try {
-			setAccessRules(UtilFile.loadAsString(new File(configFolder, pathAccess)));
+			setAccessRules(UtilFile.loadAsString(new File(configFolder, ACCESS_RULE_CONFIG_FILE)));
 		} catch (Exception e) {
 			log.error("Loading initial version of access rules file");
 		}
@@ -227,11 +247,27 @@ public class RepoConfiguration {
 	public void saveAccessRules(String config) throws IOException
 	{
 		synchronized (syncObject) {
-			saveWithMkDirParent(new File(configFolder, pathAccess), config);
+			saveWithMkDirParent(new File(configFolder, ACCESS_RULE_CONFIG_FILE), config);
 			setAccessRules(config);
 		}
 	}
-	private void setAccessRules(String config)
+	
+	/**
+	 * Sets up the access rules by a composite textual description. Access rules
+	 * description is a single or multiline text, in which a line consists of
+	 * the following tokens:
+	 * <ol>
+	 * <li>access mode; possible values are: {@value #REPOMODE_ABBR_RO}, 
+	 * {@value #REPOMODE_ABBR_ADD_ONLY}, {@value #REPOMODE_ABBR_UPDATE} and
+	 * {@value #REPOMODE_ABBR_TRANSPARENT}
+	 * <li>tabulator character as separator
+	 * <li>an URL path prefix, without the {@code http://} or {@code https://}
+	 * protocol string. If a request URL, received by the repocache proxy, 
+	 * starts with a matching prefix, the specified repo access mode will be applied to it.
+	 * </ol> 
+	 * @param config the textual description of access rules
+	 */
+	public void setAccessRules(String config)
 	{
 		synchronized (syncObject) {
 			log.info("Access rules reloaded");
@@ -255,6 +291,10 @@ public class RepoConfiguration {
 						rules.add(new AccessRule(rm, path));
 						log.info("Access rule: "+rm+" '"+path+"'");
 					}
+				} else 
+				{
+					log.error("Access rule skipped because of too many tokens: "
+							+ "\"" + line + "\"");
 				}
 			}
 		}
@@ -262,15 +302,16 @@ public class RepoConfiguration {
 	}
 	private RepoMode parseMode(String mode) {
 		switch (mode) {
-		case "ro":
+		case REPOMODE_ABBR_RO:
 			return RepoMode.READ_ONLY;
-		case "add":
+		case REPOMODE_ABBR_ADD_ONLY:
 			return RepoMode.ADD_ONLY;
-		case "update":
+		case REPOMODE_ABBR_UPDATE:
 			return RepoMode.UPDATE;
-		case "transparent":
+		case REPOMODE_ABBR_TRANSPARENT:
 			return RepoMode.NO_CACHE_TRANSPARENT;
 		default:
+			log.error("Unknown repository access mode in configuration: " + mode);
 			return null;
 		}
 	}
