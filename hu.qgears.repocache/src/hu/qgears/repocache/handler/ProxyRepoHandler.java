@@ -19,7 +19,6 @@ import hu.qgears.repocache.https.HttpsProxyConnectionsManager.RegistryEntry;
 
 public class ProxyRepoHandler extends MyRequestHandler {
 	private static Log log=LogFactory.getLog(ProxyRepoHandler.class);
-	private boolean updateProxyPort;
 
 	public ProxyRepoHandler(RepoCache rc) {
 		super(rc);
@@ -52,7 +51,7 @@ public class ProxyRepoHandler extends MyRequestHandler {
 		}else
 		{
 			port=baseRequest.getServerPort();
-			rwMode=updateProxyPort;
+			rwMode=false;
 		}
 		StringBuilder bld=new StringBuilder();
 		bld.append(servername);
@@ -77,9 +76,5 @@ public class ProxyRepoHandler extends MyRequestHandler {
 		default:
 			throw new IOException("Invalid scheme '"+scheme+"'");
 		}
-	}
-	public ProxyRepoHandler setUpdateProxyPort(boolean updateProxyPort) {
-		this.updateProxyPort = updateProxyPort;
-		return this;
 	}
 }
