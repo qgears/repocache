@@ -13,7 +13,14 @@ import hu.qgears.repocache.config.RepoConfiguration;
  */
 public class TestRepoConfig extends RepoConfiguration {
 	public TestRepoConfig() throws IOException {
-		super(File.createTempFile("repocache", "test", 
-				new File("java.io.tmpdir")));
+		super(createTempDir());
+	}
+	
+	private static File createTempDir() throws IOException {
+		final File tempDir = File.createTempFile("repocache", "test");
+		
+		tempDir.mkdirs();
+
+		return tempDir;
 	}
 }
