@@ -52,4 +52,16 @@ public class AccessLog {
 		a.add(msg);
 	}
 
+
+	/**
+	 * Clears all messages from the accesslog. 
+	 */
+	public void clear() {
+		didNotChange.clear();
+		updated.clear();
+		localOnly.clear();
+		errorDownload.clear();
+		fromCache.clear();
+        missingCache.clear();
+	}
 }
