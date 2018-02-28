@@ -17,8 +17,9 @@ public class TestRepoCache extends RepoCache {
 		
 		commandLineArgs.configFolder = tempDir.newFolder("config"); 
 		commandLineArgs.repo = new File(tempDir.getRoot(), "repo");
-		/* Proxy port will be randomized. */
+		/* HTTP and HTTP proxy ports will be randomized. */
 		commandLineArgs.port = 0;
+		commandLineArgs.proxyPort = 0;
 		
 		return commandLineArgs;
 	}

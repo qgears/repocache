@@ -65,7 +65,7 @@ public class ProxyHandler extends AbstractHandler {
 		// Provide custom retry handler is necessary
 		method.getParams().setParameter(HttpMethodParams.RETRY_HANDLER, new DefaultHttpMethodRetryHandler(3, false));
 
-		try(DownloadLogAndTimeout log=new DownloadLogAndTimeout(method)) {
+		try(DownloadLogAndTimeout log=new DownloadLogAndTimeout()) {
 			// Execute the method.
 			int statusCode = client.executeMethod(method);
 

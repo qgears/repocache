@@ -22,6 +22,12 @@ public class TestHttpServer extends Server {
 	 */
 	public TestHttpServer() {
 		super(new InetSocketAddress(0));
+		setHandler(new SoTimeoutHandler());
+	}
+	
+	private TestHttpServer(final int port) {
+		super(new InetSocketAddress(port));
+		setHandler(new SoTimeoutHandler());
 	}
 	
 	/**
@@ -36,5 +42,19 @@ public class TestHttpServer extends Server {
 	 */
 	public int getPort() {
 		return ((ServerConnector)getConnectors()[0]).getLocalPort();
+	}
+	
+	/**
+	 * Simple command line interface, which runs until the process is terminated.
+	 * For example, Ctrl+C is an appropriate way to exit from the server.
+	 * @param args one single integer, which is the port - if not specified, 
+	 * port is defaulted to 20000
+	 * @throws Exception passed up if an error is encountered during starting up
+	 * the server
+	 */
+	public static void main(final String... args) throws Exception {
+		final int port = args.length > 0 ? Integer.parseInt(args[0]) : 20000;
+		final TestHttpServer instance = new TestHttpServer(port);
+		instance.start();
 	}
 }

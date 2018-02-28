@@ -30,7 +30,7 @@ public class TestHttpClient {
 	public static byte[] download(final String urlString, final int proxyPort) 
 			throws MalformedURLException, IOException {
 		final Proxy proxy = new Proxy(Proxy.Type.HTTP, 
-				new InetSocketAddress("localhost", proxyPort));
+				new InetSocketAddress("127.0.0.1", proxyPort));
 		final URLConnection openConnection = new URL(urlString).openConnection(proxy);
 		final byte[] data = UtilFile.loadFile(openConnection.getInputStream());
 		
