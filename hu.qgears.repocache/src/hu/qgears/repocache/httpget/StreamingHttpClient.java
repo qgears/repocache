@@ -4,7 +4,9 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.net.SocketTimeoutException;
 
+import org.apache.commons.httpclient.ConnectTimeoutException;
 import org.apache.commons.httpclient.DefaultHttpMethodRetryHandler;
 import org.apache.commons.httpclient.Header;
 import org.apache.commons.httpclient.HttpClient;
@@ -13,6 +15,7 @@ import org.apache.commons.httpclient.HttpStatus;
 import org.apache.commons.httpclient.methods.GetMethod;
 import org.apache.commons.httpclient.params.HttpConnectionManagerParams;
 import org.apache.commons.httpclient.params.HttpMethodParams;
+import org.apache.commons.httpclient.util.TimeoutController.TimeoutException;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -48,7 +51,7 @@ public class StreamingHttpClient {
 		method.getParams().setParameter(HttpMethodParams.RETRY_HANDLER, 
 				new DefaultHttpMethodRetryHandler(3, false));
 
-		try(DownloadLogAndTimeout log=new DownloadLogAndTimeout(method)) {
+		try(DownloadLogAndTimeout log=new DownloadLogAndTimeout()) {
 			// Execute the method.
 			int statusCode = client.executeMethod(method);
 
@@ -98,6 +101,8 @@ public class StreamingHttpClient {
 				ret.contentType=h.getValue();
 			}
 			return ret;
+		} catch (final ConnectTimeoutException | SocketTimeoutException te) {
+			throw te;
 		} finally {
 			get.close();
 			method.abort();

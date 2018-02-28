@@ -1,10 +1,12 @@
 package hu.qgears.repocache.handler;
 
 import java.io.IOException;
+import java.net.SocketTimeoutException;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.commons.httpclient.ConnectTimeoutException;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.eclipse.jetty.server.Request;
@@ -60,6 +62,9 @@ public abstract class MyRequestHandler extends AbstractHandler {
 					response.setStatus(HttpServletResponse.SC_NOT_FOUND);
 				}
 			}
+		} catch (final ConnectTimeoutException | SocketTimeoutException e) {
+			response.setStatus(HttpServletResponse.SC_GATEWAY_TIMEOUT);
+			response.getOutputStream().close();
 		}
 	}
 	
@@ -83,7 +88,10 @@ public abstract class MyRequestHandler extends AbstractHandler {
 				q.rc.accessLog.missingCache(q);
 			}
 		}
-		log.debug("HANDLE: '" + q.getPathString() +"' "+ (updateRequired?"UPDATED":(cachedContent==null?"NO CACHE":("CACHE: "+cachedContent))));
+		log.debug("HANDLE: '" + q.getPathString() + "' "
+				+ (updateRequired ? "UPDATED" : (cachedContent == null 
+						? "NO CACHE" : ("CACHE: " + cachedContent))));
+		
 		if(qr!=null)
 		{
 			try
@@ -102,20 +110,24 @@ public abstract class MyRequestHandler extends AbstractHandler {
 		return cachedContent;
 	}
 
-	private QueryResponse getResponseFromPlugin(ClientQuery q, QueryResponse cachedContent, boolean netAllowed) throws IOException {
+	private QueryResponse getResponseFromPlugin(ClientQuery q, 
+			QueryResponse cachedContent, boolean netAllowed) throws IOException {
 		Path path=rc.getConfiguration().rewriteInternetPath(q.getPath());
 		try {
 			AbstractRepoPlugin plugin=rc.getPlugin(path);
 			if(plugin!=null)
 			{
-				return plugin.getOnlineResponse(path, new Path(path).remove(0), q, cachedContent, netAllowed);
+				return plugin.getOnlineResponse(path, new Path(path).remove(0), 
+						q, cachedContent, netAllowed);
 			}
 			if(path.pieces.size()==0)
 			{
 				return new StatusPage(q).generate();
 			}
+		} catch (final ConnectTimeoutException | SocketTimeoutException te) { 
+			throw te;
 		} catch (Exception e) {
-			log.debug("Error fetching file: "+path + ", message: " + e.getMessage());
+			log.error("Error fetching file: "+path + ", message: " + e.getMessage());
 			q.rc.accessLog.errorDownloading(q);
 		}
 		return cachedContent;

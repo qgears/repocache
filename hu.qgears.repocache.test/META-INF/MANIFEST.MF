@@ -7,7 +7,9 @@ Bundle-Vendor: Q-Gears Kft.
 Bundle-RequiredExecutionEnvironment: JavaSE-1.8
 Require-Bundle: hu.qgears.repocache;bundle-version="2.0.0",
  org.apache.commons.httpclient;bundle-version="3.1.0",
+ org.apache.httpcomponents.httpcore;bundle-version="4.3.3",
  org.eclipse.jetty.server;bundle-version="9.2.13",
+ org.eclipse.jetty.servlet;bundle-version="9.2.13",
  org.eclipse.jetty.util;bundle-version="9.2.13",
  org.junit;bundle-version="4.12.0",
  hu.qgears.commons

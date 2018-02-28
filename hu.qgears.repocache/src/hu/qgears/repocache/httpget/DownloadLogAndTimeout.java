@@ -1,8 +1,8 @@
 package hu.qgears.repocache.httpget;
 
 import java.util.concurrent.Callable;
+import java.util.concurrent.TimeUnit;
 
-import org.apache.commons.httpclient.methods.GetMethod;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -11,29 +11,25 @@ import hu.qgears.commons.UtilTimer;
 public class DownloadLogAndTimeout implements AutoCloseable, Callable<Object>
 {
 	private Log log=LogFactory.getLog(DownloadLogAndTimeout.class);
-	private GetMethod method;
 	private String url="none";
 	private long t0=System.nanoTime();
 	private long t1=t0;
 	private long sum;
 	private long l;
 	private boolean closed=false;
+	
 	/**
-	 * After 30 secs without reply query is aborted.
+	 * After 5 secs of receiving no data, a stall warning is emitted.
 	 */
-	private long timeoutReply=30000;
+	public static final long STALL_WARNING_TIME_MS = 5000;
+	
 	/**
 	 * Minimum download speed is about 100 KBps 
 	 */
-	private long minBps=100000;
-	public DownloadLogAndTimeout(GetMethod method) {
-		this.method=method;
-		try {
-			url=method.getURI().toString();
-		} catch (Exception e) {
-			log.error("Error decoding URI of download query", e);
-		}
-		UtilTimer.getInstance().executeTimeout(1000, this);
+	private static final long MIN_BPS = 100000;
+	
+	public DownloadLogAndTimeout() {
+		UtilTimer.getInstance().executeTimeout(STALL_WARNING_TIME_MS, this);
 	}
 
 	@Override
@@ -54,35 +50,44 @@ public class DownloadLogAndTimeout implements AutoCloseable, Callable<Object>
 
 	@Override
 	public Object call() throws Exception {
-		boolean close;
-		long bps;
-		long remaining;
+		final boolean stallWarning;
+		final long bps;
+		final long remaining;
+		
 		synchronized (this) {
 			if(closed)
 			{
 				return null;
 			}
-			long t=System.nanoTime();
-			long dt=(t-t1)/1000000l;
-			if(dt==0l)
+			long tNs = System.nanoTime();
+			long dtMs = TimeUnit.NANOSECONDS.toMillis(tNs - t1);
+			
+			if(dtMs==0l)
 			{
 				// Avoid div by zero
-				dt=1;
+				dtMs=1;
 			}
-			bps=(sum*1000/dt);
+			bps=(sum*1000/dtMs);
 			remaining=l-sum;
 			float eta=((float)remaining/bps);
-			log.debug("Download progress: "+url+" "+sum+"/"+l+" "+bps+"BPS ETA: "+eta+" seconds");
-			close=(dt>timeoutReply&&sum==0l)||(bps<minBps&&dt>timeoutReply);
+			
+			log.debug("Download progress: " + url + " " + sum + "/" + l + " " 
+			+ bps + "BPS ETA: " + eta + " seconds");
+			
+			stallWarning = (dtMs > STALL_WARNING_TIME_MS && sum == 0l) 
+					|| (bps < MIN_BPS && dtMs > STALL_WARNING_TIME_MS);
 		}
-		if(close)
-		{
-			log.error("Download stalled - abort: "+url+" "+sum+"/"+l+" "+bps+"BPS"+" ETA: "+((float)remaining/bps)+" seconds");
-			method.abort();
-		} else 
-		{
-			UtilTimer.getInstance().executeTimeout(1000, this);
+		
+		if (stallWarning) {
+			log.error("Download stalled - abort: " + url + " " + sum + "/" + l 
+					+ " " + bps + " BPS; ETA: " + ((float) remaining / bps) 
+					+ " seconds");
 		}
+
+		if (!closed) {
+			UtilTimer.getInstance().executeTimeout(STALL_WARNING_TIME_MS, this);
+		}
+
 		return null;
 	}
 }
