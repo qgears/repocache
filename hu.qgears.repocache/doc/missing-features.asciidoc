@@ -1,9 +1,6 @@
-Content type should be handled in storage so the original content type is replied.
+* Content type should be handled in storage so the original content type is replied.
 
-Stop crawling: Ongoing crawlings must be registered. config page should list them with a link, which when called cancels the crawling (after the current file is finished.)
+* Stop crawling: Ongoing crawlings must be registered. config page should list them with a link, which when called cancels the crawling (after the current file is finished.)
 (Currently setting the client to read only mode fixes this problem.)
 
-* missingFilesTransparentDownload mode: use cache when available but download when not available. Downloaded file is not saved to c
-Add crawling result in a single commit (but do not lock the repository while crawling - makes it hard).
-
-
+* Add crawling result in a single commit (but do not lock the repository while crawling - makes it hard).
