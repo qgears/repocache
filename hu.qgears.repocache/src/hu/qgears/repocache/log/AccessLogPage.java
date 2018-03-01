@@ -3,12 +3,14 @@ package hu.qgears.repocache.log;
 import hu.qgears.commons.UtilEventListener;
 import hu.qgears.commons.signal.SignalFuture;
 import hu.qgears.commons.signal.Slot;
+import hu.qgears.quickjs.qpage.QButton;
 import hu.qgears.quickjs.qpage.QLabel;
 import hu.qgears.quickjs.qpage.QPage;
 import hu.qgears.repocache.ClientQuery;
 
 public class AccessLogPage extends hu.qgears.quickjs.utils.AbstractQPage
 {
+	private static final String CLEAR_LOG_ID = "clearLog";
 	ClientQuery query;
 	public AccessLogPage(ClientQuery query) {
 		super();
@@ -28,7 +30,10 @@ public class AccessLogPage extends hu.qgears.quickjs.utils.AbstractQPage
 	protected void writeBody() {
 		write("<h1>");
 		writeHtml(query.rc.getConfiguration().getName());
-		write(" Access Logs</h1>\n<a href=\"../\">Repo cache root folder (../)</a><br/>\n\n");
+		write(" Access Logs</h1>\n<a href=\"../\">Repo cache root folder (../)</a><br/>\n<button id=\"");
+		writeObject(CLEAR_LOG_ID);
+		write("\" >Clear logs</button>\n");
+		write("<br/>\n");
 		writeDiv("fromCache");
 		writeDiv("missingCache");
 		writeDiv("didNotChange");
@@ -49,6 +54,7 @@ public class AccessLogPage extends hu.qgears.quickjs.utils.AbstractQPage
 	}
 	@Override
 	protected void initQPage(QPage page) {
+		new QButton(page, CLEAR_LOG_ID).clicked.addListener(this::clearLogs);
 		addPageElement("fromCache", query.rc.accessLog.fromCache);
 		addPageElement("missingCache", query.rc.accessLog.missingCache);
 		addPageElement("didNotChange", query.rc.accessLog.didNotChange);
@@ -56,6 +62,11 @@ public class AccessLogPage extends hu.qgears.quickjs.utils.AbstractQPage
 		addPageElement("errorDownload", query.rc.accessLog.errorDownload);
 		addPageElement("localOnly", query.rc.accessLog.localOnly);
 	}
+	
+	private void clearLogs(QButton ev){
+		query.rc.accessLog.clear();
+	}
+	
 	private void addPageElement(String id, final LogEventList list) {
 		final QLabel l=new QLabel(page, id);
 		final UtilEventListener<LogEventList> listener=new UtilEventListener<LogEventList>() {

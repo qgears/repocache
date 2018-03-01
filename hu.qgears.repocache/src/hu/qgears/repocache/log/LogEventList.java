@@ -28,5 +28,13 @@ public class LogEventList {
 			}
 		}
 	}
+	
+	/**
+	 * Clears the log messages stored in this list.
+	 */
+	public void clear (){
+		events.clear();
+		changed.eventHappened(this);
+	}
 
 }
