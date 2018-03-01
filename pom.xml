@@ -10,6 +10,7 @@
 
 	<modules>
 		<module>hu.qgears.repocache</module>
+		<module>hu.qgears.repocache.test</module>
 		<module>build/hu.qgears.repocache.p2</module>
 	</modules>
 </project>
