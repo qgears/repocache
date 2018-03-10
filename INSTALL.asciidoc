@@ -1,0 +1,82 @@
+= Repocache Installation
+
+== Building repocache
+
+Tools required for the build:
+
+* OpenJDK 8
+* maven 3.3.9
+
+Build has been tested under Ubuntu 16.04.2 LTS.
+
+
+Copy the following snippet into ~/.m2/toolchains.xml:
+[source,xml]
+----
+<toolchains>
+  <!-- ... -->
+  <!-- JDK toolchains -->
+  <toolchain>
+    <type>jdk</type>
+    <provides>
+      <id>JavaSE-1.8</id>
+    </provides>
+    <configuration>
+      <jdkHome>/usr/lib/jvm/java-8-openjdk-amd64/jre</jdkHome>
+    </configuration>
+  </toolchain>
+  <!-- ... -->
+</toolchains>
+
+----
+Install script is as follows - note that it will require sudo password when installing the application:
+
+[source,bash]
+----
+#!/bin/bash
+
+mkdir -p ~/git/qgears
+cd ~/git/qgears
+
+git clone --recursive https://github.com/qgears/repocache.git
+
+cd repocache
+mvn package
+# or maybe 'mvn integration-test' to run the build with tests
+
+# The file matching the repocache-$VERSION-$DATE.jar pattern will be found here:
+cd hu.qgears.repocache/target/
+ls -lah
+
+# Selecting the most recently built jar file
+MOST_RECENT=$(ls -Art repocache-*.jar | tail -n 1)
+INSTALL_DIR=/opt/repocache
+
+sudo mkdir $INSTALL_DIR
+sudo cp $MOST_RECENT $INSTALL_DIR
+sudo ln -s /opt/repocache/$MOST_RECENT /opt/repocache/repocache.jar
+
+cd ../..
+
+# Edit and customize the following startup script, then them to their final locations!
+
+# Upstart startup script suitable for Ubuntu 14 LTS and 16 LTS:
+sudo cp hu.qgears.repocache/doc/repocache.conf /etc/init
+sudo chown root:root /etc/init/repocache.conf
+
+# Copying configuration:
+sudo cp hu.qgears.repocache/doc/sample-config/* /opt/repocache
+
+----
+
+== Starting repocache
+
+In order to start repocache manually, issue the following command:
+[source,bash]
+----
+sudo service repocache start
+----
+
+Now, you have a working HTTP proxy repocache installation and a running instance, so you may configure your applications that require repository artifact caching, like _maven_.
+
+Web administration interface: http://localhost:18081.
