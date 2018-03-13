@@ -20,7 +20,7 @@ public class InitCertsFolder {
 			installFile(certsFolder, "rootcerts.sh", true);
 			installFile(certsFolder, "template.cert.config", true);
 			
-			if(!new File(certsFolder, "public/repocache.qgears.com.cert").exists()
+			if(!new File(certsFolder, "public/repocache.qgears.com.crt").exists()
 			|| !new File(certsFolder, "keys/repocache.qgears.com.private").exists())
 			{
 				File script=new File(certsFolder, "rootcerts.sh");
