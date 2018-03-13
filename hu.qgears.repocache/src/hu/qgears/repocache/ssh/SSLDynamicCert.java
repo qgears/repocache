@@ -14,12 +14,16 @@ import hu.qgears.commons.UtilProcess;
  */
 public class SSLDynamicCert
 {
-	public SSLDynamicCert(File certsFolder)
+	private final File certsFolder;
+	private final Object lockObject=new Object();
+	private final String repocacheHostName;
+	
+	public SSLDynamicCert(File certsFolder, String repocacheHostName)
 	{
 		this.certsFolder=certsFolder;
+		this.repocacheHostName = repocacheHostName;
 	}
-	private File certsFolder;
-	private Object lockObject=new Object();
+	
 	public SSLServerSocketFactory openServer(String hostName) throws Exception
 	{
 		validateHostname(hostName);
@@ -28,8 +32,9 @@ public class SSLDynamicCert
 			if(!pkfile.exists())
 			{
 				File script=new File(certsFolder, "dynamiccert.sh");
-				// System.out.println("Site does not exist yet! '"+hostName+"' '"+ pkfile.getAbsolutePath()+"'");
-				ProcessBuilder pb=new ProcessBuilder(new String[]{script.getAbsolutePath(), hostName}).directory(certsFolder);
+				ProcessBuilder pb=new ProcessBuilder(new String[] {
+						script.getAbsolutePath(), hostName, repocacheHostName
+				}).directory(certsFolder);
 				Process p=pb.start();
 				String s=UtilProcess.execute(p);
 			}

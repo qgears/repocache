@@ -34,7 +34,8 @@ public class TransparentProxyTool extends AbstractTool
 				{
 					throw new RuntimeException("certsFolder is not specified");
 				}
-				dynamicCertSupplier=new SSLDynamicCert(certsFolder);
+				dynamicCertSupplier=new SSLDynamicCert(certsFolder,
+						"repocache.qgears.com");
 			}
 			return dynamicCertSupplier;
 		}

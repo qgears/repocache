@@ -13,6 +13,11 @@ public class CommandLineArgs implements IArgs
 	public File configFolder;
 	@JOHelp("Folder that contains the cached git repository. If not exists then it is created.")
 	public File repo;
+	@JOHelp("Host name of the server. This value is currently used to locate "
+			+ "the directory in which the self signed root CA signing key is "
+			+ "found. Use the same value as you passed as the parameter when "
+			+ "invoking the rootcerts.sh script during the installation!")
+	public String repocacheHostName="repocache.qgears.com";
 	@JOHelp("Http server port that is opened by the server")
 	public int port=8080;
 	@JOHelp("Http proxy server port that is opened by the server")
@@ -72,7 +77,8 @@ public class CommandLineArgs implements IArgs
 	{
 		if(dynamicCertSupplier==null)
 		{
-			dynamicCertSupplier=new SSLDynamicCert(getCertsFolder());
+			dynamicCertSupplier=new SSLDynamicCert(getCertsFolder(),
+					repocacheHostName);
 		}
 		return dynamicCertSupplier;
 	}
