@@ -1,6 +1,6 @@
 = Repocache Installation
 
-== Building repocache
+== Building and installing repocache
 
 Tools required for the build:
 
@@ -79,4 +79,51 @@ sudo service repocache start
 
 Now, you have a working HTTP proxy repocache installation and a running instance, so you may configure your applications that require repository artifact caching, like _maven_.
 
-Web administration interface: http://localhost:18081.
+Web administration interface: http://repocache.yourdomain.com:18081.
+
+Note that HTTPS proxying is not available at this stage; see the following chapter for the setup.
+
+== HTTPS proxy setup
+
+Scenario: setting up repocache as a HTTPS proxy with a self signed certificate, exclusively locally on a workstation.
+
+Assumption: the name `repocache.yourdomain.com` is a valid, resolvable domain name on your computer. For a single-workstation setup, ensure that the following entry is present in your `/etc/hosts` file:
+----
+127.0.1.1       repocache.yourdomain.com
+----
+
+Open http://repocache.yourdomain.com:18081/config.html and press the button titled ''Initialize certs folder''. The `/opt/repocache/certs` directory will be created.
+
+Customize the `certs/template.cert.config` with arbitrary data, then execute the `rootcerts.sh` script as follows, to create a certificate for the `repocache.yourdomain.com` hostname:
+
+[source,bash]
+----
+cd /opt/repocache/certs
+./rootcerts.sh repocache.yourdomain.com
+----
+
+This way, you will have a self signed certificate, that you will be able to use on your local workstation after installing it as follows:
+[source,bash]
+----
+cd /opt/repocache/certs/public
+sudo cp repocache.yourdomain.com.crt /usr/local/share/ca-certificates
+sudo update-ca-certificates
+# Update the init script to make repocache utilize the newly
+# generated certificate and signing keys
+sudo sed -i 's/--repocacheHostName\ repocache.qgears.com/--repocacheHostName\ repocache.yourdomain.com/g' /etc/init/repocache.conf
+# Restart repocache
+sudo service repocache restart
+----
+
+Now your workstation will accept the certificate and will be able to act as HTTPS proxy clients.
+
+TIP: If you want more workstations to use the currently configured repocache instance to use as an HTTPS repo artifact proxy, don't forget to copy the `repocache.yourdomain.com.crt` file to their `/usr/local/share/ca-certificate` folders and issue the `update-ca-certificates` command on all workstations.
+
+== Testing the HTTPS proxy download
+
+Issue the following command:
+
+[source,bash]
+----
+wget -e use_proxy=yes -e https_proxy=repocache.yourdomain.com:18083 https://repo1.maven.org/maven2/ant/ant/maven-metadata.xml
+----
