@@ -32,10 +32,6 @@ public class SSLDynamicCert
 				ProcessBuilder pb=new ProcessBuilder(new String[]{script.getAbsolutePath(), hostName}).directory(certsFolder);
 				Process p=pb.start();
 				String s=UtilProcess.execute(p);
-				// System.out.println("Process output: "+s);
-			}else
-			{
-				// System.out.println("Site already exists! '"+hostName+"' '"+ pkfile.getAbsolutePath()+"'");
 			}
 		}
 		SSLServerSocketFactory fact=SSLContextFactory.createContext(pkfile, "verysec", "site");
