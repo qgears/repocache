@@ -20,17 +20,16 @@ public class DecodedClientHandlerToProxy implements IDecodedClientHandler {
 	public void handleDecodedClient(Socket client, String targethost,
 			int targetport) {
 		try {
-			Socket proxy=new Socket(connectHost, connectPort);
-			proxy.getLocalPort();
-			System.out.println("Local port: "+proxy.getLocalPort());
-//			RewriteOutputStreamFilter rewrite=new RewriteOutputStreamFilter(proxy.getOutputStream(), targethost, targetport, rewriteInfo);
-				try(Connection c=new Connection("SSL plaintext "+targethost+":"+targetport, proxy, proxy.getOutputStream(), proxy.getInputStream(), false))
+			final Socket proxy=new Socket(connectHost, connectPort);
+			try(Connection c=new Connection("SSL plaintext "+targethost+":"+
+					targetport, proxy, proxy.getOutputStream(), 
+					proxy.getInputStream(), false)) {
+				try(RegistryEntry entry=HttpsProxyConnectionsManager.getInstance().register(
+						proxy.getLocalPort(), targethost, targetport, rewriteInfo))
 				{
-					try(RegistryEntry entry=HttpsProxyConnectionsManager.getInstance().register(proxy.getLocalPort(), targethost, targetport, rewriteInfo))
-					{
-						c.connectStreams(client, client.getInputStream(), client.getOutputStream());
-					}
+					c.connectStreams(client, client.getInputStream(), client.getOutputStream());
 				}
+			}
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
