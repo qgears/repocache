@@ -142,3 +142,19 @@ Issue the following command:
 ----
 wget -e use_proxy=yes -e https_proxy=repocache.yourdomain.com:18083 https://repo1.maven.org/maven2/ant/ant/maven-metadata.xml
 ----
+
+If the configuration has been successful, `wget` is expected to produce output similar to this:
+[source,bash]
+----
+--2018-03-19 15:16:04--  https://repo1.maven.org/maven2/ant/ant/maven-metadata.xml
+Resolving repocache.yourdomain.com (repocache.yourdomain.com)... 127.0.0.1
+Connecting to repocache.yourdomain.com (repocache.yourdomain.com)|127.0.0.1|:18083... connected.
+Proxy request sent, awaiting response... 200 OK
+Length: 537 [application/xml]
+Saving to: ‘maven-metadata.xml’
+
+100%[=========================================================================================================================================================================>] 537         --.-K/s   in 0s
+
+2018-03-19 15:16:05 (155 MB/s) - ‘maven-metadata.xml’ saved [537/537]
+
+----
