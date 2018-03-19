@@ -7,8 +7,18 @@ Tools required for the build:
 * OpenJDK 8
 * maven 3.3.9
 
-Build has been tested under Ubuntu 16.04.2 LTS.
+Build has been tested under Ubuntu 14.04.3 and 16.04.2 LTS.
 
+=== Steps specific to Ubuntu 14.04.3
+
+[source,bash]
+----
+sudo add-apt-repository ppa:openjdk-r/ppa
+sudo apt-get update
+sudo apt-get install openjdk-8-jdk
+----
+
+=== Generic steps
 
 Copy the following snippet into ~/.m2/toolchains.xml:
 [source,xml]
@@ -50,6 +60,8 @@ ls -lah
 
 # Selecting the most recently built jar file
 MOST_RECENT=$(ls -Art repocache-*.jar | tail -n 1)
+echo $MOST_RECENT
+
 INSTALL_DIR=/opt/repocache
 
 sudo mkdir $INSTALL_DIR
@@ -66,6 +78,9 @@ sudo chown root:root /etc/init/repocache.conf
 
 # Copying configuration:
 sudo cp hu.qgears.repocache/doc/sample-config/* /opt/repocache
+
+# Allowing write access to the current user
+sudo chown $(id -ng):$(id -nu) $INSTALL_DIR -Rc
 
 ----
 
