@@ -25,11 +25,10 @@ public class AccessLog {
 	}
 
 	private String path(ClientQuery q) {
-		String s=q.getPathString();
-		String orig=q.getOriginalPath().toStringPath();
-		if(!orig.equals(s))
-		{
-			return s+" (rewrite from: "+orig+")";
+		String s = q.getPathString();
+		String orig = q.getOriginalPathString();
+		if (!orig.equals(s)) {
+			return s + " (rewrite from: " + orig + ")";
 		}
 		return s;
 	}

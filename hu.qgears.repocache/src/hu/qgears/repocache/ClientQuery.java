@@ -54,18 +54,45 @@ abstract public class ClientQuery
 		return StringUtils.isEmptyOrNull(mimeType) ? "application/data" : mimeType;
 	}
 
+	/**
+	 * The current path of the request (after resolving aliases).
+	 * 
+	 * @return
+	 */
 	public Path getPath() {
 		return path;
 	}
 
+	/**
+	 * Returns the String representation of current path. Note that a '/' will be
+	 * appended before the path string.
+	 * 
+	 * @return
+	 */
 	public String getPathString() {
 		return "/"+getPath().toStringPath();
 	}
 
-	public void setPath(Path rewriteClientPath) {
-		this.path=rewriteClientPath;
+	/**
+	 * Returns the String representation of the original path. See {@link #getOriginalPath()}.
+	 * Note that a '/' will be appended before the path string.
+	 * 
+	 * @return
+	 */
+	public String getOriginalPathString() {
+		return "/"+getOriginalPath().toStringPath();
 	}
+
+	/**
+	 * The original path of the request ( before resolving aliases)
+	 * 
+	 * @return
+	 */
 	public Path getOriginalPath() {
 		return originalPath;
+	}
+
+	public void setPath(Path rewriteClientPath) {
+		this.path=rewriteClientPath;
 	}
 }
