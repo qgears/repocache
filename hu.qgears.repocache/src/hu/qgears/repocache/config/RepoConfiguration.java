@@ -63,6 +63,11 @@ public class RepoConfiguration {
 	protected int httpSoTimeoutMs = 0;
 	protected int httpConnectionTimeoutMs = 0;
 	
+	/** Upstream proxy server hostname or IP address - optional */
+	private String upstreamProxyHostname;
+	/** Upstream proxy server port - optional */
+	private Integer upstreamProxyPort;
+	
 	public static final String ACCESS_RULE_CONFIG_FILE = "access.config";
 	private final String pathClientAlias="client-alias.config";
 	private final String pathPluginsConfig="plugins.config";
@@ -92,6 +97,15 @@ public class RepoConfiguration {
 	 * Title of administration page in a web user interface.
 	 */
 	private String name = "Unconfigured repocache name";
+	
+	/**
+	 * @see #upstreamProxyHostname
+	 */
+	private static final String PROP_NAME_UPSTREAM_PROXY_HOST = "upstreamproxy.hostname";
+	/**
+	 * @see #upstreamProxyPort
+	 */
+	private static final String PROP_NAME_UPSTREAM_PROXY_PORT = "upstreamproxy.port";
 	
 	public final UtilEvent<RepoConfiguration> configChanged=new UtilEvent<>();
 	
@@ -176,6 +190,12 @@ public class RepoConfiguration {
 						PROP_NAME_HTTP_CONN_TIMEOUT, "0"));
 				this.httpSoTimeoutMs = Integer.parseInt(repoCacheProps.getProperty(
 						PROP_NAME_HTTP_SO_TIMEOUT, "0"));
+				this.upstreamProxyHostname = repoCacheProps.getProperty(
+						PROP_NAME_UPSTREAM_PROXY_HOST);
+				final String upstreamProxyPortString = repoCacheProps.getProperty(
+						PROP_NAME_UPSTREAM_PROXY_PORT);
+				this.upstreamProxyPort = upstreamProxyPortString == null
+						? null : Integer.parseInt(upstreamProxyPortString);
 				
 				return repoCacheProps;
 			}
@@ -206,6 +226,13 @@ public class RepoConfiguration {
 			repoCacheProps.setProperty(PROP_NAME_HTTP_SO_TIMEOUT, 
 					Integer.toString(httpSoTimeoutMs));
 			repoCacheProps.setProperty(PROP_NAME_BROWSER_TITLE, name);
+			
+			if (isUpstreamProxyConfigured()) {
+				repoCacheProps.setProperty(PROP_NAME_UPSTREAM_PROXY_HOST, 
+						upstreamProxyHostname);
+				repoCacheProps.setProperty(PROP_NAME_UPSTREAM_PROXY_PORT, 
+						Integer.toString(upstreamProxyPort));
+			}
 			
 			try (final FileWriter cfgWriter = new FileWriter(configFile)) {
 				repoCacheProps.store(cfgWriter, null);
@@ -501,5 +528,18 @@ public class RepoConfiguration {
 		}
 		UtilFile.saveAsFile(targetFile, content);
 		
+	}
+
+	public String getUpstreamProxyHostname() {
+		return upstreamProxyHostname;
+	}
+
+	public Integer getUpstreamProxyPort() {
+		return upstreamProxyPort;
+	}
+	
+	public boolean isUpstreamProxyConfigured() {
+		return upstreamProxyHostname != null && !upstreamProxyHostname.isEmpty()
+				&& upstreamProxyPort != null;
 	}
 }

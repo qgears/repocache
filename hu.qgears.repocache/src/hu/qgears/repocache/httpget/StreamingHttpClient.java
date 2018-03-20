@@ -12,6 +12,7 @@ import org.apache.commons.httpclient.Header;
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.HttpException;
 import org.apache.commons.httpclient.HttpStatus;
+import org.apache.commons.httpclient.ProxyHost;
 import org.apache.commons.httpclient.methods.GetMethod;
 import org.apache.commons.httpclient.params.HttpConnectionManagerParams;
 import org.apache.commons.httpclient.params.HttpMethodParams;
@@ -22,8 +23,39 @@ import hu.qgears.repocache.QueryResponse;
 import hu.qgears.repocache.config.RepoConfiguration;
 
 public class StreamingHttpClient {
+	private static final Log logger=LogFactory.getLog(StreamingHttpClient.class);
 	public static final int bufferSize=1024*1024;
-	final static Log logger=LogFactory.getLog(StreamingHttpClient.class);
+	
+	/**
+	 * Creates a configured HTTP client. 
+	 * @param get the HTTP get request, for fulfilling which, a client will be 
+	 * created
+	 * @return the HTTP client that will handle the get request
+	 */
+	private HttpClient createHttpClient(final HttpGet get) {
+		final RepoConfiguration repocacheConfig = get.getRepoConfiguration();
+		// Create an instance of HttpClient
+		// XXX a HttpClient can and is advised to be reused according to this:
+		// http://hc.apache.org/httpclient-3.x/performance.html#Reuse_of_HttpClient_instance
+		final HttpClient client = new HttpClient();
+		
+		if (repocacheConfig.isUpstreamProxyConfigured()) {
+			final ProxyHost proxyHost = new ProxyHost(
+					repocacheConfig.getUpstreamProxyHostname(), 
+					repocacheConfig.getUpstreamProxyPort());
+			client.getHostConfiguration().setProxyHost(proxyHost);
+		}
+		
+		final HttpConnectionManagerParams httpConnParams = 
+				client.getHttpConnectionManager().getParams();
+		
+		httpConnParams.setConnectionTimeout(repocacheConfig.getHttpConnectionTimeoutMs());
+		
+		httpConnParams.setSoTimeout(repocacheConfig.getHttpSoTimeoutMs());
+		
+		return client;
+	}
+	
 	/**
 	 * 
 	 * @param get
@@ -32,17 +64,7 @@ public class StreamingHttpClient {
 	 * @throws IOException
 	 */
 	public QueryResponse get(HttpGet get) throws HttpException, IOException {
-		// Create an instance of HttpClient
-		HttpClient client = new HttpClient();
-		
-		final HttpConnectionManagerParams httpConnParams = 
-				client.getHttpConnectionManager().getParams();
-		final RepoConfiguration repocacheConfig = get.getRepoConfiguration();
-		
-		httpConnParams.setConnectionTimeout(repocacheConfig.getHttpConnectionTimeoutMs());
-		
-		httpConnParams.setSoTimeout(repocacheConfig.getHttpSoTimeoutMs());
-		
+		final HttpClient client = createHttpClient(get);
 		// Create a method instance.
 		GetMethod method = new GetMethod(get.url);
 		
