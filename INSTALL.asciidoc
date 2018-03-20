@@ -5,7 +5,7 @@
 Tools required for the build:
 
 * OpenJDK 8
-* maven 3.3.9
+* maven (tested with 3.0.5 and 3.3.9)
 
 Build has been tested under Ubuntu 14.04.3 and 16.04.2 LTS.
 
