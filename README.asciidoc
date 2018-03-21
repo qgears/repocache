@@ -1,7 +1,5 @@
 = repocache
 
-[red] *This project is not ready yet! Please don't use for real!*
-
 Http and https cache proxy implementation with a goal to make work with online refreshed tools reproducible.
 
 Can be used to proxy installers, maven and p2 repositories. Amd maybe many others.
