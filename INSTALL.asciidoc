@@ -100,7 +100,9 @@ Note that HTTPS proxying is not available at this stage; see the following chapt
 
 == HTTPS proxy setup
 
-Scenario: setting up repocache as a HTTPS proxy with a self signed certificate, exclusively locally on a workstation.
+Scenario: setting up repocache as a MITM (man-in-the-middle) HTTPS proxy with a self signed certificate, exclusively locally on a workstation
+
+NOTE: As repocache is a cache, it has to decrypt encrypted communication to be able to store downloaded artifacts. This is why an own (self signed) key set and certificate is to be created and installed: when using repocache as a HTTPS proxy, decrypted traffic will be reencrypted using its generated private key and can be accepted by clients by utilizing the corresponding self-signed certificate.
 
 Assumption: the name `repocache.yourdomain.com` is a valid, resolvable domain name on your computer. For a single-workstation setup, ensure that the following entry is present in your `/etc/hosts` file:
 ----
@@ -158,3 +160,18 @@ Saving to: ‘maven-metadata.xml’
 2018-03-19 15:16:05 (155 MB/s) - ‘maven-metadata.xml’ saved [537/537]
 
 ----
+
+== Upstream proxy setup
+
+Repocache can be configured to download artifacts through an other proxy server, called 'upstream proxy' henceforth.
+
+The relevant settings can be set in the `repocache.config` file when repocache _is not running_:
+
+----
+upstreamproxy.hostname=upstreamproxy.yourdomain.com
+upstreamproxy.port=3128
+----
+
+WARNING: Repocache may delete the above settings from `repocache.config` file upon exiting, if they are inserted while repocache is running.
+
+NOTE: Currently, only HTTP upstream proxying is supported without authentication.
