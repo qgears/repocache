@@ -6,6 +6,8 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.SocketTimeoutException;
 
+import javax.net.ssl.SSLHandshakeException;
+
 import org.apache.commons.httpclient.ConnectTimeoutException;
 import org.apache.commons.httpclient.DefaultHttpMethodRetryHandler;
 import org.apache.commons.httpclient.Header;
@@ -124,6 +126,8 @@ public class StreamingHttpClient {
 			return ret;
 		} catch (final ConnectTimeoutException | SocketTimeoutException te) {
 			throw te;
+		} catch (final SSLHandshakeException she) {
+			throw she;
 		} finally {
 			get.close();
 			method.abort();

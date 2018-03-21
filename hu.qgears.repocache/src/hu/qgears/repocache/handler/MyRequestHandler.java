@@ -3,6 +3,7 @@ package hu.qgears.repocache.handler;
 import java.io.IOException;
 import java.net.SocketTimeoutException;
 
+import javax.net.ssl.SSLHandshakeException;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletResponse;
 
@@ -62,8 +63,11 @@ public abstract class MyRequestHandler extends AbstractHandler {
 					response.setStatus(HttpServletResponse.SC_NOT_FOUND);
 				}
 			}
-		} catch (final ConnectTimeoutException | SocketTimeoutException e) {
+		} catch (final ConnectTimeoutException | SocketTimeoutException te) {
 			response.setStatus(HttpServletResponse.SC_GATEWAY_TIMEOUT);
+			response.getOutputStream().close();
+		} catch (final SSLHandshakeException she) {
+			response.setStatus(HttpServletResponse.SC_BAD_GATEWAY);
 			response.getOutputStream().close();
 		}
 	}
@@ -126,6 +130,8 @@ public abstract class MyRequestHandler extends AbstractHandler {
 			}
 		} catch (final ConnectTimeoutException | SocketTimeoutException te) { 
 			throw te;
+		} catch (final SSLHandshakeException she) {
+			throw she;
 		} catch (Exception e) {
 			log.error("Error fetching file: "+path + ", message: " + e.getMessage());
 			q.rc.accessLog.errorDownloading(q);
