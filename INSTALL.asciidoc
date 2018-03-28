@@ -180,13 +180,21 @@ Saving to: ‘maven-metadata.xml’
 
 Repocache can be configured to download artifacts through an other proxy server, called 'upstream proxy' henceforth.
 
-The relevant settings can be set in the `repocache.config` file when repocache _is not running_:
+The relevant settings can be set either on the web user interface, while repocache is running, or in the `repocache.config` file, when repocache _is not running_:
 
 ----
 upstreamproxy.hostname=upstreamproxy.yourdomain.com
 upstreamproxy.port=3128
 ----
 
+Currently, only HTTP upstream proxying is supported without authentication.
+
 WARNING: Repocache may delete the above settings from `repocache.config` file upon exiting, if they are inserted while repocache is running.
 
-NOTE: Currently, only HTTP upstream proxying is supported without authentication.
+=== Exceptions from upstream proxying
+
+By default, all requests are routed through the upstream proxy if it is configured. However, there might be cases when the upstream proxy is not able to access a certain set of hosts.
+
+Upstream proxy exceptions can be configured on the web user interface, in the list titled ''_Exceptions_'' in the ''_Upstream proxy configuration_'' section, by specifying the full host names, one in each line. If repocache clients attempt downloading files from any of the specified hosts, the download will be performed directly, ignoring the upstream proxy.
+
+[small]#Example scenario: repocache is utilized for maven build processes in an enterprise environment, so that downloading files from the Internet is only permitted and possible through a corporate proxy, _but_ build artifacts are downloaded both from maven central repo _and_ mirrors hosted in the local network, which can be accessed only directly. If the corporate proxy is not able to access the mirrors in the local network, they have to be added to the upstream proxy exception list in repocace, so that files can be downloaded from the local mirrors directly.#
