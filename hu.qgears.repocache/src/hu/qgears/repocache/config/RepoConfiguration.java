@@ -63,10 +63,10 @@ public class RepoConfiguration {
 	protected int httpSoTimeoutMs = 0;
 	protected int httpConnectionTimeoutMs = 0;
 	
-	/** Upstream proxy server hostname or IP address - optional */
-	private String upstreamProxyHostname;
-	/** Upstream proxy server port - optional */
-	private Integer upstreamProxyPort;
+	/** Upstream HTTP proxy server hostname or IP address - optional */
+	private String upstreamHttpProxyHostname;
+	/** Upstream HTTP proxy server port - optional */
+	private Integer upstreamHttpProxyPort;
 	
 	public static final String ACCESS_RULE_CONFIG_FILE = "access.config";
 	private final String pathClientAlias="client-alias.config";
@@ -99,13 +99,13 @@ public class RepoConfiguration {
 	private String name = "Unconfigured repocache name";
 	
 	/**
-	 * @see #upstreamProxyHostname
+	 * @see #upstreamHttpProxyHostname
 	 */
-	private static final String PROP_NAME_UPSTREAM_PROXY_HOST = "upstreamproxy.hostname";
+	private static final String PROP_NAME_UPSTREAM_HTTP_PROXY_HOST = "upstreamproxy.hostname";
 	/**
-	 * @see #upstreamProxyPort
+	 * @see #upstreamHttpProxyPort
 	 */
-	private static final String PROP_NAME_UPSTREAM_PROXY_PORT = "upstreamproxy.port";
+	private static final String PROP_NAME_UPSTREAM_HTTP_PROXY_PORT = "upstreamproxy.port";
 	
 	public final UtilEvent<RepoConfiguration> configChanged=new UtilEvent<>();
 	
@@ -190,11 +190,11 @@ public class RepoConfiguration {
 						PROP_NAME_HTTP_CONN_TIMEOUT, "0"));
 				this.httpSoTimeoutMs = Integer.parseInt(repoCacheProps.getProperty(
 						PROP_NAME_HTTP_SO_TIMEOUT, "0"));
-				this.upstreamProxyHostname = repoCacheProps.getProperty(
-						PROP_NAME_UPSTREAM_PROXY_HOST);
+				this.upstreamHttpProxyHostname = repoCacheProps.getProperty(
+						PROP_NAME_UPSTREAM_HTTP_PROXY_HOST);
 				final String upstreamProxyPortString = repoCacheProps.getProperty(
-						PROP_NAME_UPSTREAM_PROXY_PORT);
-				this.upstreamProxyPort = upstreamProxyPortString == null
+						PROP_NAME_UPSTREAM_HTTP_PROXY_PORT);
+				this.upstreamHttpProxyPort = upstreamProxyPortString == null
 						? null : Integer.parseInt(upstreamProxyPortString);
 				
 				return repoCacheProps;
@@ -227,11 +227,14 @@ public class RepoConfiguration {
 					Integer.toString(httpSoTimeoutMs));
 			repoCacheProps.setProperty(PROP_NAME_BROWSER_TITLE, name);
 			
-			if (isUpstreamProxyConfigured()) {
-				repoCacheProps.setProperty(PROP_NAME_UPSTREAM_PROXY_HOST, 
-						upstreamProxyHostname);
-				repoCacheProps.setProperty(PROP_NAME_UPSTREAM_PROXY_PORT, 
-						Integer.toString(upstreamProxyPort));
+			if (isUpstreamHttpProxyConfigured()) {
+				repoCacheProps.setProperty(PROP_NAME_UPSTREAM_HTTP_PROXY_HOST, 
+						upstreamHttpProxyHostname);
+				repoCacheProps.setProperty(PROP_NAME_UPSTREAM_HTTP_PROXY_PORT, 
+						Integer.toString(upstreamHttpProxyPort));
+			} else {
+				repoCacheProps.remove(PROP_NAME_UPSTREAM_HTTP_PROXY_HOST);
+				repoCacheProps.remove(PROP_NAME_UPSTREAM_HTTP_PROXY_PORT);
 			}
 			
 			try (final FileWriter cfgWriter = new FileWriter(configFile)) {
@@ -530,16 +533,24 @@ public class RepoConfiguration {
 		
 	}
 
-	public String getUpstreamProxyHostname() {
-		return upstreamProxyHostname;
-	}
-
-	public Integer getUpstreamProxyPort() {
-		return upstreamProxyPort;
+	public String getUpstreamHttpProxyHostname() {
+		return upstreamHttpProxyHostname;
 	}
 	
-	public boolean isUpstreamProxyConfigured() {
-		return upstreamProxyHostname != null && !upstreamProxyHostname.isEmpty()
-				&& upstreamProxyPort != null;
+	public void setUpstreamHttpProxyHostname(String upstreamProxyHostname) {
+		this.upstreamHttpProxyHostname = upstreamProxyHostname;
+	}
+
+	public Integer getUpstreamHttpProxyPort() {
+		return upstreamHttpProxyPort;
+	}
+	
+	public void setUpstreamHttpProxyPort(final Integer upstreamProxyPort) {
+		this.upstreamHttpProxyPort = upstreamProxyPort;
+	}
+	
+	public boolean isUpstreamHttpProxyConfigured() {
+		return upstreamHttpProxyHostname != null && !upstreamHttpProxyHostname.isEmpty()
+				&& upstreamHttpProxyPort != null;
 	}
 }

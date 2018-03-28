@@ -41,10 +41,10 @@ public class StreamingHttpClient {
 		// http://hc.apache.org/httpclient-3.x/performance.html#Reuse_of_HttpClient_instance
 		final HttpClient client = new HttpClient();
 		
-		if (repocacheConfig.isUpstreamProxyConfigured()) {
+		if (repocacheConfig.isUpstreamHttpProxyConfigured()) {
 			final ProxyHost proxyHost = new ProxyHost(
-					repocacheConfig.getUpstreamProxyHostname(), 
-					repocacheConfig.getUpstreamProxyPort());
+					repocacheConfig.getUpstreamHttpProxyHostname(), 
+					repocacheConfig.getUpstreamHttpProxyPort());
 			client.getHostConfiguration().setProxyHost(proxyHost);
 		}
 		
@@ -52,7 +52,6 @@ public class StreamingHttpClient {
 				client.getHttpConnectionManager().getParams();
 		
 		httpConnParams.setConnectionTimeout(repocacheConfig.getHttpConnectionTimeoutMs());
-		
 		httpConnParams.setSoTimeout(repocacheConfig.getHttpSoTimeoutMs());
 		
 		return client;
