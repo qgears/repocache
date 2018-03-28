@@ -64,7 +64,7 @@ public class CommitTimer implements Callable<Object>{
 	public void executeCommit(final String commitMessage) 
 			throws IOException, NoFilepatternException, GitAPIException {
 		if (commitMessage != null && !commitMessage.isEmpty()) {
-			this.commitMessage.insert(0, commitMessage);
+			this.commitMessage.insert(0, commitMessage + System.lineSeparator());
 		}
 		
 		synchronized (rc) {
