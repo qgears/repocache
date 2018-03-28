@@ -39,16 +39,42 @@ public class CommitTimer implements Callable<Object>{
 		UtilTimer.getInstance().executeTimeout(timeoutMillis+10, this);
 		commitStateChanged.eventHappened(this);
 	}
-	public void executeCommit() throws IOException, NoFilepatternException, GitAPIException
-	{
+	
+	/**
+	 * Executes a commit on the cache, so that only automatically added commit
+	 * messages will be saved. This method calls {@link #executeCommit(String)}
+	 * with {@code null} as the parameter.
+	 * @throws IOException passed up from {@link #executeCommit(String)} 
+	 * @throws NoFilepatternException passed up from {@link #executeCommit(String)}
+	 * @throws GitAPIException passed up from {@link #executeCommit(String)}
+	 * @see #executeCommit(String)
+	 */
+	public void executeCommit() throws NoFilepatternException, IOException, GitAPIException {
+		executeCommit(null);
+	}
+	
+	/**
+	 * Executes a commit on the cache.
+	 * @param commitMessage if not null, it will be prepended to the 
+	 * automatically added commit messages
+	 * @throws IOException passed up from {@link RepoCache#assertStatusClean()}
+	 * @throws NoFilepatternException TODO 
+	 * @throws GitAPIException TODO
+	 */
+	public void executeCommit(final String commitMessage) 
+			throws IOException, NoFilepatternException, GitAPIException {
+		if (commitMessage != null && !commitMessage.isEmpty()) {
+			this.commitMessage.insert(0, commitMessage);
+		}
+		
 		synchronized (rc) {
-			if(commitMessage.length()>0)
+			if(this.commitMessage.length()>0)
 			{
 				rc.git.add().addFilepattern(".").call();
-				rc.git.commit().setMessage(commitMessage.toString()).call();
+				rc.git.commit().setMessage(this.commitMessage.toString()).call();
 				rc.assertStatusClean();
 				log.info("Git commit executed!");
-				commitMessage=new StringBuilder();
+				this.commitMessage=new StringBuilder();
 			}
 		}
 		commitStateChanged.eventHappened(this);
