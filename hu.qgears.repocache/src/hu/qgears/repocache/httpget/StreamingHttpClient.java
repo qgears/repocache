@@ -4,7 +4,10 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.net.MalformedURLException;
 import java.net.SocketTimeoutException;
+import java.net.URL;
+import java.util.List;
 
 import javax.net.ssl.SSLHandshakeException;
 
@@ -29,19 +32,43 @@ public class StreamingHttpClient {
 	public static final int bufferSize=1024*1024;
 	
 	/**
+	 * Determines whether a get request is to be routed through an upstream
+	 * proxy or not, based on the host name extracted from the request and the
+	 * contents of the {@link RepoConfiguration#getUpstreamProxyExceptionList()
+	 * upstream proxy exception list}. 
+	 * @param get the request, of which it is to be determined whether it is to
+	 * be routed through a proxy server or not 
+	 * @return {@code true} if the get request is to be proxied, {@code false}
+	 * otherwise
+	 * @throws MalformedURLException if the {@link HttpGet#url} cannot be 
+	 * converted to a {@link URL}
+	 */
+	private boolean isUpstreamProxyException(final HttpGet get) throws MalformedURLException {
+		final URL url = new URL(get.url);
+		final RepoConfiguration repoConfig = get.getRepoConfiguration();
+		final List<String> upstreamProxyExceptionList = 
+				repoConfig.getUpstreamProxyExceptionList();
+		
+		return upstreamProxyExceptionList.contains(url.getHost());
+	}
+	
+	/**
 	 * Creates a configured HTTP client. 
 	 * @param get the HTTP get request, for fulfilling which, a client will be 
 	 * created
 	 * @return the HTTP client that will handle the get request
+	 * @throws MalformedURLException if the {@link HttpGet#url} cannot be 
+	 * converted to a {@link URL}
 	 */
-	private HttpClient createHttpClient(final HttpGet get) {
+	private HttpClient createHttpClient(final HttpGet get) throws MalformedURLException {
 		final RepoConfiguration repocacheConfig = get.getRepoConfiguration();
 		// Create an instance of HttpClient
 		// XXX a HttpClient can and is advised to be reused according to this:
 		// http://hc.apache.org/httpclient-3.x/performance.html#Reuse_of_HttpClient_instance
 		final HttpClient client = new HttpClient();
 		
-		if (repocacheConfig.isUpstreamHttpProxyConfigured()) {
+		if (repocacheConfig.isUpstreamHttpProxyConfigured()
+				&& !isUpstreamProxyException(get)) {
 			final ProxyHost proxyHost = new ProxyHost(
 					repocacheConfig.getUpstreamHttpProxyHostname(), 
 					repocacheConfig.getUpstreamHttpProxyPort());

@@ -6,6 +6,8 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Properties;
 
@@ -67,6 +69,12 @@ public class RepoConfiguration {
 	private String upstreamHttpProxyHostname;
 	/** Upstream HTTP proxy server port - optional */
 	private Integer upstreamHttpProxyPort;
+	/** Hosts that are exceptions from upstream proxying */
+	private String upstreamProxyExceptions;
+	/**
+	 * Always synchronized to {@link #upstreamProxyExceptions}
+	 */
+	private List<String> upstreamProxyExceptionList;
 	
 	public static final String ACCESS_RULE_CONFIG_FILE = "access.config";
 	private final String pathClientAlias="client-alias.config";
@@ -106,6 +114,10 @@ public class RepoConfiguration {
 	 * @see #upstreamHttpProxyPort
 	 */
 	private static final String PROP_NAME_UPSTREAM_HTTP_PROXY_PORT = "upstreamproxy.port";
+	/**
+	 * @see #upstreamProxyExceptions 
+	 */
+	private static final String PROP_NAME_UPSTREAM_PROXY_EXCEPTIONS = "upstreamproxy.exceptions";
 	
 	public final UtilEvent<RepoConfiguration> configChanged=new UtilEvent<>();
 	
@@ -196,6 +208,9 @@ public class RepoConfiguration {
 						PROP_NAME_UPSTREAM_HTTP_PROXY_PORT);
 				this.upstreamHttpProxyPort = upstreamProxyPortString == null
 						? null : Integer.parseInt(upstreamProxyPortString);
+				this.upstreamProxyExceptions = repoCacheProps.getProperty(
+						PROP_NAME_UPSTREAM_PROXY_EXCEPTIONS);
+						
 				
 				return repoCacheProps;
 			}
@@ -236,6 +251,9 @@ public class RepoConfiguration {
 				repoCacheProps.remove(PROP_NAME_UPSTREAM_HTTP_PROXY_HOST);
 				repoCacheProps.remove(PROP_NAME_UPSTREAM_HTTP_PROXY_PORT);
 			}
+			
+			repoCacheProps.setProperty(PROP_NAME_UPSTREAM_PROXY_EXCEPTIONS, 
+					upstreamProxyExceptions);
 			
 			try (final FileWriter cfgWriter = new FileWriter(configFile)) {
 				repoCacheProps.store(cfgWriter, null);
@@ -552,5 +570,28 @@ public class RepoConfiguration {
 	public boolean isUpstreamHttpProxyConfigured() {
 		return upstreamHttpProxyHostname != null && !upstreamHttpProxyHostname.isEmpty()
 				&& upstreamHttpProxyPort != null;
+	}
+
+	public String getUpstreamProxyExceptions() {
+		return upstreamProxyExceptions;
+	}
+	
+	public List<String> getUpstreamProxyExceptionList() {
+		if (upstreamProxyExceptionList == null) {
+			if (upstreamProxyExceptions != null && !upstreamProxyExceptions.isEmpty()) {
+				/* Properties class will insert line endings as "\r\n" */ 
+				upstreamProxyExceptionList = Collections.unmodifiableList(
+						Arrays.asList(upstreamProxyExceptions.split("\r\n")));
+			} else {
+				upstreamProxyExceptionList = Collections.emptyList();
+			}
+		}
+		
+		return upstreamProxyExceptionList;
+	}
+
+	public void setUpstreamProxyExceptions(final String upstreamProxyExceptions) {
+		this.upstreamProxyExceptions = upstreamProxyExceptions;
+		this.upstreamProxyExceptionList = null;
 	}
 }
