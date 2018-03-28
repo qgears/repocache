@@ -184,6 +184,15 @@ public class RepoCache {
 		return sc;
 	}
 
+	/**
+	 * Checks whether the cache repository is clean, i. e. is ready to be 
+	 * committed to. 
+	 * @throws IOException either if the {@link #versionFilePath version file}
+	 * cannot be read or the repository version stored in that file is 
+	 * unexpected   
+	 * @throws NoWorkTreeException
+	 * @throws GitAPIException
+	 */
 	public void assertStatusClean() throws IOException, NoWorkTreeException, GitAPIException {
 		synchronized (this) {
 			Status status = git.status().call();
