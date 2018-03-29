@@ -120,7 +120,7 @@ public class RepoCache {
 				+ ", isBare: " + repository.isBare());
 		worktree = git.getRepository().getWorkTree();
 		assertStatusClean();
-		DispatchByPortHandler dispatchHandler = new DispatchByPortHandler();
+		DispatchByPortHandler dispatchHandler = new DispatchByPortHandler(this);
 		RepoHandler rh = new RepoHandler(this);
 
 		server = new Server();
