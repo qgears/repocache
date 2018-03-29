@@ -159,8 +159,12 @@ public class ConfigHandler2 extends hu.qgears.quickjs.utils.AbstractQPage
 			
 			upstreamHttpProxyHostEditor.text.setPropertyFromServer(
 					repoCacheConfig.getUpstreamHttpProxyHostname());
-			upstreamHttpProxyPortEditor.text.setPropertyFromServer(Integer.toString(
-					repoCacheConfig.getUpstreamHttpProxyPort()));
+			final Integer upstreamHttpProxyPort = 
+					repoCacheConfig.getUpstreamHttpProxyPort();
+			if (upstreamHttpProxyPort != null) {
+				upstreamHttpProxyPortEditor.text.setPropertyFromServer(
+						Integer.toString(upstreamHttpProxyPort));
+			}
 			upstreamProxyExceptions.text.setPropertyFromServer(
 					repoCacheConfig.getUpstreamProxyExceptions());
 			
