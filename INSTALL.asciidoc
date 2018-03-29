@@ -1,5 +1,7 @@
 = Repocache Installation
 
+:toc:
+
 == Building and installing repocache
 
 Tools required for the build:
@@ -197,4 +199,67 @@ By default, all requests are routed through the upstream proxy if it is configur
 
 Upstream proxy exceptions can be configured on the web user interface, in the list titled ''_Exceptions_'' in the ''_Upstream proxy configuration_'' section, by specifying the full host names, one in each line. If repocache clients attempt downloading files from any of the specified hosts, the download will be performed directly, ignoring the upstream proxy.
 
+Relevant settings in the `repocache.config` file:
+
+----
+upstreamproxy.hostname=upstreamproxy.yourdomain.com
+upstreamproxy.port=3128
+upstreamproxy.exceptions=upstreamproxyexception.com\r\ndonotproxyme.intranet.net\r\nlocalhost
+----
+
 [small]#Example scenario: repocache is utilized for maven build processes in an enterprise environment, so that downloading files from the Internet is only permitted and possible through a corporate proxy, _but_ build artifacts are downloaded both from maven central repo _and_ mirrors hosted in the local network, which can be accessed only directly. If the corporate proxy is not able to access the mirrors in the local network, they have to be added to the upstream proxy exception list in repocace, so that files can be downloaded from the local mirrors directly.#
+
+== Operation modes
+
+The repocache proxy supports different usage scenarios by certain operation modes. See the case study that gives an example how these settings are to be applied in practice.
+
+Click on the links to read the related documentation in the source code comments on how repocache can operate, i. e. what caching policies are implemented!
+
+* https://github.com/qgears/repocache/blob/7644ba4e65d55572b4e240a34eb34558b3fa8d57/hu.qgears.repocache/src/hu/qgears/repocache/config/RepoMode.java#L32[*update* mode]
+* https://github.com/qgears/repocache/blob/7644ba4e65d55572b4e240a34eb34558b3fa8d57/hu.qgears.repocache/src/hu/qgears/repocache/config/RepoMode.java#L23[*add* mode]
+* https://github.com/qgears/repocache/blob/7644ba4e65d55572b4e240a34eb34558b3fa8d57/hu.qgears.repocache/src/hu/qgears/repocache/config/RepoMode.java#L15[*readonly* mode]
+* https://github.com/qgears/repocache/blob/7644ba4e65d55572b4e240a34eb34558b3fa8d57/hu.qgears.repocache/src/hu/qgears/repocache/config/RepoMode.java#L38[*transparent* mode]
+
+These operation modes can be configured either globally or per-site, in the `access.config` configuration file.
+
+=== Format of the `access.config` file
+
+The `access.config` file consists of `[operation-mode whitespace-separators host-and-path-fragment]` triplets, one in each line (without the square brackets).
+
+The `host-and-path-fragment` is a part of the host name and path parts of the URI, mapped into an internal format,
+
+* prefixed with the `/proxy/` string,
+* including the protocol, via which the artifact is accessed (`http` or `https`),
+* including a fragment of the host name and path of artifacts as follows:
+
+`/proxy/[http|https]/hostname.com/path-fragment`
+
+Example:
+----
+# Maven is additional, artifacts do not change in it.
+# If new ones are required, those are downloaded,
+# anyway, everything artifacts are served from the cache,
+# the URL of which contains the 'repo1.maven.org/maven2'
+# string:
+add /proxy/http/repo1.maven.org/maven2
+
+# Repocache will not store the contents of an internal,
+# manually maintained download site, as that would be
+# unnecessary redundancy:
+transparent /proxy/http/your.intranet.net/some-repo
+
+----
+
+The default https://github.com/qgears/repocache/blob/master/hu.qgears.repocache/doc/sample-config/access.config[access.config] configuration file provided in the sample configuration makes repocache work in `update` mode for all sites. This is likely to be suitable for creating the initial repository contents.
+
+== Site aliasespath
+
+Problem: certain repositories publish their contents...
+
+* both via HTTP and HTTPS protocol, or
+* via more than one domain names, or
+* via domain names and paths changing in time.
+
+So proxy clients may download the same artifacts via different URLs. If they do, repocache will store these artifacts more than once, redundantly.
+
+TODO finish this!

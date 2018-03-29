@@ -1,0 +1,8 @@
+= Case study on utiliting the repocache proxy
+
+The repocache is designed to solve the following problem:
+
+* There is a maven-based autobuild process, which relies on access to the Maven Central repository and different P2 (OSGi) repositories,
+*
+
+TODO finish this
