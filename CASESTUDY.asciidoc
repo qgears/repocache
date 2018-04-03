@@ -1,8 +1,84 @@
-= Case study on utiliting the repocache proxy
+= Case study on utilizing the repocache proxy
 
 The repocache is designed to solve the following problem:
 
-* There is a maven-based autobuild process, which relies on access to the Maven Central repository and different P2 (OSGi) repositories,
-*
+* there is a 'maven'-based autobuild process, which relies on access to the Maven Central repository and different P2 repositories
+* the result of the build process must be reproducible on the long term, in certain states, i. e. at tagged SCM-revisions
+* the build processes must work without Internet connection
+* the build processes must run in a corporate networking environment, in which accessing the Internet is only available through corporate HTTP proxy servers
 
-TODO finish this
+Further factors to consider:
+
+* maven, by principle, requires Internet connection, at least for the first build, when it is populating its local caches (initializing a maven build process without Internet connection may be possible, but cumbersome and hard to manage)
+* 3rd party repositories used by maven may change over time:
+** new items may be added to remote repositories without notice, resulting in change in the set of dependencies of the autobuild process and possibly altering the build output
+** items may be deleted or may become inaccessible by various reasons (for example, a mirror site gets deleted, renamed or reorganized)
+* the build process may evolve or change, therefore its build dependencies may change, too
+* ensuring long term reproducibility should not imply large scale changes in build process code, configuration and modification in 3rd party components,
+* build dependencies should not be stored in the same source code management system as the source of the project for practical reasons, such as avoiding to pollute developer workstations with hundreds or thousands of megabytes of obsolete build artifacts,
+* easy maintainability when build process changes
+
+== Requirements
+
+A tool is to be implemented that fulfills the following requirements:
+
+* the tool must be a *server*, that stores artifacts a build dependencies once, for all client build servers and developer workstations
+* all states of build dependencies must to be stored, and any state must by available all the time -> build dependency sets are to be versioned, too, in an underlying version control system, henceforth VCS
+* GIT must be used as underlying VCS
+* an environment for maven is to be simulated, as if it was run in the past, with all the required dependencies being available in the past, not less and not more to avoid uncontrolled dependency changes by 3rd party build libraries
+* *HTTP proxy server interface* is to be provided...
+** for its small impact on the build system by its easy configurability in maven and any other tools, and
+** to simulate past remote repository states for maven
+* *HTTP proxy client interface* is to be provided for being able to work in corporate environments - the corporate proxy, through which downloads will be performed, is called henceforth 'upstream proxy' server
+* *operation modes* must be provided to support the following operations:
+** *updating* the dependencies with working Internet connection or upstream proxy to support build system changes
+** *offline mode* to support regular builds: artifacts through the HTTP proxy server interface must be available even if there is no connection to the Internet or the upstream proxies
+* *WEB-based user interface* is to be provided with the following functions:
+** displaying the changes of dependencies for an administrator user, i. e. showing the newly downloaded or changed artifacts
+** allowing the administrator to *save a new state* (i. e. commit the new state of the artifact repository) or *discard the changes*
+
+== Usage
+
+=== Deployment
+
+* repocache is configured as written in the installation guide and is set up on a machine which has a server role
+* an upstream proxy server is configured if direct Internet connection is not available
+* maven is configured so that is will use repocache as a proxy server - settings required in the `~/.m2/settings.xml` are https://maven.apache.org/guides/mini/guide-proxies.html[documented here]
+* the version of maven and even Java Development Environment is strongly advised to be managed, as the dependency set may change over maven versions:
+** maven and JDK versions are to be stored, so they can be reverted later
+** after each version upgrade (change), the list of changes
+
+=== First build
+
+* repocache is to be configured in *update* mode globally for all repositories maven is going to access
+* the `~/.m2/repository` folder must be empty
+* the maven-based build process is to be run, so maven will download all required artifacts, which repocache will store with downloaded repository metadata
+* a list of downloaded artifacts will be presented on the web UI of repocache: it may either be committed with a user-defined commit comment or will automatically be committed after a 5 minute delay
+* the repocache repository, may be tagged after being prepared, for example, by using the git command line interface
+
+=== Regular builds
+
+During subsequent, regular builds, repocache has to be run in read-only mode, so maven will always detect the last metadata and build artifact set downloaded through repocache.
+
+Details:
+
+* repocache is to be run in read-only mode
+** dependency sets detected by maven will not change this way
+** builds are not expected to break by repository-related problems
+* reconfiguration from 'update mode' to 'read-only mode' can be performed during runtime, on the WEB UI
+
+=== Maven or JDK version upgrades & build config changes
+
+* old Maven and JDK binaries are stored
+* after upgrading maven or JDK or applying changes to the build dependencies, repocache is to be configured in *update* mode
+* maven build is to be performed
+* newly downloaded dependencies have to be committed
+* the new state of the repocache repository is to be tagged
+
+=== Rolling back to an earlier state
+
+* repocache is to be switched to *read-only* mode
+* maven and JDK binaries are to be reverted if necessary
+* the underlying git repo must be checked out to the appropriate state (for example, by previously placed tags)
+* repocache will serve the previously reverted state
+* maven build is to be run 
