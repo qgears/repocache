@@ -1,0 +1,13 @@
+= Repocache release notes
+
+== 2.2.0
+
+* tag: https://github.com/qgears/repocache/tree/v2.2.0.201804051438
+* new features:
+** https://github.com/qgears/repocache/issues/1[upstream proxy support],  https://github.com/qgears/repocache/commit/f5bdb92c296cdcceaecfd5ef1bfe945cc093788c[web UI configuration for it], and https://github.com/qgears/repocache/issues/10[defining exceptions from upstream proxying]
+** https://github.com/qgears/repocache/issues/11[user-specified commit message can be added now] when updating the contents of the cache
+* autobuild improvement: https://github.com/qgears/repocache/commit/3bfddce4a9b70dc8a380c0e066e39eef26e68b84[standalone, runnable jar is included into the P2 repository during autobuild]
+* error handling improvements:
+** https://github.com/qgears/repocache/commit/98b9e7304630bc371aeb752994b2a927be75ed7c[returning error code 502 instead of 404 in case of SSL handshake error]
+** https://github.com/qgears/repocache/commit/6e1f9f88d8d1c1842a5c2c8d5f6125c8915c6a80[giving error 400 and easy-to-interpret error message if clients are configured erroneously and send proxy requests to the WEB UI port]
+* documentation improvements; adding https://github.com/qgears/repocache/blob/master/CASESTUDY.asciidoc[case study]
