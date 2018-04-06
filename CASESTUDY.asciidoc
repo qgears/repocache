@@ -2,10 +2,10 @@
 
 The repocache is designed to solve the following problem:
 
-* there is a 'maven'-based autobuild process, which relies on access to the Maven Central repository and different P2 repositories
+* there is a 'maven'-based autobuild process, which relies on access to the Maven Central repository and various P2 repositories
 * the result of the build process must be reproducible on the long term, in certain states, i. e. at tagged SCM-revisions
 * the build processes must work without Internet connection
-* the build processes must run in a corporate networking environment, in which accessing the Internet is only available through corporate HTTP proxy servers
+* the build processes must run in a corporate networking environment, in which accessing the Internet is only possible through corporate HTTP proxy servers
 
 Further factors to consider:
 
@@ -46,7 +46,7 @@ A tool is to be implemented that fulfills the following requirements:
 * maven is configured so that is will use repocache as a proxy server - settings required in the `~/.m2/settings.xml` are https://maven.apache.org/guides/mini/guide-proxies.html[documented here]
 * the version of maven and even Java Development Environment is strongly advised to be managed, as the dependency set may change over maven versions:
 ** maven and JDK versions are to be stored, so they can be reverted later
-** after each version upgrade (change), the list of changes
+** after each version upgrade (change), the list of changes of dependencies should be reviewed and committed
 
 === First build
 
@@ -69,7 +69,7 @@ Details:
 
 === Maven or JDK version upgrades & build config changes
 
-* old Maven and JDK binaries are stored
+* obsolete Maven and JDK binaries are to be stored
 * after upgrading maven or JDK or applying changes to the build dependencies, repocache is to be configured in *update* mode
 * maven build is to be performed
 * newly downloaded dependencies have to be committed
@@ -81,4 +81,4 @@ Details:
 * maven and JDK binaries are to be reverted if necessary
 * the underlying git repo must be checked out to the appropriate state (for example, by previously placed tags)
 * repocache will serve the previously reverted state
-* maven build is to be run 
+* maven build is to be run
